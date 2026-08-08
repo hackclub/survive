@@ -1,0 +1,19 @@
+.DS_Store
+Thumbs.db
+*~
+*.swp
+.idea/
+.vscode/
+
+node_modules/
+.env
+.env.*
+!.env.example
+
+log/
+tmp/
+*.log
+
+# Ignore key files for decrypting credentials and more.
+/config/*.key
+
