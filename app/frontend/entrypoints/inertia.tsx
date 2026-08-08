@@ -6,6 +6,7 @@ import '../styles/nav.css'
 import '../styles/buttons.css'
 import '../styles/scene.css'
 import '../styles/trail.css'
+import '../styles/faq.css'
 
 void createInertiaApp({
   pages: "../pages",
