@@ -19,7 +19,11 @@ Rails.application.routes.draw do
   delete "auth/signout" => "auth#destroy", as: :signout
 
   get "dashboard" => "dashboard#index", as: :dashboard
-  resources :projects, only: %i[new create]
+  resources :projects, only: %i[new create show update] do
+    member do
+      post :submit_for_review
+    end
+  end
 
   # Defines the root path route ("/")
   root "landing#index"

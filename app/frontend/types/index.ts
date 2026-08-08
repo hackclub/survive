@@ -26,6 +26,7 @@ export type ProjectStatus = "draft" | "pending" | "approved" | "rejected"
 export type Project = {
   id: number
   name: string
+  description: string | null
   status: ProjectStatus
   repoLink: string | null
   demoLink: string | null

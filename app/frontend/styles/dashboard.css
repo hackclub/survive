@@ -43,17 +43,46 @@
 
 .dashboard__row {
   display: flex;
-  align-items: center;
-  gap: var(--sp-4);
+  flex-direction: column;
+  gap: var(--sp-2);
   padding: var(--sp-4) var(--sp-5);
   border-radius: var(--r-md);
   background: var(--bg-raised);
   border: 1px solid var(--line);
+  transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+
+.dashboard__row:hover {
+  border-color: var(--line-strong);
+  transform: translateY(-1px);
+}
+
+.dashboard__row-top {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-4);
 }
 
 .dashboard__name {
   font-weight: 700;
   flex: 1;
+}
+
+.dashboard__description {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard__row-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-4);
+}
+
+.dashboard__row-meta span:not(:first-child) {
+  padding-left: var(--sp-4);
+  border-left: 1px solid var(--line);
 }
 
 .dashboard__status {
@@ -84,8 +113,4 @@
 .dashboard__status--rejected {
   color: var(--rust-800);
   background: var(--rust-200);
-}
-
-.dashboard__updated {
-  white-space: nowrap;
 }

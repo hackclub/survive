@@ -75,3 +75,8 @@
   outline: 3px solid var(--rust-500);
   outline-offset: 1px;
 }
+
+.project-form__actions {
+  display: flex;
+  gap: var(--sp-3);
+}

@@ -13,4 +13,16 @@ class Project < ApplicationRecord
   def submit!
     update!(status: :pending)
   end
+
+  def as_client_json
+    {
+      id: id,
+      name: name,
+      description: description,
+      status: status,
+      repoLink: repo_link,
+      demoLink: demo_link,
+      updatedAt: updated_at.strftime("%b %d, %Y")
+    }
+  end
 end
