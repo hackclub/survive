@@ -14,8 +14,8 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   get "signin" => "auth#show", as: :signin
-  get "auth/hca/start" => "auth#new", as: :hca_start
-  get "auth/hca/callback" => "auth#create", as: :hca_callback
+  get "auth/hack_club/callback" => "auth#create", as: :hack_club_callback
+  get "auth/failure" => "auth#failure", as: :auth_failure
   delete "auth/signout" => "auth#destroy", as: :signout
 
   get "dashboard" => "dashboard#index", as: :dashboard

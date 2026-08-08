@@ -7,12 +7,8 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :display_name, presence: true
 
-  def self.exchange_hca_token(code, redirect_uri)
-    token_data = HcaService.exchange_code_for_token(code, redirect_uri)
-    raise StandardError, "Failed to exchange authorization code for an HCA access token" unless token_data
-
-    access_token = token_data["access_token"]
-    raise StandardError, "No access token in HCA response" unless access_token
+  def self.exchange_hca_token(access_token)
+    raise StandardError, "No access token from HCA" if access_token.blank?
 
     hca_response = HcaService.me(access_token)
     raise StandardError, "Failed to fetch user identity from HCA" unless hca_response

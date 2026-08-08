@@ -2,6 +2,11 @@ import { Head } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 
 export default function SignIn() {
+  const csrfToken =
+    typeof document !== "undefined"
+      ? document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || ""
+      : ""
+
   return (
     <>
       <Head title="Sign in - Survive" />
@@ -15,9 +20,12 @@ export default function SignIn() {
             One click with your Hack Club account. If you don't have one yet, making it takes
             about a minute.
           </p>
-          <a className="btn btn--primary btn--lg" href="/auth/hca/start">
-            Continue with Hack Club
-          </a>
+          <form action="/auth/hack_club" method="post">
+            <input type="hidden" name="authenticity_token" value={csrfToken} />
+            <button className="btn btn--primary btn--lg" type="submit">
+              Continue with Hack Club
+            </button>
+          </form>
         </div>
       </main>
     </>
