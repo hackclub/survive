@@ -36,6 +36,9 @@ gem "image_processing", "~> 1.2"
 
 gem "faraday", "~> 2.13"
 gem "pundit", "~> 2.4"
+gem "omniauth"
+gem "omniauth-oauth2"
+gem "omniauth-rails_csrf_protection"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
