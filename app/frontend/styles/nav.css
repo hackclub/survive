@@ -135,3 +135,20 @@
   transform: translateY(-6px) rotate(-45deg);
 }
 
+.nav__who {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ink);
+  padding-inline: 0.5rem;
+}
+
+.nav__avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+

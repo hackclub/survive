@@ -66,7 +66,6 @@ class User < ApplicationRecord
       display_name: first_name.presence || identity["id"] || "User",
       first_name: first_name.presence,
       last_name: last_name.presence,
-      avatar: identity["profile_picture"].presence,
       slack_id: identity["slack_id"] || "",
       verification_status: identity["verification_status"] || "",
       hca_token: access_token,
@@ -97,6 +96,12 @@ class User < ApplicationRecord
     }.compact
 
     update!(attrs) if attrs.any?
+  end
+
+  def avatar_url
+    return nil if slack_id.blank?
+
+    "https://cachet.hackclub.com/users/#{slack_id}/r"
   end
 
   def reviewer?

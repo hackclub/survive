@@ -1,6 +1,13 @@
+import { usePage } from "@inertiajs/react"
 import mark from "../images/mark.webp"
 
 export function Nav() {
+  const { auth, signInPath, signOutPath } = usePage().props
+  const csrfToken =
+    typeof document !== "undefined"
+      ? document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || ""
+      : ""
+
   return (
     <nav className="nav" data-nav>
       <div className="nav__shell">
@@ -34,21 +41,51 @@ export function Nav() {
         </div>
 
         <div className="nav__actions">
-          <a className="btn btn--ghost btn--sm" href="/dashboard">
-            Sign in
-          </a>
-          <a className="btn btn--primary btn--sm" href="/dashboard">
-            Ship a project
-            <svg className="btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M5 12h13m0 0-5-5m5 5-5 5"
-                stroke="currentColor"
-                strokeWidth="2.2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
+          {auth.user ? (
+            <>
+              <span className="nav__who">
+                {auth.user.avatar && <img className="nav__avatar" src={auth.user.avatar} alt="" />}
+                {auth.user.displayName}
+              </span>
+              <form action={signOutPath} method="post">
+                <input type="hidden" name="_method" value="delete" />
+                <input type="hidden" name="authenticity_token" value={csrfToken} />
+                <button className="btn btn--ghost btn--sm" type="submit">
+                  Sign out
+                </button>
+              </form>
+              <a className="btn btn--primary btn--sm" href="/dashboard">
+                Ship a project
+                <svg className="btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M5 12h13m0 0-5-5m5 5-5 5"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            </>
+          ) : (
+            <>
+              <a className="btn btn--ghost btn--sm" href={signInPath}>
+                Sign in
+              </a>
+              <a className="btn btn--primary btn--sm" href={signInPath}>
+                Ship a project
+                <svg className="btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                  <path
+                    d="M5 12h13m0 0-5-5m5 5-5 5"
+                    stroke="currentColor"
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </a>
+            </>
+          )}
         </div>
       </div>
     </nav>
