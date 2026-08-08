@@ -1,11 +1,24 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title data-inertia><%= content_for(:title) || "Survive" %></title>
+    <title data-inertia><%= content_for(:title) || "Survive · Hack Club" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Survive">
     <meta name="mobile-web-app-capable" content="yes">
+
+    <meta name="description" content="A Hack Club You Ship, We Ship program. Build something that works with no internet, then ship it for review.">
+
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Survive">
+    <meta property="og:title" content="Survive · Hack Club">
+    <meta property="og:description" content="A Hack Club You Ship, We Ship program. Build something that works with no internet, then ship it for review.">
+    <meta property="og:image" content="<%= "#{request.base_url}/og-image.jpg" %>">
+    <meta property="og:url" content="<%= request.original_url %>">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="<%= "#{request.base_url}/og-image.jpg" %>">
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
@@ -14,8 +27,7 @@
     <%# Enable PWA manifest for installable apps (make sure to enable in config/routes.rb too!) %>
     <%#= tag.link rel: "manifest", href: pwa_manifest_path(format: :json) %>
 
-    <link rel="icon" href="/icon.png" type="image/png">
-    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.png" type="image/png">
     <link rel="apple-touch-icon" href="/icon.png">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">

@@ -1,4 +1,5 @@
 import { useEffect } from "react"
+import { Head } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import { Trail } from "./Trail"
 import { Faq } from "./Faq"
@@ -18,6 +19,13 @@ export default function Index() {
 
   return (
     <>
+      <Head title="Survive - Build something that works offline.">
+        <meta
+          name="description"
+          content="A Hack Club You Ship, We Ship program. Build something that works with no internet, then ship it for review."
+        />
+      </Head>
+
       <Nav />
 
       <main id="main">
