@@ -18,6 +18,7 @@ export type SharedProps = {
   }
   signInPath: string
   signOutPath: string
+  errors: Record<string, string[]>
 }
 
 export type ProjectStatus = "draft" | "pending" | "approved" | "rejected"

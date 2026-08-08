@@ -1,0 +1,77 @@
+.project-form {
+  min-height: 100vh;
+  padding: clamp(6rem, 10vw, 8rem) clamp(1.5rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+  background: var(--paper);
+}
+
+.project-form__shell {
+  max-width: var(--wrap-narrow);
+  margin: 0 auto;
+}
+
+.project-form__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-d2);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin-bottom: var(--sp-2);
+}
+
+.project-form__note {
+  margin-bottom: var(--sp-6);
+}
+
+.project-form__errors {
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--rust-50);
+  border: 1px solid var(--rust-200);
+  color: var(--rust-800);
+}
+
+.project-form__errors ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  font-size: var(--fs-sm);
+}
+
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.field__label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+
+.field__input {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line-strong);
+  background: var(--bg-raised);
+  font-size: var(--fs-body);
+  color: var(--ink);
+}
+
+.field__input--textarea {
+  resize: vertical;
+}
+
+.field__input:focus-visible {
+  outline: 3px solid var(--rust-500);
+  outline-offset: 1px;
+}

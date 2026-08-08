@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react"
+import { Head, Link } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import type { Project, ProjectStatus } from "../../types"
 
@@ -20,11 +20,17 @@ export default function Index({ projects }: { projects: Project[] }) {
         <div className="dashboard__shell">
           <div className="dashboard__header">
             <h1 className="dashboard__title">Your projects</h1>
+            <Link className="btn btn--primary btn--sm" href="/projects/new">
+              New project
+            </Link>
           </div>
 
           {projects.length === 0 ? (
             <div className="dashboard__empty">
               <p className="u-lead">You haven't started a project yet.</p>
+              <Link className="btn btn--primary btn--sm" href="/projects/new">
+                Start your first project
+              </Link>
             </div>
           ) : (
             <ul className="dashboard__list">
