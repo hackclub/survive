@@ -8,6 +8,7 @@ import '../styles/scene.css'
 import '../styles/trail.css'
 import '../styles/faq.css'
 import '../styles/footer.css'
+import '../styles/signin.css'
 
 void createInertiaApp({
   pages: "../pages",

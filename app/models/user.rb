@@ -5,11 +5,118 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :display_name, presence: true
 
+  def self.exchange_hca_token(code, redirect_uri)
+    token_data = HcaService.exchange_code_for_token(code, redirect_uri)
+    raise StandardError, "Failed to exchange authorization code for an HCA access token" unless token_data
+
+    access_token = token_data["access_token"]
+    raise StandardError, "No access token in HCA response" unless access_token
+
+    hca_response = HcaService.me(access_token)
+    raise StandardError, "Failed to fetch user identity from HCA" unless hca_response
+
+    identity = hca_response["identity"]
+    raise StandardError, "No identity data in HCA response" unless identity
+
+    if ysws_ineligible?(identity)
+      raise StandardError, "Sorry, Survive is for YSWS-eligible teen builders. You're not eligible to participate."
+    end
+
+    user = find_by(hca_id: identity["id"])
+
+    if user.present?
+      user.update!(hca_token: access_token, email: identity["primary_email"])
+      user.apply_hca_identity(identity)
+      return user
+    end
+
+    user = create_from_hca(identity, access_token)
+    user.apply_hca_identity(identity)
+    user
+  end
+
+  def self.ysws_ineligible?(identity)
+    status = identity["verification_status"].to_s
+    return true if status == "ineligible"
+
+    status == "verified" && identity["ysws_eligible"] != true
+  end
+
+  def self.determine_is_adult(identity)
+    birthday_str = identity["birthday"]
+    return false if birthday_str.blank?
+
+    birthday = Date.parse(birthday_str)
+    ((Date.today - birthday.to_date) / 365.25) >= 19
+  rescue ArgumentError
+    false
+  end
+
+  def self.create_from_hca(identity, access_token)
+    email = identity["primary_email"]
+    unless email.present? && email.match?(URI::MailTo::EMAIL_REGEXP)
+      raise StandardError, "HCA user has an invalid email: #{email.inspect}"
+    end
+
+    first_name = identity["first_name"] || ""
+    last_name = identity["last_name"] || ""
+
+    create!(
+      email: email,
+      display_name: first_name.presence || identity["id"] || "User",
+      first_name: first_name.presence,
+      last_name: last_name.presence,
+      avatar: identity["profile_picture"].presence,
+      slack_id: identity["slack_id"] || "",
+      verification_status: identity["verification_status"] || "",
+      hca_token: access_token,
+      hca_id: identity["id"],
+      is_adult: determine_is_adult(identity),
+      is_banned: false
+    )
+  end
+
+  def apply_hca_identity(identity)
+    return if identity.blank?
+
+    addr = Array(identity["addresses"]).first
+    addr = identity["address"] if addr.blank? && identity["address"].is_a?(Hash)
+    addr ||= {}
+
+    birthday_val = Date.parse(identity["birthday"].to_s) rescue nil
+
+    attrs = {
+      address_line1: pick(addr, %w[line_1 address_line_1 address_line1 line1 street]).presence,
+      address_line2: pick(addr, %w[line_2 address_line_2 address_line2 line2]).presence,
+      city: pick(addr, %w[city locality]).presence,
+      state: pick(addr, %w[state state_province province region]).presence,
+      country: pick(addr, %w[country country_code]).presence,
+      postal_code: pick(addr, %w[postal_code zip zip_code postcode]).presence,
+      phone_number: pick(identity, %w[phone_number phone]).presence || pick(addr, %w[phone_number phone]).presence,
+      birthday: birthday_val
+    }.compact
+
+    update!(attrs) if attrs.any?
+  end
+
   def reviewer?
     roles.include?("reviewer") || admin?
   end
 
   def admin?
     roles.include?("admin")
+  end
+
+  private
+
+  def pick(hash, keys)
+    return "" unless hash.is_a?(Hash)
+
+    keys.each do |k|
+      value = hash[k] || hash[k.to_sym]
+      return value.to_s if value.present?
+    end
+
+    ""
   end
 end
