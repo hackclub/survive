@@ -35,6 +35,18 @@
   text-align: center;
 }
 
+.dashboard__hackatime-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-4) var(--sp-5);
+  margin-bottom: var(--sp-6);
+  border-radius: var(--r-md);
+  background: var(--bg-sunken);
+  border: 1px solid var(--line);
+}
+
 .dashboard__list {
   display: flex;
   flex-direction: column;

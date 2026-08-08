@@ -5,6 +5,8 @@ class User < ApplicationRecord
   has_many :projects, dependent: :destroy
   has_many :hackatime_projects, dependent: :destroy
 
+  after_commit -> { Rails.cache.delete("user/#{id}") }
+
   validates :hca_id, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true
   validates :display_name, presence: true

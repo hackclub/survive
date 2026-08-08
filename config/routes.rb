@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   get "auth/hack_club/callback" => "auth#create", as: :hack_club_callback
   get "auth/failure" => "auth#failure", as: :auth_failure
   delete "auth/signout" => "auth#destroy", as: :signout
+  get "auth/hackatime/callback" => "hackatime_identities#create", as: :hackatime_callback
 
   get "dashboard" => "dashboard#index", as: :dashboard
   resources :projects, only: %i[new create show update] do

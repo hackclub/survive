@@ -1,6 +1,6 @@
-import { Head, Link } from "@inertiajs/react"
+import { Head, Link, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
-import type { Project, ProjectStatus } from "../../types"
+import type { Project, ProjectStatus, SharedProps } from "../../types"
 
 const STATUS_LABEL: Record<ProjectStatus, string> = {
   draft: "Draft",
@@ -10,6 +10,12 @@ const STATUS_LABEL: Record<ProjectStatus, string> = {
 }
 
 export default function Index({ projects }: { projects: Project[] }) {
+  const { auth } = usePage<SharedProps>().props
+  const csrfToken =
+    typeof document !== "undefined"
+      ? document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || ""
+      : ""
+
   return (
     <>
       <Head title="Dashboard - Survive" />
@@ -24,6 +30,20 @@ export default function Index({ projects }: { projects: Project[] }) {
               New project
             </Link>
           </div>
+
+          {auth.user && !auth.user.hackatimeConnected && (
+            <div className="dashboard__hackatime-banner">
+              <p className="u-sm u-soft">
+                Connect Hackatime to track coding hours on your projects.
+              </p>
+              <form action="/auth/hackatime" method="post">
+                <input type="hidden" name="authenticity_token" value={csrfToken} />
+                <button className="btn btn--ghost btn--sm" type="submit">
+                  Connect Hackatime
+                </button>
+              </form>
+            </div>
+          )}
 
           {projects.length === 0 ? (
             <div className="dashboard__empty">

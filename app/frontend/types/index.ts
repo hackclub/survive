@@ -10,6 +10,7 @@ export type AuthUser = {
   avatar: string | null
   isReviewer: boolean
   isAdmin: boolean
+  hackatimeConnected: boolean
 }
 
 export type SharedProps = {
