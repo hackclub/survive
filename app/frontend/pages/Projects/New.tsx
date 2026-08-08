@@ -1,15 +1,19 @@
 import { Head, useForm, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
-import type { SharedProps } from "../../types"
+import { Flash } from "../../components/Flash"
+import { HackatimeProjectPicker } from "../../components/HackatimeProjectPicker"
+import { humanizeField } from "../../lib/format"
+import type { HackatimeProject, SharedProps } from "../../types"
 
-export default function New() {
-  const { errors } = usePage<SharedProps>().props
+export default function New({ hackatimeProjects }: { hackatimeProjects: HackatimeProject[] }) {
+  const { auth, errors } = usePage<SharedProps>().props
 
   const form = useForm({
     name: "",
     description: "",
     repo_link: "",
     demo_link: "",
+    hackatime_project_name: "",
   })
 
   function submit(e: React.FormEvent) {
@@ -25,6 +29,8 @@ export default function New() {
 
       <main id="main" className="project-form">
         <div className="project-form__shell">
+          <Flash />
+
           <h1 className="project-form__title">Start a project</h1>
           <p className="u-lead u-soft project-form__note">
             Save it as a draft now, add your repo and demo links once you're ready to submit for
@@ -35,7 +41,11 @@ export default function New() {
             <div className="project-form__errors">
               <ul>
                 {Object.entries(errors).map(([field, messages]) =>
-                  messages.map((message) => <li key={`${field}-${message}`}>{message}</li>)
+                  messages.map((message) => (
+                    <li key={`${field}-${message}`}>
+                      {humanizeField(field)} {message}
+                    </li>
+                  ))
                 )}
               </ul>
             </div>
@@ -95,6 +105,38 @@ export default function New() {
                 onChange={(e) => form.setData("demo_link", e.target.value)}
                 placeholder="https://your-demo.example.com"
               />
+            </div>
+
+            <div className="field">
+              <label className="field__label">
+                Hackatime project <span className="u-faint">(optional, required to submit for review)</span>
+              </label>
+
+              {!auth.user?.hackatimeConnected ? (
+                <p className="u-sm u-soft">
+                  Connect Hackatime from your{" "}
+                  <a className="u-accent" href="/dashboard">
+                    dashboard
+                  </a>{" "}
+                  to link one now, or do it later from the project page.
+                </p>
+              ) : form.data.hackatime_project_name ? (
+                <div className="hackatime-link__row">
+                  <span className="u-mono u-sm">{form.data.hackatime_project_name}</span>
+                  <button
+                    className="btn btn--ghost btn--sm"
+                    type="button"
+                    onClick={() => form.setData("hackatime_project_name", "")}
+                  >
+                    Clear
+                  </button>
+                </div>
+              ) : (
+                <HackatimeProjectPicker
+                  options={hackatimeProjects}
+                  onSelect={(option) => form.setData("hackatime_project_name", option.name)}
+                />
+              )}
             </div>
 
             <button className="btn btn--primary" type="submit" disabled={form.processing}>

@@ -33,3 +33,10 @@ export type Project = {
   demoLink: string | null
   updatedAt: string
 }
+
+export type HackatimeProject = {
+  id: number
+  name: string
+  seconds: number
+  linked?: boolean
+}

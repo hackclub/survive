@@ -8,6 +8,7 @@ class Project < ApplicationRecord
   validates :repo_link, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
   validates :demo_link, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
   validates :repo_link, :demo_link, presence: true, unless: :draft?
+  validate :hackatime_project_linked, unless: :draft?
 
   scope :reviewable, -> { where(status: :pending) }
 
@@ -25,5 +26,13 @@ class Project < ApplicationRecord
       demoLink: demo_link,
       updatedAt: updated_at.strftime("%b %d, %Y")
     }
+  end
+
+  private
+
+  def hackatime_project_linked
+    return if hackatime_projects.exists?
+
+    errors.add(:base, "Link a Hackatime project before submitting for review")
   end
 end

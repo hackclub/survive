@@ -22,7 +22,8 @@ Rails.application.routes.draw do
   get "dashboard" => "dashboard#index", as: :dashboard
   resources :projects, only: %i[new create show update] do
     member do
-      post :submit_for_review
+      post "hackatime_projects/:hackatime_project_id/link" => "projects#link_hackatime_project", as: :link_hackatime_project
+      post "hackatime_projects/:hackatime_project_id/unlink" => "projects#unlink_hackatime_project", as: :unlink_hackatime_project
     end
   end
 

@@ -80,3 +80,57 @@
   display: flex;
   gap: var(--sp-3);
 }
+
+.hackatime-link__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
+}
+
+.hackatime-link__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+}
+
+.hackatime-picker {
+  position: relative;
+}
+
+.hackatime-picker__results {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  margin-top: var(--sp-2);
+  padding: var(--sp-2);
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+  background: var(--bg-raised);
+  box-shadow: var(--shadow-1);
+}
+
+.hackatime-picker__result {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  width: 100%;
+  padding: var(--sp-2) var(--sp-3);
+  border-radius: var(--r-xs);
+  text-align: left;
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.hackatime-picker__result:hover {
+  background: var(--bg-sunken);
+}
+
+.hackatime-picker__empty {
+  margin-top: var(--sp-2);
+}

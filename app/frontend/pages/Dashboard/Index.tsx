@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
+import { Flash } from "../../components/Flash"
 import type { Project, ProjectStatus, SharedProps } from "../../types"
 
 const STATUS_LABEL: Record<ProjectStatus, string> = {
@@ -24,6 +25,8 @@ export default function Index({ projects }: { projects: Project[] }) {
 
       <main id="main" className="dashboard">
         <div className="dashboard__shell">
+          <Flash />
+
           <div className="dashboard__header">
             <h1 className="dashboard__title">Your projects</h1>
             <Link className="btn btn--primary btn--sm" href="/projects/new">

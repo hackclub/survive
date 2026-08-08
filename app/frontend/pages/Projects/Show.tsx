@@ -1,6 +1,9 @@
 import { Head, useForm, usePage, router } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
-import type { Project, ProjectStatus, SharedProps } from "../../types"
+import { Flash } from "../../components/Flash"
+import { HackatimeProjectPicker } from "../../components/HackatimeProjectPicker"
+import { formatHours, humanizeField } from "../../lib/format"
+import type { HackatimeProject, Project, ProjectStatus, SharedProps } from "../../types"
 
 const STATUS_LABEL: Record<ProjectStatus, string> = {
   draft: "Draft",
@@ -12,11 +15,13 @@ const STATUS_LABEL: Record<ProjectStatus, string> = {
 export default function Show({
   project,
   can,
+  hackatimeProjects,
 }: {
   project: Project
   can: { update: boolean; submitForReview: boolean }
+  hackatimeProjects: HackatimeProject[]
 }) {
-  const { errors } = usePage<SharedProps>().props
+  const { auth, errors } = usePage<SharedProps>().props
 
   const form = useForm({
     name: project.name,
@@ -31,7 +36,18 @@ export default function Show({
   }
 
   function submitForReview() {
-    router.post(`/projects/${project.id}/submit_for_review`)
+    form.transform((data) => ({ ...data, submit_for_review: true }))
+    form.patch(`/projects/${project.id}`, {
+      onFinish: () => form.transform((data) => data),
+    })
+  }
+
+  function linkHackatimeProject(hackatimeProject: HackatimeProject) {
+    router.post(`/projects/${project.id}/hackatime_projects/${hackatimeProject.id}/link`)
+  }
+
+  function unlinkHackatimeProject(hackatimeProjectId: number) {
+    router.post(`/projects/${project.id}/hackatime_projects/${hackatimeProjectId}/unlink`)
   }
 
   return (
@@ -42,6 +58,8 @@ export default function Show({
 
       <main id="main" className="project-form">
         <div className="project-form__shell">
+          <Flash />
+
           <div className="dashboard__header">
             <h1 className="project-form__title">{project.name}</h1>
             <span className={`dashboard__status dashboard__status--${project.status}`}>
@@ -53,7 +71,11 @@ export default function Show({
             <div className="project-form__errors">
               <ul>
                 {Object.entries(errors).map(([field, messages]) =>
-                  messages.map((message) => <li key={`${field}-${message}`}>{message}</li>)
+                  messages.map((message) => (
+                    <li key={`${field}-${message}`}>
+                      {humanizeField(field)} {message}
+                    </li>
+                  ))
                 )}
               </ul>
             </div>
@@ -116,6 +138,51 @@ export default function Show({
                 />
               </div>
 
+              <div className="field">
+                <label className="field__label">
+                  Hackatime project <span className="u-faint">(required to submit for review)</span>
+                </label>
+
+                {!auth.user?.hackatimeConnected ? (
+                  <p className="u-sm u-soft">
+                    Connect Hackatime from your{" "}
+                    <a className="u-accent" href="/dashboard">
+                      dashboard
+                    </a>{" "}
+                    to track coding hours on this project.
+                  </p>
+                ) : (
+                  <>
+                    {hackatimeProjects.filter((hp) => hp.linked).length > 0 && (
+                      <ul className="hackatime-link__list">
+                        {hackatimeProjects
+                          .filter((hp) => hp.linked)
+                          .map((hackatimeProject) => (
+                            <li key={hackatimeProject.id} className="hackatime-link__row">
+                              <span className="u-mono u-sm">{hackatimeProject.name}</span>
+                              <span className="u-sm u-faint">
+                                {formatHours(hackatimeProject.seconds)}
+                              </span>
+                              <button
+                                className="btn btn--ghost btn--sm"
+                                type="button"
+                                onClick={() => unlinkHackatimeProject(hackatimeProject.id)}
+                              >
+                                Unlink
+                              </button>
+                            </li>
+                          ))}
+                      </ul>
+                    )}
+
+                    <HackatimeProjectPicker
+                      options={hackatimeProjects.filter((hp) => !hp.linked)}
+                      onSelect={linkHackatimeProject}
+                    />
+                  </>
+                )}
+              </div>
+
               <div className="project-form__actions">
                 <button className="btn btn--ghost" type="submit" disabled={form.processing}>
                   {form.processing ? "Saving..." : "Save"}
@@ -131,7 +198,9 @@ export default function Show({
                 )}
               </div>
             </form>
-          ) : (
+          ) : null}
+
+          {!can.update && (
             <div className="field-group">
               {project.description && <p className="u-lead u-soft">{project.description}</p>}
               {project.repoLink && (

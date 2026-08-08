@@ -1,5 +1,6 @@
 import { Head } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
+import { Flash } from "../../components/Flash"
 
 export default function SignIn() {
   const csrfToken =
@@ -15,6 +16,8 @@ export default function SignIn() {
 
       <main id="main" className="signin">
         <div className="signin__card">
+          <Flash />
+
           <h1 className="signin__title">Sign in to Survive</h1>
           <p className="signin__note">
             One click with your Hack Club account. If you don't have one yet, making it takes

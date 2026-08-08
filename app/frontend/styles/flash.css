@@ -1,0 +1,24 @@
+.flash {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-5);
+}
+
+.flash__banner {
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+}
+
+.flash__banner--notice {
+  background: var(--lime-50);
+  border: 1px solid var(--lime-200);
+  color: var(--lime-700);
+}
+
+.flash__banner--alert {
+  background: var(--rust-50);
+  border: 1px solid var(--rust-200);
+  color: var(--rust-800);
+}
