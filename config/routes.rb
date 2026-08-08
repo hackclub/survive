@@ -27,6 +27,10 @@ Rails.application.routes.draw do
     end
   end
 
+  namespace :admin do
+    get "review" => "review#index", as: :review
+  end
+
   # Defines the root path route ("/")
   root "landing#index"
 end
