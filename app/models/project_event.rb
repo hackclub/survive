@@ -4,6 +4,8 @@ class ProjectEvent < ApplicationRecord
 
   enum :action, { submitted: 0, approved: 1, rejected: 2 }
 
+  validates :feedback, presence: true, if: :rejected?
+
   default_scope { order(created_at: :desc) }
 
   def as_client_json

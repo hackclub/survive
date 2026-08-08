@@ -32,6 +32,7 @@ export type Project = {
   repoLink: string | null
   demoLink: string | null
   updatedAt: string
+  reviewFeedback: string | null
 }
 
 export type HackatimeProject = {

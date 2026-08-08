@@ -20,6 +20,20 @@ class Project < ApplicationRecord
     end
   end
 
+  def approve!(actor)
+    transaction do
+      update!(status: :approved)
+      project_events.create!(actor: actor, action: :approved)
+    end
+  end
+
+  def reject!(actor, feedback:)
+    transaction do
+      update!(status: :rejected)
+      project_events.create!(actor: actor, action: :rejected, feedback: feedback)
+    end
+  end
+
   def as_client_json
     {
       id: id,
@@ -28,7 +42,8 @@ class Project < ApplicationRecord
       status: status,
       repoLink: repo_link,
       demoLink: demo_link,
-      updatedAt: updated_at.strftime("%b %d, %Y")
+      updatedAt: updated_at.strftime("%b %d, %Y"),
+      reviewFeedback: rejected? ? project_events.rejected.first&.feedback : nil
     }
   end
 

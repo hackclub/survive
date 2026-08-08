@@ -29,6 +29,8 @@ Rails.application.routes.draw do
 
   namespace :admin do
     get "review" => "review#index", as: :review
+    post "review/:id/approve" => "review#approve", as: :approve_review
+    post "review/:id/reject" => "review#reject", as: :reject_review
   end
 
   # Defines the root path route ("/")

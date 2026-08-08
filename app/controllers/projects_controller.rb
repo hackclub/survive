@@ -4,7 +4,7 @@ class ProjectsController < ApplicationController
   def new
     authorize Project.new(user: current_user)
 
-    seconds_by_name = sync_hackatime_projects
+    seconds_by_name = sync_hackatime_projects(current_user)
 
     render inertia: "Projects/New", props: {
       hackatimeProjects: current_user.hackatime_projects.where(project_id: nil).order(:name).map { |hackatime_project|
@@ -35,15 +35,20 @@ class ProjectsController < ApplicationController
 
   def show
     authorize @project
-    seconds_by_name = sync_hackatime_projects
+    owner = @project.user
+    is_owner = owner == current_user
+    seconds_by_name = sync_hackatime_projects(owner)
+
+    visible_project_ids = is_owner ? [ nil, @project.id ] : @project.id
 
     render inertia: "Projects/Show", props: {
       project: @project.as_client_json,
       can: {
         update: policy(@project).update?,
-        submitForReview: policy(@project).submit_for_review?
+        submitForReview: policy(@project).submit_for_review?,
+        review: policy(@project).review?
       },
-      hackatimeProjects: current_user.hackatime_projects.where(project_id: [ nil, @project.id ]).order(:name).map { |hackatime_project|
+      hackatimeProjects: owner.hackatime_projects.where(project_id: visible_project_ids).order(:name).map { |hackatime_project|
         {
           id: hackatime_project.id,
           name: hackatime_project.name,
@@ -96,15 +101,15 @@ class ProjectsController < ApplicationController
 
   private
 
-  def sync_hackatime_projects
-    return {} if current_user.hackatime_uid.blank?
+  def sync_hackatime_projects(user)
+    return {} if user.hackatime_uid.blank?
 
-    result = HackatimeService.fetch_stats(current_user.hackatime_uid, access_token: current_user.hackatime_token)
+    result = HackatimeService.fetch_stats(user.hackatime_uid, access_token: user.hackatime_token)
     seconds_by_name = result&.dig(:projects) || {}
     return seconds_by_name if seconds_by_name.blank?
 
     HackatimeProject.insert_all(
-      seconds_by_name.keys.map { |name| { user_id: current_user.id, name: name, created_at: Time.current, updated_at: Time.current } },
+      seconds_by_name.keys.map { |name| { user_id: user.id, name: name, created_at: Time.current, updated_at: Time.current } },
       unique_by: %i[user_id name]
     )
 

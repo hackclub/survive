@@ -21,7 +21,7 @@ class ProjectPolicy < ApplicationPolicy
   end
 
   def review?
-    user&.reviewer?
+    user&.reviewer? && record.pending?
   end
 
   private
