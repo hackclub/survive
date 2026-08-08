@@ -1,5 +1,6 @@
 import { useEffect } from "react"
 import { Nav } from "../../components/Nav"
+import { Trail } from "./Trail"
 import { initMotion } from "../../lib/motion"
 
 import mark from "../../images/mark.webp"
@@ -97,6 +98,8 @@ export default function Index() {
             Scroll
           </span>
         </header>
+
+        <Trail />
       </main>
     </>
   )
