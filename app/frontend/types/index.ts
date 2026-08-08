@@ -40,3 +40,12 @@ export type HackatimeProject = {
   seconds: number
   linked?: boolean
 }
+
+export type ReviewQueueEntry = {
+  id: number
+  name: string
+  ownerName: string
+  repoLink: string | null
+  demoLink: string | null
+  submittedAt: string
+}
