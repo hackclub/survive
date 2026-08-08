@@ -179,12 +179,6 @@ function initParallax(reduced: boolean, cleanups: Array<() => void>) {
   })
 }
 
-function initYear() {
-  document.querySelectorAll("[data-year]").forEach((el) => {
-    el.textContent = String(new Date().getFullYear())
-  })
-}
-
 export function initMotion(): () => void {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
   const cleanups: Array<() => void> = []
@@ -195,7 +189,6 @@ export function initMotion(): () => void {
   initAccordion(cleanups)
   initEmbers(reduced)
   initParallax(reduced, cleanups)
-  initYear()
 
   return () => cleanups.forEach((fn) => fn())
 }
