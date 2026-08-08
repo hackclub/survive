@@ -1,5 +1,6 @@
 class Project < ApplicationRecord
   belongs_to :user
+  has_many :hackatime_projects, dependent: :nullify
 
   enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3 }
 

@@ -10,9 +10,20 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_08_103642) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_08_124808) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "hackatime_projects", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "project_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_hackatime_projects_on_project_id"
+    t.index ["user_id", "name"], name: "index_hackatime_projects_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_hackatime_projects_on_user_id"
+  end
 
   create_table "projects", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -37,6 +48,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_103642) do
     t.string "display_name", null: false
     t.string "email", null: false
     t.string "first_name"
+    t.text "hackatime_token"
+    t.string "hackatime_uid"
     t.string "hca_id", null: false
     t.text "hca_token"
     t.boolean "is_adult", default: false, null: false
@@ -50,10 +63,13 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_103642) do
     t.datetime "updated_at", null: false
     t.string "verification_status"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["hackatime_uid"], name: "index_users_on_hackatime_uid", unique: true
     t.index ["hca_id"], name: "index_users_on_hca_id", unique: true
     t.index ["roles"], name: "index_users_on_roles", using: :gin
     t.index ["slack_id"], name: "index_users_on_slack_id"
   end
 
+  add_foreign_key "hackatime_projects", "projects"
+  add_foreign_key "hackatime_projects", "users"
   add_foreign_key "projects", "users"
 end

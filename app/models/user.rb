@@ -1,7 +1,9 @@
 class User < ApplicationRecord
   encrypts :hca_token
+  encrypts :hackatime_token
 
   has_many :projects, dependent: :destroy
+  has_many :hackatime_projects, dependent: :destroy
 
   validates :hca_id, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true
