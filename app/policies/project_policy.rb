@@ -1,0 +1,42 @@
+class ProjectPolicy < ApplicationPolicy
+  def show?
+    return true if record.approved?
+    owner? || user&.reviewer?
+  end
+
+  def create?
+    user.present?
+  end
+
+  def update?
+    owner? && editable?
+  end
+
+  def destroy?
+    owner? && editable?
+  end
+
+  def submit_for_review?
+    owner? && (record.draft? || record.rejected?)
+  end
+
+  def review?
+    user&.reviewer?
+  end
+
+  private
+
+  def editable?
+    record.draft? || record.rejected?
+  end
+
+  class Scope < ApplicationPolicy::Scope
+    def resolve
+      if user&.reviewer?
+        scope.all
+      else
+        scope.where(user: user)
+      end
+    end
+  end
+end
