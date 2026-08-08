@@ -18,6 +18,8 @@ Rails.application.routes.draw do
   get "auth/hca/callback" => "auth#create", as: :hca_callback
   delete "auth/signout" => "auth#destroy", as: :signout
 
+  get "dashboard" => "dashboard#index", as: :dashboard
+
   # Defines the root path route ("/")
   root "landing#index"
 end
