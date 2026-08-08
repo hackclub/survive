@@ -1,6 +1,7 @@
 class Project < ApplicationRecord
   belongs_to :user
   has_many :hackatime_projects, dependent: :nullify
+  has_many :project_events, dependent: :destroy
 
   enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3 }
 
@@ -13,7 +14,10 @@ class Project < ApplicationRecord
   scope :reviewable, -> { where(status: :pending) }
 
   def submit!
-    update!(status: :pending)
+    transaction do
+      update!(status: :pending)
+      project_events.create!(actor: user, action: :submitted)
+    end
   end
 
   def as_client_json

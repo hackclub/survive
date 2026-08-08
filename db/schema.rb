@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_08_124808) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_08_222737) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -23,6 +23,18 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_124808) do
     t.index ["project_id"], name: "index_hackatime_projects_on_project_id"
     t.index ["user_id", "name"], name: "index_hackatime_projects_on_user_id_and_name", unique: true
     t.index ["user_id"], name: "index_hackatime_projects_on_user_id"
+  end
+
+  create_table "project_events", force: :cascade do |t|
+    t.integer "action", null: false
+    t.bigint "actor_id", null: false
+    t.datetime "created_at", null: false
+    t.text "feedback"
+    t.bigint "project_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["action"], name: "index_project_events_on_action"
+    t.index ["actor_id"], name: "index_project_events_on_actor_id"
+    t.index ["project_id"], name: "index_project_events_on_project_id"
   end
 
   create_table "projects", force: :cascade do |t|
@@ -71,5 +83,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_124808) do
 
   add_foreign_key "hackatime_projects", "projects"
   add_foreign_key "hackatime_projects", "users"
+  add_foreign_key "project_events", "projects"
+  add_foreign_key "project_events", "users", column: "actor_id"
   add_foreign_key "projects", "users"
 end
