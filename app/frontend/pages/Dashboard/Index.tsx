@@ -59,22 +59,34 @@ export default function Index({ projects }: { projects: Project[] }) {
             <ul className="dashboard__list">
               {projects.map((project) => (
                 <li key={project.id}>
-                  <Link className="dashboard__row" href={`/projects/${project.id}`}>
-                    <div className="dashboard__row-top">
-                      <span className="dashboard__name">{project.name}</span>
-                      <span className={`dashboard__status dashboard__status--${project.status}`}>
-                        {STATUS_LABEL[project.status]}
-                      </span>
-                    </div>
+                  <Link className="dashboard__row dashboard__row--banner" href={`/projects/${project.id}`}>
+                    {project.bannerUrl ? (
+                      <img
+                        className="dashboard__row-banner-image"
+                        src={project.bannerUrl}
+                        alt=""
+                      />
+                    ) : (
+                      <div className="dashboard__row-banner-placeholder" />
+                    )}
 
-                    <p className="dashboard__description u-sm u-soft">
-                      {project.description || "No description yet."}
-                    </p>
+                    <div className="dashboard__row-glass">
+                      <div className="dashboard__row-top">
+                        <span className="dashboard__name">{project.name}</span>
+                        <span className={`dashboard__status dashboard__status--${project.status}`}>
+                          {STATUS_LABEL[project.status]}
+                        </span>
+                      </div>
 
-                    <div className="dashboard__row-meta u-sm u-faint">
-                      <span>{project.repoLink ? "Repo linked" : "No repo link yet"}</span>
-                      <span>{project.demoLink ? "Demo linked" : "No demo link yet"}</span>
-                      <span>Updated {project.updatedAt}</span>
+                      <p className="dashboard__description u-sm u-soft">
+                        {project.description || "No description yet."}
+                      </p>
+
+                      <div className="dashboard__row-meta u-sm u-faint">
+                        <span>{project.repoLink ? "Repo linked" : "No repo link yet"}</span>
+                        <span>{project.demoLink ? "Demo linked" : "No demo link yet"}</span>
+                        <span>Updated {project.updatedAt}</span>
+                      </div>
                     </div>
                   </Link>
                 </li>

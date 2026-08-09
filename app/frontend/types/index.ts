@@ -31,6 +31,7 @@ export type Project = {
   status: ProjectStatus
   repoLink: string | null
   demoLink: string | null
+  bannerUrl: string | null
   updatedAt: string
   reviewFeedback: string | null
 }
@@ -48,6 +49,7 @@ export type ReviewQueueEntry = {
   ownerName: string
   repoLink: string | null
   demoLink: string | null
+  bannerUrl: string | null
   submittedAt: string
   claimedByYou: boolean
   hackatimeSeconds: number

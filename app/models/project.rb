@@ -5,6 +5,10 @@ class Project < ApplicationRecord
   belongs_to :claimed_by, class_name: "User", optional: true
   has_many :hackatime_projects, dependent: :nullify
   has_many :project_events, dependent: :destroy
+  has_one_attached :banner
+
+  BANNER_CONTENT_TYPES = %w[image/png image/jpeg image/webp image/gif].freeze
+  BANNER_MAX_SIZE = 5.megabytes
 
   enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3 }
 
@@ -13,6 +17,8 @@ class Project < ApplicationRecord
   validates :demo_link, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
   validates :repo_link, :demo_link, presence: true, unless: :draft?
   validate :hackatime_project_linked, unless: :draft?
+  validate :banner_attached, unless: :draft?
+  validate :banner_is_valid_image, if: -> { banner.attached? }
 
   scope :reviewable, -> { where(status: :pending) }
   scope :unclaimed_or_claimed_by, ->(user) {
@@ -67,6 +73,12 @@ class Project < ApplicationRecord
     end
   end
 
+  def banner_url
+    return nil unless banner.attached?
+
+    Rails.application.routes.url_helpers.rails_blob_path(banner, only_path: true)
+  end
+
   def as_client_json
     {
       id: id,
@@ -75,12 +87,29 @@ class Project < ApplicationRecord
       status: status,
       repoLink: repo_link,
       demoLink: demo_link,
+      bannerUrl: banner_url,
       updatedAt: updated_at.strftime("%b %d, %Y"),
       reviewFeedback: (approved? || rejected?) ? project_events.where(action: %w[approved rejected]).first&.feedback : nil
     }
   end
 
   private
+
+  def banner_attached
+    return if banner.attached?
+
+    errors.add(:banner, "must be uploaded before submitting for review")
+  end
+
+  def banner_is_valid_image
+    unless banner.content_type.in?(BANNER_CONTENT_TYPES)
+      errors.add(:banner, "must be a PNG, JPEG, WEBP, or GIF")
+    end
+
+    if banner.byte_size > BANNER_MAX_SIZE
+      errors.add(:banner, "must be smaller than 5MB")
+    end
+  end
 
   def hackatime_project_linked
     return if hackatime_projects.exists?

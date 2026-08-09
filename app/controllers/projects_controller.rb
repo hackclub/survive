@@ -21,6 +21,7 @@ class ProjectsController < ApplicationController
     project = current_user.projects.build(project_params)
     project.status = :draft
     authorize project
+    attach_banner_if_uploaded(project)
 
     if project.save
       if params[:hackatime_project_name].present?
@@ -56,6 +57,7 @@ class ProjectsController < ApplicationController
 
   def update
     authorize @project
+    attach_banner_if_uploaded(@project)
 
     unless @project.update(project_params)
       redirect_back fallback_location: project_path(@project), inertia: { errors: @project.errors.messages }
@@ -101,6 +103,13 @@ class ProjectsController < ApplicationController
   end
 
   def project_params
-    params.expect(project: %i[name description repo_link demo_link])
+    params.permit(:name, :description, :repo_link, :demo_link)
+  end
+
+  def attach_banner_if_uploaded(project)
+    banner_param = params[:banner]
+    return if banner_param.blank?
+
+    project.banner.attach(banner_param)
   end
 end

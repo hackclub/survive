@@ -9,7 +9,7 @@ class Admin::ReviewController < ApplicationController
       scope = scope.joins(:user).where("projects.name ILIKE :q OR users.display_name ILIKE :q", q: query)
     end
 
-    pagy, projects = pagy(scope.includes(:user, :hackatime_projects).order(:updated_at))
+    pagy, projects = pagy(scope.includes(:user, :hackatime_projects, banner_attachment: :blob).order(:updated_at))
 
     seconds_by_owner = projects.map(&:user).uniq.index_with { |owner| HackatimeSyncService.call(owner) }
 
@@ -24,6 +24,7 @@ class Admin::ReviewController < ApplicationController
           ownerName: project.user.review_display_name,
           repoLink: project.repo_link,
           demoLink: project.demo_link,
+          bannerUrl: project.banner_url,
           submittedAt: project.updated_at.strftime("%b %d, %Y"),
           claimedByYou: project.claimed_by?(current_user),
           hackatimeSeconds: linked_seconds

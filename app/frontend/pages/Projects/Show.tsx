@@ -1,6 +1,7 @@
 import { Head, useForm, usePage, router } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
+import { BannerUpload } from "../../components/BannerUpload"
 import { HackatimeProjectPicker } from "../../components/HackatimeProjectPicker"
 import { formatHours, humanizeField } from "../../lib/format"
 import type { HackatimeProject, Project, ProjectStatus, SharedProps } from "../../types"
@@ -28,6 +29,7 @@ export default function Show({
     description: project.description ?? "",
     repo_link: project.repoLink ?? "",
     demo_link: project.demoLink ?? "",
+    banner: null as File | null,
   })
 
   function save(e: React.FormEvent) {
@@ -89,6 +91,17 @@ export default function Show({
 
           {can.update ? (
             <form onSubmit={save} className="field-group">
+              <div className="field">
+                <label className="field__label">
+                  Banner <span className="u-faint">(required to submit for review)</span>
+                </label>
+                <BannerUpload
+                  file={form.data.banner}
+                  currentUrl={project.bannerUrl}
+                  onChange={(file) => form.setData("banner", file)}
+                />
+              </div>
+
               <div className="field">
                 <label className="field__label" htmlFor="name">
                   Project name
@@ -208,6 +221,11 @@ export default function Show({
 
           {!can.update && (
             <div className="field-group">
+              {project.bannerUrl && (
+                <div className="project-banner">
+                  <img className="banner-upload__image" src={project.bannerUrl} alt="" />
+                </div>
+              )}
               {project.description && <p className="u-lead u-soft">{project.description}</p>}
               {project.repoLink && (
                 <p>

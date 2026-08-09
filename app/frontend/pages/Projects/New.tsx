@@ -1,6 +1,7 @@
 import { Head, useForm, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
+import { BannerUpload } from "../../components/BannerUpload"
 import { HackatimeProjectPicker } from "../../components/HackatimeProjectPicker"
 import { humanizeField } from "../../lib/format"
 import type { HackatimeProject, SharedProps } from "../../types"
@@ -14,6 +15,7 @@ export default function New({ hackatimeProjects }: { hackatimeProjects: Hackatim
     repo_link: "",
     demo_link: "",
     hackatime_project_name: "",
+    banner: null as File | null,
   })
 
   function submit(e: React.FormEvent) {
@@ -52,6 +54,16 @@ export default function New({ hackatimeProjects }: { hackatimeProjects: Hackatim
           )}
 
           <form onSubmit={submit} className="field-group">
+            <div className="field">
+              <label className="field__label">
+                Banner <span className="u-faint">(required to submit for review)</span>
+              </label>
+              <BannerUpload
+                file={form.data.banner}
+                onChange={(file) => form.setData("banner", file)}
+              />
+            </div>
+
             <div className="field">
               <label className="field__label" htmlFor="name">
                 Project name

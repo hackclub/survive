@@ -78,6 +78,12 @@ export default function Show({
 
           <div className="review__grid">
             <div className="review__main">
+              {project.bannerUrl && (
+                <div className="project-banner">
+                  <img className="banner-upload__image" src={project.bannerUrl} alt="" />
+                </div>
+              )}
+
               {project.description && (
                 <p className="review__description u-lead u-soft">{project.description}</p>
               )}
