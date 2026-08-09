@@ -58,12 +58,11 @@ module HackatimeService
   end
 
   def resolve_api_key(hackatime_uid, access_token)
-    cache_key = "hackatime_api_key:#{hackatime_uid}"
-    cached = Rails.cache.read(cache_key)
+    cached = Rails.cache.read(api_key_cache_key(hackatime_uid))
     return cached if cached.present?
 
     key = fetch_api_key(access_token)
-    Rails.cache.write(cache_key, key, expires_in: 1.week) if key.present?
+    Rails.cache.write(api_key_cache_key(hackatime_uid), key, expires_in: 1.week) if key.present?
     key
   end
 
@@ -77,12 +76,18 @@ module HackatimeService
           req.headers["Authorization"] = "Bearer #{api_key}"
         end
         return [ response, false ] if response.success?
+
+        Rails.cache.delete(api_key_cache_key(hackatime_uid))
       end
 
       Rails.logger.warn("HackatimeService falling back to public API for uid=#{hackatime_uid}")
     end
 
     [ connection.get("users/#{hackatime_uid}/stats", params), access_token.present? ]
+  end
+
+  def api_key_cache_key(hackatime_uid)
+    "hackatime_api_key:#{hackatime_uid}"
   end
 
   def connection
