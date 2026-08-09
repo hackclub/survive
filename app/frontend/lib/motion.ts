@@ -24,7 +24,24 @@ function initNav(cleanups: Array<() => void>) {
     )
   }
 
-  const onScroll = () => nav.classList.toggle("is-stuck", window.scrollY > 24)
+  let lastY = window.scrollY
+  const onScroll = () => {
+    const y = window.scrollY
+    nav.classList.toggle("is-stuck", y > 24)
+
+    if (nav.classList.contains("is-open")) {
+      lastY = y
+      return
+    }
+
+    if (y > lastY && y > 80) {
+      nav.classList.add("is-hidden")
+    } else if (y < lastY) {
+      nav.classList.remove("is-hidden")
+    }
+
+    lastY = y
+  }
   onScroll()
   window.addEventListener("scroll", onScroll, { passive: true })
   cleanups.push(() => window.removeEventListener("scroll", onScroll))

@@ -53,10 +53,10 @@ class Project < ApplicationRecord
     end
   end
 
-  def approve!(actor)
+  def approve!(actor, feedback:)
     transaction do
       update!(status: :approved)
-      project_events.create!(actor: actor, action: :approved)
+      project_events.create!(actor: actor, action: :approved, feedback: feedback)
     end
   end
 
@@ -76,7 +76,7 @@ class Project < ApplicationRecord
       repoLink: repo_link,
       demoLink: demo_link,
       updatedAt: updated_at.strftime("%b %d, %Y"),
-      reviewFeedback: rejected? ? project_events.rejected.first&.feedback : nil
+      reviewFeedback: (approved? || rejected?) ? project_events.where(action: %w[approved rejected]).first&.feedback : nil
     }
   end
 

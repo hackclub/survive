@@ -1,0 +1,129 @@
+.review__header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-6);
+}
+
+.review__eyebrow {
+  color: var(--ink-faint);
+  margin-bottom: var(--sp-1);
+}
+
+.review__title {
+  font-family: var(--font-display);
+  font-size: var(--fs-d2);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+.review__header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.review__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 18rem;
+  gap: var(--sp-7);
+  align-items: start;
+}
+
+.review__main {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+.review__description {
+  max-width: 62ch;
+}
+
+.review__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+}
+
+.review__link-chip {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-3) var(--sp-4);
+  border-radius: var(--r-sm);
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+  max-width: 22rem;
+  overflow: hidden;
+  transition: border-color var(--dur-fast) var(--ease);
+}
+
+.review__link-chip:hover {
+  border-color: var(--line-strong);
+}
+
+.review__link-chip span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--accent);
+}
+
+.review__action-bar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  padding: var(--sp-5);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
+  background: var(--bg-sunken);
+}
+
+.review__action-buttons {
+  display: flex;
+  gap: var(--sp-3);
+}
+
+.review__sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.review__card {
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+}
+
+.review__card-title {
+  margin-bottom: var(--sp-3);
+}
+
+.review__timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.review__timeline-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding-bottom: var(--sp-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.review__timeline-item:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+@media (max-width: 860px) {
+  .review__grid {
+    grid-template-columns: 1fr;
+  }
+}

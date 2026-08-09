@@ -49,7 +49,7 @@ export function Nav() {
               </span>
               {auth.user.isReviewer && (
                 <a className="btn btn--ghost btn--sm" href="/admin/review">
-                  Review
+                  Admin
                 </a>
               )}
               <form action={signOutPath} method="post">

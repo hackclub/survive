@@ -11,8 +11,9 @@
 
 .dashboard__header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
+  gap: var(--sp-4);
   margin-bottom: var(--sp-6);
 }
 
@@ -21,6 +22,10 @@
   font-size: var(--fs-d2);
   font-weight: 800;
   letter-spacing: -0.03em;
+}
+
+.dashboard__subtitle {
+  margin-top: var(--sp-1);
 }
 
 .dashboard__empty {
@@ -143,4 +148,28 @@
 .dashboard__status--rejected {
   color: var(--rust-800);
   background: var(--rust-200);
+}
+
+.mystats__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-6);
+}
+
+.mystats__tile {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  padding: var(--sp-5);
+  border-radius: var(--r-md);
+  background: var(--bg-raised);
+  border: 1px solid var(--line);
+}
+
+.mystats__number {
+  font-family: var(--font-display);
+  font-size: var(--fs-d2);
+  font-weight: 800;
+  letter-spacing: -0.02em;
 }

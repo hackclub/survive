@@ -69,6 +69,28 @@ class Admin::ReviewController < ApplicationController
     }
   end
 
+  def mystats
+    authorize :review, :index?
+
+    events = ProjectEvent.where(actor: current_user).where(action: %i[approved rejected]).includes(:project).order(created_at: :desc)
+
+    render inertia: "Admin/Review/MyStats", props: {
+      totalReviews: events.count,
+      approvedCount: events.approved.count,
+      rejectedCount: events.rejected.count,
+      todayCount: events.where(created_at: Time.zone.now.all_day).count,
+      weekCount: events.where(created_at: 7.days.ago..).count,
+      recent: events.limit(20).map { |event|
+        {
+          id: event.id,
+          action: event.action,
+          projectName: event.project.name,
+          createdAt: event.created_at.strftime("%b %d, %Y")
+        }
+      }
+    }
+  end
+
   def next_project
     authorize :review, :index?
 
@@ -91,8 +113,10 @@ class Admin::ReviewController < ApplicationController
     authorize project, :review?
     return if blocked_by_claim?(project)
 
-    project.approve!(current_user)
+    project.approve!(current_user, feedback: params[:feedback])
     redirect_to admin_review_path, notice: "Approved #{project.name}."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to admin_review_project_path(project), alert: e.record.errors.full_messages.to_sentence
   end
 
   def reject

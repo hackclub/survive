@@ -30,6 +30,7 @@ Rails.application.routes.draw do
   namespace :admin do
     get "review" => "review#index", as: :review
     get "review/next" => "review#next_project", as: :next_review
+    get "review/mystats" => "review#mystats", as: :review_mystats
     get "review/:id" => "review#show", as: :review_project
     post "review/:id/approve" => "review#approve", as: :approve_review
     post "review/:id/reject" => "review#reject", as: :reject_review

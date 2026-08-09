@@ -73,3 +73,10 @@ export type SubmitterHistory = {
   approvedCount: number
   rejectedCount: number
 }
+
+export type ReviewHistoryEntry = {
+  id: number
+  action: "approved" | "rejected"
+  projectName: string
+  createdAt: string
+}
