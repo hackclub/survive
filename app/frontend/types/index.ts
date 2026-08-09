@@ -50,3 +50,18 @@ export type ReviewQueueEntry = {
   demoLink: string | null
   submittedAt: string
 }
+
+export type ProjectEventAction = "submitted" | "approved" | "rejected"
+
+export type ProjectEvent = {
+  id: number
+  action: ProjectEventAction
+  feedback: string | null
+  actorName: string
+  createdAt: string
+}
+
+export type SubmitterHistory = {
+  approvedCount: number
+  rejectedCount: number
+}

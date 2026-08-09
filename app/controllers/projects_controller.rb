@@ -4,7 +4,7 @@ class ProjectsController < ApplicationController
   def new
     authorize Project.new(user: current_user)
 
-    seconds_by_name = sync_hackatime_projects(current_user)
+    seconds_by_name = HackatimeSyncService.call(current_user)
 
     render inertia: "Projects/New", props: {
       hackatimeProjects: current_user.hackatime_projects.where(project_id: nil).order(:name).map { |hackatime_project|
@@ -37,7 +37,7 @@ class ProjectsController < ApplicationController
     authorize @project
     owner = @project.user
     is_owner = owner == current_user
-    seconds_by_name = sync_hackatime_projects(owner)
+    seconds_by_name = HackatimeSyncService.call(owner)
 
     visible_project_ids = is_owner ? [ nil, @project.id ] : @project.id
 
@@ -100,21 +100,6 @@ class ProjectsController < ApplicationController
   end
 
   private
-
-  def sync_hackatime_projects(user)
-    return {} if user.hackatime_uid.blank?
-
-    result = HackatimeService.fetch_stats(user.hackatime_uid, access_token: user.hackatime_token)
-    seconds_by_name = result&.dig(:projects) || {}
-    return seconds_by_name if seconds_by_name.blank?
-
-    HackatimeProject.insert_all(
-      seconds_by_name.keys.map { |name| { user_id: user.id, name: name, created_at: Time.current, updated_at: Time.current } },
-      unique_by: %i[user_id name]
-    )
-
-    seconds_by_name
-  end
 
   def set_project
     @project = Project.find(params[:id])

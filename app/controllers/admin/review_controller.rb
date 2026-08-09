@@ -18,9 +18,40 @@ class Admin::ReviewController < ApplicationController
     }
   end
 
+  def show
+    project = Project.find(params[:id])
+    authorize project, :review?
+
+    claimed_project = Project.atomic_claim!(project.id, current_user)
+    if claimed_project.nil?
+      redirect_to admin_review_path, alert: "#{project.name} is already being reviewed by someone else."
+      return
+    end
+
+    owner = claimed_project.user
+    seconds_by_name = HackatimeSyncService.call(owner)
+
+    render inertia: "Admin/Review/Show", props: {
+      project: claimed_project.as_client_json,
+      hackatimeProjects: owner.hackatime_projects.where(project_id: claimed_project.id).order(:name).map { |hackatime_project|
+        {
+          id: hackatime_project.id,
+          name: hackatime_project.name,
+          seconds: seconds_by_name[hackatime_project.name].to_i
+        }
+      },
+      history: claimed_project.project_events.map(&:as_client_json),
+      submitterHistory: {
+        approvedCount: owner.projects.approved.count,
+        rejectedCount: owner.projects.rejected.count
+      }
+    }
+  end
+
   def approve
     project = Project.find(params[:id])
     authorize project, :review?
+    return if blocked_by_claim?(project)
 
     project.approve!(current_user)
     redirect_to admin_review_path, notice: "Approved #{project.name}."
@@ -29,10 +60,20 @@ class Admin::ReviewController < ApplicationController
   def reject
     project = Project.find(params[:id])
     authorize project, :review?
+    return if blocked_by_claim?(project)
 
     project.reject!(current_user, feedback: params[:feedback])
     redirect_to admin_review_path, notice: "Rejected #{project.name}."
   rescue ActiveRecord::RecordInvalid => e
-    redirect_to project_path(project), alert: e.record.errors.full_messages.to_sentence
+    redirect_to admin_review_project_path(project), alert: e.record.errors.full_messages.to_sentence
+  end
+
+  private
+
+  def blocked_by_claim?(project)
+    return false unless project.claimed_by_someone_else?(current_user)
+
+    redirect_to admin_review_path, alert: "#{project.name} is being reviewed by someone else."
+    true
   end
 end
