@@ -41,6 +41,10 @@ export default function Show({
     router.post(`/admin/review/${project.id}/approve`)
   }
 
+  function unclaim() {
+    router.delete(`/admin/review/${project.id}/claim`)
+  }
+
   function reject(e: React.FormEvent) {
     e.preventDefault()
     router.post(`/admin/review/${project.id}/reject`, { feedback })
@@ -61,6 +65,9 @@ export default function Show({
             <span className={`dashboard__status dashboard__status--${project.status}`}>
               {STATUS_LABEL[project.status]}
             </span>
+            <button className="btn btn--ghost btn--sm" type="button" onClick={unclaim}>
+              Unclaim
+            </button>
           </div>
 
           <div className="field-group">

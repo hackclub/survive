@@ -32,6 +32,7 @@ Rails.application.routes.draw do
     get "review/:id" => "review#show", as: :review_project
     post "review/:id/approve" => "review#approve", as: :approve_review
     post "review/:id/reject" => "review#reject", as: :reject_review
+    delete "review/:id/claim" => "review#unclaim", as: :unclaim_review
   end
 
   # Defines the root path route ("/")

@@ -68,6 +68,18 @@ class Admin::ReviewController < ApplicationController
     redirect_to admin_review_project_path(project), alert: e.record.errors.full_messages.to_sentence
   end
 
+  def unclaim
+    project = Project.find(params[:id])
+    authorize project, :review?
+
+    if project.claimed_by?(current_user)
+      project.unclaim!
+      redirect_to admin_review_path, notice: "Unclaimed #{project.name}."
+    else
+      redirect_to admin_review_path, alert: "You don't hold the claim on #{project.name}."
+    end
+  end
+
   private
 
   def blocked_by_claim?(project)
