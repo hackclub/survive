@@ -35,20 +35,15 @@ class ProjectsController < ApplicationController
 
   def show
     authorize @project
-    owner = @project.user
-    is_owner = owner == current_user
-    seconds_by_name = HackatimeSyncService.call(owner)
-
-    visible_project_ids = is_owner ? [ nil, @project.id ] : @project.id
+    seconds_by_name = HackatimeSyncService.call(current_user)
 
     render inertia: "Projects/Show", props: {
       project: @project.as_client_json,
       can: {
         update: policy(@project).update?,
-        submitForReview: policy(@project).submit_for_review?,
-        review: policy(@project).review?
+        submitForReview: policy(@project).submit_for_review?
       },
-      hackatimeProjects: owner.hackatime_projects.where(project_id: visible_project_ids).order(:name).map { |hackatime_project|
+      hackatimeProjects: current_user.hackatime_projects.where(project_id: [ nil, @project.id ]).order(:name).map { |hackatime_project|
         {
           id: hackatime_project.id,
           name: hackatime_project.name,

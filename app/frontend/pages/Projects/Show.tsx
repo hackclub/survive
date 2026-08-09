@@ -1,4 +1,3 @@
-import { useState } from "react"
 import { Head, useForm, usePage, router } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
@@ -19,11 +18,10 @@ export default function Show({
   hackatimeProjects,
 }: {
   project: Project
-  can: { update: boolean; submitForReview: boolean; review: boolean }
+  can: { update: boolean; submitForReview: boolean }
   hackatimeProjects: HackatimeProject[]
 }) {
   const { auth, errors } = usePage<SharedProps>().props
-  const [rejectFeedback, setRejectFeedback] = useState("")
 
   const form = useForm({
     name: project.name,
@@ -50,15 +48,6 @@ export default function Show({
 
   function unlinkHackatimeProject(hackatimeProjectId: number) {
     router.post(`/projects/${project.id}/hackatime_projects/${hackatimeProjectId}/unlink`)
-  }
-
-  function approve() {
-    router.post(`/admin/review/${project.id}/approve`)
-  }
-
-  function reject(e: React.FormEvent) {
-    e.preventDefault()
-    router.post(`/admin/review/${project.id}/reject`, { feedback: rejectFeedback })
   }
 
   return (
@@ -89,6 +78,12 @@ export default function Show({
                   ))
                 )}
               </ul>
+            </div>
+          )}
+
+          {project.reviewFeedback && (
+            <div className="project-form__errors">
+              <p className="u-sm">{project.reviewFeedback}</p>
             </div>
           )}
 
@@ -242,46 +237,9 @@ export default function Show({
                 </ul>
               )}
 
-              {project.reviewFeedback && (
-                <div className="project-form__errors">
-                  <p className="u-sm">{project.reviewFeedback}</p>
-                </div>
-              )}
-
-              {!can.review && (
-                <p className="u-sm u-faint">
-                  This project is locked from editing while {STATUS_LABEL[project.status].toLowerCase()}.
-                </p>
-              )}
-
-              {can.review && (
-                <div className="project-form__actions">
-                  <button className="btn btn--primary" type="button" onClick={approve}>
-                    Approve
-                  </button>
-                </div>
-              )}
-
-              {can.review && (
-                <form onSubmit={reject} className="field-group">
-                  <div className="field">
-                    <label className="field__label" htmlFor="feedback">
-                      Reject with feedback
-                    </label>
-                    <textarea
-                      id="feedback"
-                      className="field__input field__input--textarea"
-                      rows={3}
-                      value={rejectFeedback}
-                      onChange={(e) => setRejectFeedback(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <button className="btn btn--ghost" type="submit">
-                    Reject
-                  </button>
-                </form>
-              )}
+              <p className="u-sm u-faint">
+                This project is locked from editing while {STATUS_LABEL[project.status].toLowerCase()}.
+              </p>
             </div>
           )}
         </div>
