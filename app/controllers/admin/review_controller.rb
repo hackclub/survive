@@ -2,7 +2,7 @@ class Admin::ReviewController < ApplicationController
   def index
     authorize :review
 
-    projects = Project.reviewable.includes(:user).order(:updated_at)
+    projects = Project.reviewable.unclaimed_or_claimed_by(current_user).includes(:user).order(:updated_at)
 
     render inertia: "Admin/Review/Index", props: {
       projects: projects.map { |project|
@@ -12,7 +12,8 @@ class Admin::ReviewController < ApplicationController
           ownerName: project.user.display_name,
           repoLink: project.repo_link,
           demoLink: project.demo_link,
-          submittedAt: project.updated_at.strftime("%b %d, %Y")
+          submittedAt: project.updated_at.strftime("%b %d, %Y"),
+          claimedByYou: project.claimed_by?(current_user)
         }
       }
     }

@@ -26,10 +26,15 @@ export default function Index({ projects }: { projects: ReviewQueueEntry[] }) {
             <ul className="dashboard__list">
               {projects.map((project) => (
                 <li key={project.id}>
-                  <Link className="dashboard__row" href={`/projects/${project.id}`}>
+                  <Link className="dashboard__row" href={`/admin/review/${project.id}`}>
                     <div className="dashboard__row-top">
                       <span className="dashboard__name">{project.name}</span>
                       <span className="u-sm u-faint">by {project.ownerName}</span>
+                      {project.claimedByYou && (
+                        <span className="dashboard__status dashboard__status--pending">
+                          Claimed by you
+                        </span>
+                      )}
                     </div>
 
                     <div className="dashboard__row-meta u-sm u-faint">

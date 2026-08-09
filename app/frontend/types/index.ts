@@ -49,6 +49,7 @@ export type ReviewQueueEntry = {
   repoLink: string | null
   demoLink: string | null
   submittedAt: string
+  claimedByYou: boolean
 }
 
 export type ProjectEventAction = "submitted" | "approved" | "rejected"
