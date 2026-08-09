@@ -103,7 +103,7 @@ class Admin::ReviewController < ApplicationController
     project = Project.find(params[:id])
     authorize project, :review?
 
-    project.unclaim! if project.claimed_by?(current_user)
+    project.unclaim!(current_user) if project.claimed_by?(current_user)
 
     skip_ids = params[:skip].to_s.split(",").map(&:to_i) + [ project.id ]
     claim_next_or_redirect_to_queue(skip_ids)
@@ -136,7 +136,7 @@ class Admin::ReviewController < ApplicationController
     authorize project, :review?
 
     if project.claimed_by?(current_user)
-      project.unclaim!
+      project.unclaim!(current_user)
       redirect_to admin_review_path, notice: "Unclaimed #{project.name}."
     else
       redirect_to admin_review_path, alert: "You don't hold the claim on #{project.name}."

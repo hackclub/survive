@@ -36,8 +36,8 @@ class Project < ApplicationRecord
     find(id)
   end
 
-  def unclaim!
-    update_columns(claimed_by_id: nil, claimed_at: nil)
+  def unclaim!(user)
+    self.class.where(id: id, claimed_by_id: user.id).update_all(claimed_by_id: nil, claimed_at: nil)
   end
 
   def claim_expired?
