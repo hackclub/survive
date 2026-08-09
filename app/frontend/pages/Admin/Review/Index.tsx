@@ -38,6 +38,9 @@ export default function Index({
           <div className="dashboard__header">
             <h1 className="dashboard__title">Review queue</h1>
             <span className="u-sm u-faint">{pagination.count} waiting</span>
+            <Link className="btn btn--primary btn--sm" href="/admin/review/next">
+              Review next
+            </Link>
           </div>
 
           <form onSubmit={submitSearch} className="dashboard__search">

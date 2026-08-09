@@ -29,11 +29,13 @@ export default function Show({
   hackatimeProjects,
   history,
   submitterHistory,
+  skipList,
 }: {
   project: Project
   hackatimeProjects: HackatimeProject[]
   history: ProjectEvent[]
   submitterHistory: SubmitterHistory
+  skipList: string
 }) {
   const [feedback, setFeedback] = useState("")
 
@@ -43,6 +45,10 @@ export default function Show({
 
   function unclaim() {
     router.delete(`/admin/review/${project.id}/claim`)
+  }
+
+  function skip() {
+    router.post(`/admin/review/${project.id}/skip`, { skip: skipList })
   }
 
   function reject(e: React.FormEvent) {
@@ -67,6 +73,9 @@ export default function Show({
             </span>
             <button className="btn btn--ghost btn--sm" type="button" onClick={unclaim}>
               Unclaim
+            </button>
+            <button className="btn btn--ghost btn--sm" type="button" onClick={skip}>
+              Skip
             </button>
           </div>
 

@@ -64,8 +64,26 @@ class Admin::ReviewController < ApplicationController
       submitterHistory: {
         approvedCount: owner.projects.approved.count,
         rejectedCount: owner.projects.rejected.count
-      }
+      },
+      skipList: params[:skip].to_s
     }
+  end
+
+  def next_project
+    authorize :review, :index?
+
+    skip_ids = params[:skip].to_s.split(",").map(&:to_i)
+    claim_next_or_redirect_to_queue(skip_ids)
+  end
+
+  def skip
+    project = Project.find(params[:id])
+    authorize project, :review?
+
+    project.unclaim! if project.claimed_by?(current_user)
+
+    skip_ids = params[:skip].to_s.split(",").map(&:to_i) + [ project.id ]
+    claim_next_or_redirect_to_queue(skip_ids)
   end
 
   def approve
@@ -101,6 +119,29 @@ class Admin::ReviewController < ApplicationController
   end
 
   private
+
+  def claim_next_or_redirect_to_queue(skip_ids)
+    loop do
+      candidate = Project.reviewable
+        .unclaimed_or_claimed_by(current_user)
+        .where.not(id: skip_ids)
+        .order(:updated_at)
+        .first
+
+      if candidate.nil?
+        redirect_to admin_review_path, notice: "No more projects waiting for review."
+        return
+      end
+
+      claimed = Project.atomic_claim!(candidate.id, current_user)
+      if claimed
+        redirect_to admin_review_project_path(claimed, skip: skip_ids.join(","))
+        return
+      end
+
+      skip_ids << candidate.id
+    end
+  end
 
   def blocked_by_claim?(project)
     return false unless project.claimed_by_someone_else?(current_user)

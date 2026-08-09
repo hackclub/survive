@@ -31,7 +31,7 @@ class Project < ApplicationRecord
   end
 
   def unclaim!
-    update!(claimed_by_id: nil, claimed_at: nil)
+    update_columns(claimed_by_id: nil, claimed_at: nil)
   end
 
   def claim_expired?

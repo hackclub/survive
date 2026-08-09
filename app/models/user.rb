@@ -4,6 +4,7 @@ class User < ApplicationRecord
 
   has_many :projects, dependent: :destroy
   has_many :hackatime_projects, dependent: :destroy
+  has_many :claimed_projects, class_name: "Project", foreign_key: :claimed_by_id, dependent: :nullify, inverse_of: :claimed_by
 
   after_commit -> { Rails.cache.delete("user/#{id}") }
 
