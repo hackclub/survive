@@ -1,24 +1,10 @@
-# README
+# survive
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+a swag YSWS where you build stuff that works offline without needing an internet connection.
 
-Things you may want to cover:
+build something that survives when:
+- the wifi dies
+- the servers explode
+- your ISP decides no more internet
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+it was built offline probably.
