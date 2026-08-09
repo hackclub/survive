@@ -1,4 +1,6 @@
 class User < ApplicationRecord
+  class AuthenticationError < StandardError; end
+
   encrypts :hca_token
   encrypts :hackatime_token
 
@@ -13,16 +15,16 @@ class User < ApplicationRecord
   validates :display_name, presence: true
 
   def self.exchange_hca_token(access_token)
-    raise StandardError, "No access token from HCA" if access_token.blank?
+    raise AuthenticationError, "No access token from HCA" if access_token.blank?
 
     hca_response = HcaService.me(access_token)
-    raise StandardError, "Failed to fetch user identity from HCA" unless hca_response
+    raise AuthenticationError, "Failed to fetch user identity from HCA" unless hca_response
 
     identity = hca_response["identity"]
-    raise StandardError, "No identity data in HCA response" unless identity
+    raise AuthenticationError, "No identity data in HCA response" unless identity
 
     if ysws_ineligible?(identity)
-      raise StandardError, "Sorry, Survive is for YSWS-eligible teen builders. You're not eligible to participate."
+      raise AuthenticationError, "Sorry, Survive is for YSWS-eligible teen builders. You're not eligible to participate."
     end
 
     user = find_by(hca_id: identity["id"])
@@ -58,7 +60,7 @@ class User < ApplicationRecord
   def self.create_from_hca(identity, access_token)
     email = identity["primary_email"]
     unless email.present? && email.match?(URI::MailTo::EMAIL_REGEXP)
-      raise StandardError, "HCA user has an invalid email: #{email.inspect}"
+      raise AuthenticationError, "HCA user has an invalid email: #{email.inspect}"
     end
 
     first_name = identity["first_name"] || ""

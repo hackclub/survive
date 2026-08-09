@@ -16,9 +16,12 @@ class AuthController < ApplicationController
     session[:user_id] = user.id
 
     redirect_to root_path, notice: "Welcome back, #{user.display_name}!"
-  rescue StandardError => e
+  rescue User::AuthenticationError => e
     Rails.logger.error("[AuthController] sign-in failed: #{e.message}")
     redirect_to root_path, alert: e.message
+  rescue StandardError => e
+    Rails.logger.error("[AuthController] sign-in failed: #{e.class}: #{e.message}")
+    redirect_to root_path, alert: "Something went wrong signing you in. Please try again."
   end
 
   def failure
