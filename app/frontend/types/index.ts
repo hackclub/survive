@@ -50,6 +50,13 @@ export type ReviewQueueEntry = {
   demoLink: string | null
   submittedAt: string
   claimedByYou: boolean
+  hackatimeSeconds: number
+}
+
+export type Pagination = {
+  page: number
+  pages: number
+  count: number
 }
 
 export type ProjectEventAction = "submitted" | "approved" | "rejected"

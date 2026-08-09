@@ -2,20 +2,39 @@ class Admin::ReviewController < ApplicationController
   def index
     authorize :review
 
-    projects = Project.reviewable.unclaimed_or_claimed_by(current_user).includes(:user).order(:updated_at)
+    scope = Project.reviewable.unclaimed_or_claimed_by(current_user)
+
+    if params[:q].present?
+      query = "%#{params[:q]}%"
+      scope = scope.joins(:user).where("projects.name ILIKE :q OR users.display_name ILIKE :q", q: query)
+    end
+
+    pagy, projects = pagy(scope.includes(:user, :hackatime_projects).order(:updated_at))
+
+    seconds_by_owner = projects.map(&:user).uniq.index_with { |owner| HackatimeSyncService.call(owner) }
 
     render inertia: "Admin/Review/Index", props: {
       projects: projects.map { |project|
+        seconds_by_name = seconds_by_owner[project.user] || {}
+        linked_seconds = project.hackatime_projects.sum { |hp| seconds_by_name[hp.name].to_i }
+
         {
           id: project.id,
           name: project.name,
-          ownerName: project.user.display_name,
+          ownerName: project.user.review_display_name,
           repoLink: project.repo_link,
           demoLink: project.demo_link,
           submittedAt: project.updated_at.strftime("%b %d, %Y"),
-          claimedByYou: project.claimed_by?(current_user)
+          claimedByYou: project.claimed_by?(current_user),
+          hackatimeSeconds: linked_seconds
         }
-      }
+      },
+      pagination: {
+        page: pagy.page,
+        pages: pagy.pages,
+        count: pagy.count
+      },
+      query: params[:q].to_s
     }
   end
 

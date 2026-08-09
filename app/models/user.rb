@@ -101,9 +101,11 @@ class User < ApplicationRecord
   end
 
   def avatar_url
-    return nil if slack_id.blank?
+    CachetService.avatar_url(slack_id)
+  end
 
-    "https://cachet.hackclub.com/users/#{slack_id}/r"
+  def review_display_name
+    CachetService.fetch_display_name(slack_id) || "Member ##{id}"
   end
 
   def reviewer?

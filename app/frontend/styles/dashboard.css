@@ -47,6 +47,24 @@
   border: 1px solid var(--line);
 }
 
+.dashboard__search {
+  display: flex;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+
+.dashboard__search .field__input {
+  flex: 1;
+}
+
+.dashboard__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  margin-top: var(--sp-6);
+}
+
 .dashboard__list {
   display: flex;
   flex-direction: column;
