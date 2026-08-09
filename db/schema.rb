@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_08_222737) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_09_000545) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -38,6 +38,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_222737) do
   end
 
   create_table "projects", force: :cascade do |t|
+    t.datetime "claimed_at"
+    t.bigint "claimed_by_id"
     t.datetime "created_at", null: false
     t.string "demo_link"
     t.text "description"
@@ -46,6 +48,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_222737) do
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["claimed_at"], name: "index_projects_on_claimed_at"
+    t.index ["claimed_by_id"], name: "index_projects_on_claimed_by_id"
     t.index ["status"], name: "index_projects_on_status"
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
@@ -86,4 +90,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_08_222737) do
   add_foreign_key "project_events", "projects"
   add_foreign_key "project_events", "users", column: "actor_id"
   add_foreign_key "projects", "users"
+  add_foreign_key "projects", "users", column: "claimed_by_id"
 end
