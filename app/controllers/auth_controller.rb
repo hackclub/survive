@@ -12,6 +12,7 @@ class AuthController < ApplicationController
     auth = request.env["omniauth.auth"]
     access_token = auth&.credentials&.token.to_s
     user = User.exchange_hca_token(access_token)
+    reset_session
     session[:user_id] = user.id
 
     redirect_to root_path, notice: "Welcome back, #{user.display_name}!"
