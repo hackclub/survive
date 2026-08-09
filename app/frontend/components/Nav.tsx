@@ -1,4 +1,6 @@
+import { useEffect } from "react"
 import { usePage } from "@inertiajs/react"
+import { initNav } from "../lib/motion"
 import mark from "../images/mark.webp"
 
 export function Nav() {
@@ -7,6 +9,12 @@ export function Nav() {
     typeof document !== "undefined"
       ? document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content || ""
       : ""
+
+  useEffect(() => {
+    const cleanups: Array<() => void> = []
+    initNav(cleanups)
+    return () => cleanups.forEach((fn) => fn())
+  }, [])
 
   return (
     <nav className="nav" data-nav>

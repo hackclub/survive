@@ -1,7 +1,7 @@
 const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v))
 const rand = (a: number, b: number) => a + Math.random() * (b - a)
 
-function initNav(cleanups: Array<() => void>) {
+export function initNav(cleanups: Array<() => void>) {
   const nav = document.querySelector<HTMLElement>("[data-nav]")
   if (!nav) return
 
@@ -200,7 +200,6 @@ export function initMotion(): () => void {
   const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
   const cleanups: Array<() => void> = []
 
-  initNav(cleanups)
   initTitle()
   initReveals(reduced, cleanups)
   initAccordion(cleanups)
