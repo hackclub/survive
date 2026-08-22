@@ -58,7 +58,6 @@ export type Project = {
   updatedAt: string
   round: number | null
   reviewState: ReviewState | null
-  claimedMinutes: number | null
   approvedMinutes: number | null
   reviewFeedback: string | null
 }

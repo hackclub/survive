@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_223908) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_224706) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_223908) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "ari_deliveries", force: :cascade do |t|
+    t.string "delivery_id", null: false
+    t.text "error"
+    t.string "event", null: false
+    t.string "external_id"
+    t.jsonb "payload", default: {}, null: false
+    t.datetime "processed_at"
+    t.datetime "received_at", null: false
+    t.bigint "review_id"
+    t.index ["delivery_id"], name: "index_ari_deliveries_on_delivery_id", unique: true
+    t.index ["received_at"], name: "index_ari_deliveries_on_received_at"
+    t.index ["review_id"], name: "index_ari_deliveries_on_review_id"
   end
 
   create_table "audit_logs", force: :cascade do |t|
@@ -95,18 +109,27 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_223908) do
 
   create_table "reviews", force: :cascade do |t|
     t.integer "approved_minutes"
+    t.string "ari_decision"
+    t.string "ari_phase"
+    t.string "ari_ship_id"
     t.jsonb "checks"
     t.datetime "checks_run_at"
-    t.integer "claimed_seconds", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "decided_at"
+    t.text "ingest_error"
+    t.integer "ingest_version", default: 1, null: false
+    t.datetime "ingested_at"
+    t.jsonb "justification"
     t.text "maker_feedback"
+    t.jsonb "minutes_breakdown"
     t.bigint "project_id", null: false
     t.bigint "reviewer_id"
     t.text "reviewer_notes"
     t.integer "round", null: false
     t.integer "state", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.index ["ari_phase"], name: "index_reviews_on_ari_phase"
+    t.index ["ari_ship_id"], name: "index_reviews_on_ari_ship_id", unique: true
     t.index ["project_id", "round"], name: "index_reviews_on_project_id_and_round", unique: true
     t.index ["reviewer_id"], name: "index_reviews_on_reviewer_id"
     t.index ["state"], name: "index_reviews_on_state"
@@ -149,6 +172,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_223908) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "ari_deliveries", "reviews"
   add_foreign_key "audit_logs", "users", column: "actor_id"
   add_foreign_key "hackatime_projects", "projects"
   add_foreign_key "hackatime_projects", "users"

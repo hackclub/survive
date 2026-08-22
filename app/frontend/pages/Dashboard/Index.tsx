@@ -83,8 +83,6 @@ export default function Index({ projects }: { projects: Project[] }) {
                       <div className="dashboard__row-meta u-sm u-faint">
                         {project.approvedMinutes !== null ? (
                           <span className="u-mono">{formatMinutes(project.approvedMinutes)} approved</span>
-                        ) : project.claimedMinutes !== null ? (
-                          <span className="u-mono">{formatMinutes(project.claimedMinutes)} claimed</span>
                         ) : (
                           <span>{project.repoLink ? "Repo linked" : "No repo link yet"}</span>
                         )}

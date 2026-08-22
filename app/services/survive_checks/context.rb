@@ -20,11 +20,7 @@ module SurviveChecks
     end
 
     def claimed_minutes
-      @claimed_minutes ||= if review
-        review.claimed_minutes_total
-      else
-        hackatime_names.sum { |name| seconds_by_name[name].to_i } / 60
-      end
+      @claimed_minutes ||= hackatime_names.sum { |name| seconds_by_name[name].to_i } / 60
     end
 
     def decided_on

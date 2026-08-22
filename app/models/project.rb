@@ -79,6 +79,10 @@ class Project < ApplicationRecord
     reviews.loaded? ? reviews.max_by(&:round) : reviews.reorder(round: :desc).first
   end
 
+  def ari_external_id
+    "survive-#{id}"
+  end
+
   def next_round
     (reviews.maximum(:round) || 0) + 1
   end
@@ -113,7 +117,6 @@ class Project < ApplicationRecord
       updatedAt: updated_at.strftime("%b %d, %Y"),
       round: latest_review&.round,
       reviewState: latest_review&.state,
-      claimedMinutes: latest_review&.claimed_minutes_total,
       approvedMinutes: latest_review&.approved_minutes,
       reviewFeedback: latest_review&.decided? ? latest_review.maker_feedback : nil
     }

@@ -8,7 +8,7 @@ class Review < ApplicationRecord
 
   validates :round, numericality: { only_integer: true, greater_than: 0 }
   validates :round, uniqueness: { scope: :project_id }
-  validates :claimed_seconds, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
+  validates :ingest_version, numericality: { only_integer: true, greater_than: 0 }
   validates :approved_minutes, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validates :maker_feedback, presence: true, if: :decided?
 
@@ -22,7 +22,7 @@ class Review < ApplicationRecord
     project.sync_status_from_reviews!
   end
 
-  def claimed_minutes_total
-    claimed_seconds / 60
+  def ingested?
+    ingested_at.present?
   end
 end
