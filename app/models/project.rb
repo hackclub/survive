@@ -1,8 +1,5 @@
 class Project < ApplicationRecord
-  CLAIM_TTL = 20.minutes
-
   belongs_to :user
-  belongs_to :claimed_by, class_name: "User", optional: true
   has_many :hackatime_projects, dependent: :nullify
   has_many :project_events, dependent: :destroy
   has_many :reviews, -> { order(:round) }, inverse_of: :project, dependent: :destroy
@@ -28,38 +25,6 @@ class Project < ApplicationRecord
   validate :hackatime_project_linked, unless: :draft?
   validate :banner_attached, unless: :draft?
   validate :banner_is_valid_image, if: -> { banner.attached? }
-
-  scope :reviewable, -> { where(status: :pending) }
-  scope :unclaimed_or_claimed_by, ->(user) {
-    where("claimed_by_id IS NULL OR claimed_at < ? OR claimed_by_id = ?", CLAIM_TTL.ago, user.id)
-  }
-
-  def self.atomic_claim!(id, user)
-    now = Time.current
-    updated = where(id: id)
-      .where("claimed_by_id IS NULL OR claimed_at < ? OR claimed_by_id = ?", now - CLAIM_TTL, user.id)
-      .update_all(claimed_by_id: user.id, claimed_at: now)
-
-    return nil if updated.zero?
-
-    find(id)
-  end
-
-  def unclaim!(user)
-    self.class.where(id: id, claimed_by_id: user.id).update_all(claimed_by_id: nil, claimed_at: nil)
-  end
-
-  def claim_expired?
-    claimed_at.nil? || claimed_at < CLAIM_TTL.ago
-  end
-
-  def claimed_by?(user)
-    claimed_by_id == user.id && !claim_expired?
-  end
-
-  def claimed_by_someone_else?(user)
-    claimed_by_id.present? && claimed_by_id != user.id && !claim_expired?
-  end
 
   def submit!
     transaction do
