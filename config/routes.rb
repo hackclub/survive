@@ -22,6 +22,17 @@ Rails.application.routes.draw do
   post "webhooks/ari" => "ari_webhooks#create", as: :ari_webhook
 
   namespace :admin do
+    root to: "overview#index"
+
+    resources :audit_logs, only: :index
+
+    resources :users, only: %i[index update] do
+      member do
+        post "ban"
+        delete "ban" => "users#unban"
+      end
+    end
+
     resources :reviews, only: :index do
       member { post "withdraw" }
     end

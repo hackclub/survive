@@ -7,9 +7,21 @@ type Item = { label: string; href: string }
 type Section = { label: string; items: Item[] }
 
 const SECTIONS: Section[] = [
+  { label: "Overview", items: [{ label: "Dashboard", href: "/admin" }] },
   { label: "Ari", items: [{ label: "Submissions", href: "/admin/reviews" }] },
   { label: "Payouts", items: [{ label: "Final review", href: "/admin/final_reviews" }] },
+  {
+    label: "Admin",
+    items: [
+      { label: "Users", href: "/admin/users" },
+      { label: "Audit log", href: "/admin/audit_logs" },
+    ],
+  },
 ]
+
+function isActive(path: string, href: string) {
+  return href === "/admin" ? path === "/admin" : path.startsWith(href)
+}
 
 export function AdminSidebarLayout({ children }: { children: ReactNode }) {
   const { url } = usePage()
@@ -28,7 +40,7 @@ export function AdminSidebarLayout({ children }: { children: ReactNode }) {
                 {section.items.map((item) => (
                   <Link
                     key={item.href}
-                    className={`admin-sidebar__link${path.startsWith(item.href) ? " is-active" : ""}`}
+                    className={`admin-sidebar__link${isActive(path, item.href) ? " is-active" : ""}`}
                     href={item.href}
                   >
                     {item.label}

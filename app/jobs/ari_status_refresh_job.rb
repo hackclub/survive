@@ -1,6 +1,7 @@
 class AriStatusRefreshJob < ApplicationJob
   queue_as :default
 
+  LAST_RUN_KEY = "ari:status_refresh:last_run".freeze
   STALE_AFTER = 48.hours
   DECIDED_PHASES = %w[reviewed withdrawn].freeze
 
@@ -9,6 +10,7 @@ class AriStatusRefreshJob < ApplicationJob
 
     client = Ari::Client.new
     Review.awaiting_ari.find_each { |review| refresh(client, review) }
+    Rails.cache.write(LAST_RUN_KEY, Time.current, expires_in: 1.week)
   end
 
   private
