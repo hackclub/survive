@@ -176,12 +176,12 @@ export default function Show({
                     <span className="u-xs u-faint u-mono">snapshotted at claim</span>
                   </div>
 
-                  <table className="ledger__table">
+                  <table className="data-table">
                     <thead>
                       <tr>
                         <th>Hackatime project</th>
-                        <th className="ledger__num">Claimed</th>
-                        <th className="ledger__num">Approve</th>
+                        <th className="data-table__num">Claimed</th>
+                        <th className="data-table__num">Approve</th>
                         <th>Verdict</th>
                         <th>Reason</th>
                       </tr>
@@ -190,8 +190,8 @@ export default function Show({
                       {rows.map(({ entry, draft, claimedMinutes, verdict }) => (
                         <tr key={entry.id}>
                           <td className="u-mono">{entry.name}</td>
-                          <td className="ledger__num u-mono u-faint">{formatMinutes(claimedMinutes)}</td>
-                          <td className="ledger__num">
+                          <td className="data-table__num u-mono u-faint">{formatMinutes(claimedMinutes)}</td>
+                          <td className="data-table__num">
                             <input
                               className="ledger__input"
                               type="number"

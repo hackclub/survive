@@ -145,37 +145,6 @@
   gap: var(--sp-3);
 }
 
-.ledger__table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.ledger__table th {
-  text-align: left;
-  padding: 0 var(--sp-3) var(--sp-2);
-  font-size: var(--fs-xs);
-  font-weight: 700;
-  color: var(--ink-faint);
-  border-bottom: 1px solid var(--line);
-  white-space: nowrap;
-}
-
-.ledger__table td {
-  padding: var(--sp-3);
-  border-bottom: 1px solid var(--line);
-  vertical-align: middle;
-  font-size: var(--fs-sm);
-}
-
-.ledger__table tr:last-child td {
-  border-bottom: 0;
-}
-
-.ledger__num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-}
-
 .ledger__input {
   width: 100%;
   padding: var(--sp-2) var(--sp-3);
@@ -186,7 +155,7 @@
   font-variant-numeric: tabular-nums;
 }
 
-.ledger__num .ledger__input {
+.data-table__num .ledger__input {
   width: 5.5rem;
   text-align: right;
 }
