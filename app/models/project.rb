@@ -99,6 +99,10 @@ class Project < ApplicationRecord
     project_events.create!(actor: actor, action: :rejected, feedback: feedback)
   end
 
+  def return_to_maker!(actor, feedback:)
+    project_events.create!(actor: actor, action: :returned, feedback: feedback)
+  end
+
   def banner_url
     return nil unless banner.attached?
 

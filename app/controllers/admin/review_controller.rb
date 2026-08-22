@@ -150,6 +150,17 @@ class Admin::ReviewController < ApplicationController
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
   end
 
+  def return_to_maker
+    review = Review.find(params[:id])
+    authorize review
+    return if blocked_by_claim?(review)
+
+    review.return_to_maker!(current_user, feedback: params[:feedback])
+    redirect_to admin_review_path, notice: "Returned #{review.project.name} to the maker."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
+  end
+
   def unclaim
     review = Review.find(params[:id])
     authorize review

@@ -2,9 +2,9 @@ class ProjectEvent < ApplicationRecord
   belongs_to :project
   belongs_to :actor, class_name: "User"
 
-  enum :action, { submitted: 0, approved: 1, rejected: 2 }
+  enum :action, { submitted: 0, approved: 1, rejected: 2, returned: 3 }
 
-  validates :feedback, presence: true, if: -> { approved? || rejected? }
+  validates :feedback, presence: true, if: -> { approved? || rejected? || returned? }
 
   default_scope { order(created_at: :desc) }
 

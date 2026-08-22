@@ -38,6 +38,7 @@ const EVENT_LABEL: Record<ProjectEvent["action"], string> = {
   submitted: "Submitted",
   approved: "Approved",
   rejected: "Rejected",
+  returned: "Returned",
 }
 
 export default function Show({
@@ -100,7 +101,7 @@ export default function Show({
     router.post(`/admin/review/${reviewId}/skip`, { skip: skipList })
   }
 
-  function decide(action: "approve" | "reject") {
+  function decide(action: "approve" | "reject" | "return") {
     const entries = Object.fromEntries(
       rows.map((row) => [
         row.entry.id,
@@ -294,6 +295,14 @@ export default function Show({
                     onClick={() => decide("approve")}
                   >
                     Approve {formatMinutes(approvedTotal)}
+                  </button>
+                  <button
+                    className="btn btn--ghost"
+                    type="button"
+                    disabled={cannotDecide}
+                    onClick={() => decide("return")}
+                  >
+                    Return for changes
                   </button>
                   <button
                     className="btn btn--ghost"

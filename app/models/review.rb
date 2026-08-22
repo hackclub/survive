@@ -125,6 +125,13 @@ class Review < ApplicationRecord
     end
   end
 
+  def return_to_maker!(actor, feedback:)
+    transaction do
+      update!(state: :returned, reviewer: actor, decided_at: Time.current, maker_feedback: feedback)
+      project.return_to_maker!(actor, feedback: feedback)
+    end
+  end
+
   def deflated_minutes
     [ claimed_minutes_total - approved_minutes_total, 0 ].max
   end
