@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_223545) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_223908) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -83,10 +83,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_223545) do
     t.string "demo_link"
     t.text "description"
     t.string "name", null: false
+    t.string "normalized_repo_url"
     t.string "repo_link"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
+    t.index ["normalized_repo_url"], name: "index_projects_on_normalized_repo_url"
     t.index ["status"], name: "index_projects_on_status"
     t.index ["user_id"], name: "index_projects_on_user_id"
   end

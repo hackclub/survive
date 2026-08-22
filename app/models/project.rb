@@ -26,6 +26,8 @@ class Project < ApplicationRecord
   validate :banner_attached, unless: :draft?
   validate :banner_is_valid_image, if: -> { banner.attached? }
 
+  before_save :set_normalized_repo_url, if: :will_save_change_to_repo_link?
+
   def submit!
     transaction do
       project_events.create!(actor: user, action: :submitted)
@@ -93,6 +95,10 @@ class Project < ApplicationRecord
   end
 
   private
+
+  def set_normalized_repo_url
+    self.normalized_repo_url = RepoUrl.normalize(repo_link)
+  end
 
   def banner_attached
     return if banner.attached?

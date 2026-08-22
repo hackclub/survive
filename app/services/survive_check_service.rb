@@ -10,7 +10,8 @@ module SurviveCheckService
     SurviveChecks::HackatimeLinked,
     SurviveChecks::MakerIdentityComplete,
     SurviveChecks::MakerAgeEligible,
-    SurviveChecks::MakerNotBanned
+    SurviveChecks::MakerNotBanned,
+    SurviveChecks::UniqueRepo
   ].freeze
 
   def run(project:, review: nil)
