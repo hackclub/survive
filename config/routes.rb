@@ -19,6 +19,8 @@ Rails.application.routes.draw do
   delete "auth/signout" => "auth#destroy", as: :signout
   get "auth/hackatime/callback" => "hackatime_identities#create", as: :hackatime_callback
 
+  post "webhooks/ari" => "ari_webhooks#create", as: :ari_webhook
+
   get "dashboard" => "dashboard#index", as: :dashboard
   resources :projects, only: %i[new create show update] do
     member do
