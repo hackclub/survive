@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_23_000522) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_23_001137) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -183,6 +183,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_000522) do
     t.index ["state"], name: "index_reviews_on_state"
   end
 
+  create_table "shop_item_regions", force: :cascade do |t|
+    t.integer "coin_cost"
+    t.datetime "created_at", null: false
+    t.boolean "enabled", default: true, null: false
+    t.string "region", null: false
+    t.bigint "shop_item_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["shop_item_id", "region"], name: "index_shop_item_regions_on_shop_item_id_and_region", unique: true
+  end
+
+  create_table "shop_items", force: :cascade do |t|
+    t.integer "coin_cost", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.boolean "enabled", default: true, null: false
+    t.decimal "internal_price_usd", precision: 10, scale: 2
+    t.integer "kind", default: 0, null: false
+    t.integer "max_quantity"
+    t.integer "min_approved_hours"
+    t.string "name", null: false
+    t.boolean "one_per_person", default: false, null: false
+    t.integer "stock"
+    t.datetime "updated_at", null: false
+    t.index ["enabled"], name: "index_shop_items_on_enabled"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "address_line1"
     t.string "address_line2"
@@ -237,5 +263,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_000522) do
   add_foreign_key "projects", "users"
   add_foreign_key "reviews", "projects"
   add_foreign_key "reviews", "users", column: "reviewer_id"
+  add_foreign_key "shop_item_regions", "shop_items"
   add_foreign_key "users", "users", column: "banned_by_id"
 end

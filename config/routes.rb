@@ -26,6 +26,8 @@ Rails.application.routes.draw do
 
     resources :audit_logs, only: :index
 
+    resources :shop_items
+
     resources :coins, only: %i[index show] do
       member { post "adjust" }
     end
@@ -50,6 +52,7 @@ Rails.application.routes.draw do
   end
 
   get "dashboard" => "dashboard#index", as: :dashboard
+  get "shop" => "shop#index", as: :shop
   resources :projects, only: %i[new create show update] do
     member do
       post "hackatime_projects/:hackatime_project_id/link" => "projects#link_hackatime_project", as: :link_hackatime_project

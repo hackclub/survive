@@ -18,13 +18,11 @@ type Row = {
 export default function Index({
   users,
   query,
-  rate,
   totals,
   pagination,
 }: {
   users: Row[]
   query: string
-  rate: number
   totals: { earned: number; adjusted: number }
   pagination: Pagination
 }) {
@@ -38,7 +36,7 @@ export default function Index({
         <div className="dashboard__header">
           <h1 className="dashboard__title">Coins</h1>
           <p className="u-sm u-faint u-mono">
-            {rate} an hour · {totals.earned} earned · {totals.adjusted} adjusted
+            {totals.earned} earned · {totals.adjusted} adjusted
           </p>
         </div>
 

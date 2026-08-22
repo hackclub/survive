@@ -10,7 +10,8 @@ const SECTIONS: Section[] = [
   { label: "Overview", items: [{ label: "Dashboard", href: "/admin" }] },
   { label: "Ari", items: [{ label: "Submissions", href: "/admin/reviews" }] },
   { label: "Payouts", items: [{ label: "Final review", href: "/admin/final_reviews" },
-      { label: "Coins", href: "/admin/coins" }] },
+      { label: "Coins", href: "/admin/coins" },
+      { label: "Shop items", href: "/admin/shop_items" }] },
   {
     label: "Admin",
     items: [

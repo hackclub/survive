@@ -9,7 +9,6 @@ class Admin::CoinsController < ApplicationController
     render inertia: "Admin/Coins/Index", props: {
       users: users.map { |user| row(user, earned[user.id].to_i, adjusted[user.id].to_i) },
       query: params[:q].to_s,
-      rate: CoinPayout.rate_per_hour,
       totals: {
         earned: CoinPayout.sum(:coins),
         adjusted: CoinAdjustment.sum(:amount)
@@ -82,7 +81,7 @@ class Admin::CoinsController < ApplicationController
         kind: "earned",
         amount: payout.coins,
         source: "#{payout.project.name} round #{payout.review.round}",
-        detail: "#{payout.net_minutes} minutes at #{payout.rate_per_hour} an hour",
+        detail: "#{payout.net_minutes} minutes at #{payout.rate_per_hour}/h",
         actor: nil
       }
     end

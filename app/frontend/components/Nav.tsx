@@ -55,8 +55,11 @@ export function Nav() {
                 {auth.user.avatar && <img className="nav__avatar" src={auth.user.avatar} alt="" />}
                 {auth.user.displayName}
               </span>
-              {auth.user.isReviewer && (
-                <a className="btn btn--ghost btn--sm" href="/admin/review">
+              <a className="btn btn--ghost btn--sm" href="/shop">
+                Shop
+              </a>
+              {auth.user.isAdmin && (
+                <a className="btn btn--ghost btn--sm" href="/admin">
                   Admin
                 </a>
               )}
