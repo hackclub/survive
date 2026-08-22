@@ -8,6 +8,7 @@ class User < ApplicationRecord
 
   has_many :projects, dependent: :destroy
   has_many :hackatime_projects, dependent: :destroy
+  belongs_to :banned_by, class_name: "User", optional: true
 
   after_commit -> { Rails.cache.delete("user/#{id}") }
 
@@ -15,6 +16,7 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true
   validates :display_name, presence: true
   validate :roles_are_known
+  validates :banned_reason, presence: true, if: :is_banned?
 
   def self.exchange_hca_token(access_token)
     raise AuthenticationError, "No access token from HCA" if access_token.blank?
@@ -103,6 +105,14 @@ class User < ApplicationRecord
     }.compact
 
     update!(attrs) if attrs.any?
+  end
+
+  def ban!(actor, reason:)
+    update!(is_banned: true, banned_at: Time.current, banned_by: actor, banned_reason: reason)
+  end
+
+  def unban!
+    update!(is_banned: false, banned_at: nil, banned_by: nil, banned_reason: nil)
   end
 
   def avatar_url

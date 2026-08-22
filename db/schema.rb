@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_215501) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_220500) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -129,6 +129,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_215501) do
   create_table "users", force: :cascade do |t|
     t.string "address_line1"
     t.string "address_line2"
+    t.datetime "banned_at"
+    t.bigint "banned_by_id"
+    t.text "banned_reason"
     t.date "birthday"
     t.string "city"
     t.string "country"
@@ -150,6 +153,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_215501) do
     t.string "state"
     t.datetime "updated_at", null: false
     t.string "verification_status"
+    t.index ["banned_by_id"], name: "index_users_on_banned_by_id"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["hackatime_uid"], name: "index_users_on_hackatime_uid", unique: true
     t.index ["hca_id"], name: "index_users_on_hca_id", unique: true
@@ -169,4 +173,5 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_215501) do
   add_foreign_key "reviews", "projects"
   add_foreign_key "reviews", "users", column: "claimed_by_id"
   add_foreign_key "reviews", "users", column: "reviewer_id"
+  add_foreign_key "users", "users", column: "banned_by_id"
 end
