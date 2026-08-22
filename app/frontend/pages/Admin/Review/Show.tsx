@@ -62,6 +62,7 @@ export default function Show({
   skipList: string
 }) {
   const [feedback, setFeedback] = useState("")
+  const [notes, setNotes] = useState("")
   const [drafts, setDrafts] = useState<Record<number, EntryDraft>>(() =>
     Object.fromEntries(
       hourEntries.map((entry) => [
@@ -88,7 +89,8 @@ export default function Show({
   const deflated = Math.max(0, claimedTotal - approvedTotal)
   const approvedShare = claimedTotal > 0 ? (approvedTotal / claimedTotal) * 100 : 0
   const missingNote = rows.some((row) => row.verdict !== "approved" && !row.draft.note.trim())
-  const blocked = !feedback.trim() || missingNote
+  const cannotDecide = !feedback.trim() || missingNote
+  const cannotApprove = cannotDecide || !notes.trim()
 
   function unclaim() {
     router.delete(`/admin/review/${reviewId}/claim`)
@@ -105,7 +107,11 @@ export default function Show({
         { approved_minutes: row.approved, verdict: row.verdict, note: row.draft.note },
       ]),
     )
-    router.post(`/admin/review/${reviewId}/${action}`, { feedback, entries })
+    router.post(`/admin/review/${reviewId}/${action}`, {
+      feedback,
+      reviewer_notes: notes,
+      entries,
+    })
   }
 
   const totalHours = hackatimeProjects.reduce((sum, hp) => sum + hp.seconds, 0)
@@ -255,7 +261,7 @@ export default function Show({
               <div className="review__action-bar">
                 <div className="field">
                   <label className="field__label" htmlFor="feedback">
-                    Reason (required for approve or reject)
+                    Feedback &mdash; the maker reads this
                   </label>
                   <textarea
                     id="feedback"
@@ -263,14 +269,28 @@ export default function Show({
                     rows={3}
                     value={feedback}
                     onChange={(e) => setFeedback(e.target.value)}
-                    placeholder="Why does this project pass or fail review?"
+                    placeholder="What did you change and why? Written to the person who built it."
+                  />
+                </div>
+
+                <div className="field">
+                  <label className="field__label" htmlFor="reviewer-notes">
+                    Assessment &mdash; goes to the YSWS grant team
+                  </label>
+                  <textarea
+                    id="reviewer-notes"
+                    className="field__input field__input--textarea"
+                    rows={3}
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Why does this project meet the bar? Required to approve."
                   />
                 </div>
                 <div className="review__action-buttons">
                   <button
                     className="btn btn--primary"
                     type="button"
-                    disabled={blocked}
+                    disabled={cannotApprove}
                     onClick={() => decide("approve")}
                   >
                     Approve {formatMinutes(approvedTotal)}
@@ -278,7 +298,7 @@ export default function Show({
                   <button
                     className="btn btn--ghost"
                     type="button"
-                    disabled={blocked}
+                    disabled={cannotDecide}
                     onClick={() => decide("reject")}
                   >
                     Reject
@@ -287,6 +307,11 @@ export default function Show({
                 {missingNote && (
                   <p className="u-xs u-faint">
                     Every reduced or rejected line needs a reason. It is sent on with the review.
+                  </p>
+                )}
+                {!missingNote && feedback.trim() && !notes.trim() && (
+                  <p className="u-xs u-faint">
+                    An assessment is required to approve. Rejecting does not need one.
                   </p>
                 )}
               </div>

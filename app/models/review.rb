@@ -16,6 +16,7 @@ class Review < ApplicationRecord
   validates :claimed_seconds, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :approved_minutes, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validates :maker_feedback, presence: true, if: :decided?
+  validates :reviewer_notes, presence: true, if: :approved?
   validates :reviewer_id, presence: true, if: :decided?
 
   scope :queued, -> { where(state: %i[pending in_review]) }
@@ -94,7 +95,7 @@ class Review < ApplicationRecord
     end
   end
 
-  def approve!(actor, feedback:, entries: {})
+  def approve!(actor, feedback:, notes:, entries: {})
     transaction do
       apply_hour_entries!(entries)
       update!(
@@ -102,13 +103,14 @@ class Review < ApplicationRecord
         reviewer: actor,
         decided_at: Time.current,
         maker_feedback: feedback,
+        reviewer_notes: notes,
         approved_minutes: hour_entries.reload.sum(:approved_minutes)
       )
       project.approve!(actor, feedback: feedback)
     end
   end
 
-  def reject!(actor, feedback:, entries: {})
+  def reject!(actor, feedback:, notes: nil, entries: {})
     transaction do
       apply_hour_entries!(entries)
       update!(
@@ -116,6 +118,7 @@ class Review < ApplicationRecord
         reviewer: actor,
         decided_at: Time.current,
         maker_feedback: feedback,
+        reviewer_notes: notes,
         approved_minutes: 0
       )
       project.reject!(actor, feedback: feedback)

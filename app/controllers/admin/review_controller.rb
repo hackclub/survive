@@ -133,7 +133,7 @@ class Admin::ReviewController < ApplicationController
     authorize review
     return if blocked_by_claim?(review)
 
-    review.approve!(current_user, feedback: params[:feedback], entries: entry_params)
+    review.approve!(current_user, feedback: params[:feedback], notes: params[:reviewer_notes], entries: entry_params)
     redirect_to admin_review_path, notice: "Approved #{review.project.name}."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
@@ -144,7 +144,7 @@ class Admin::ReviewController < ApplicationController
     authorize review
     return if blocked_by_claim?(review)
 
-    review.reject!(current_user, feedback: params[:feedback], entries: entry_params)
+    review.reject!(current_user, feedback: params[:feedback], notes: params[:reviewer_notes], entries: entry_params)
     redirect_to admin_review_path, notice: "Rejected #{review.project.name}."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
