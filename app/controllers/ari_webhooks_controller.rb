@@ -41,7 +41,7 @@ class AriWebhooksController < ActionController::Base
   def record(payload)
     return head :ok if AriDelivery.exists?(delivery_id: delivery_id)
 
-    AriDelivery.create!(
+    delivery = AriDelivery.create!(
       delivery_id: delivery_id,
       event: payload["event"].presence || "unknown",
       external_id: payload["external_id"],
@@ -50,6 +50,7 @@ class AriWebhooksController < ActionController::Base
       received_at: Time.current
     )
 
+    AriDeliveryJob.perform_later(delivery.id)
     Rails.logger.info("[Ari] stored delivery #{delivery_id} #{payload['event']} for #{payload['external_id']}")
     head :accepted
   rescue ActiveRecord::RecordNotUnique

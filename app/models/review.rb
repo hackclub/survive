@@ -10,7 +10,6 @@ class Review < ApplicationRecord
   validates :round, uniqueness: { scope: :project_id }
   validates :ingest_version, numericality: { only_integer: true, greater_than: 0 }
   validates :approved_minutes, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :maker_feedback, presence: true, if: :decided?
 
   scope :open_rounds, -> { where(state: %i[pending in_review]) }
 

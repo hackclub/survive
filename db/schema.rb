@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_224706) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_230042) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -111,6 +111,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_224706) do
     t.integer "approved_minutes"
     t.string "ari_decision"
     t.string "ari_phase"
+    t.string "ari_reviewer_email"
+    t.string "ari_reviewer_slack_id"
     t.string "ari_ship_id"
     t.jsonb "checks"
     t.datetime "checks_run_at"

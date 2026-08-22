@@ -66,6 +66,10 @@ class Project < ApplicationRecord
     update_column(:status, self.class.statuses.fetch(derived.to_s))
   end
 
+  def record_event(action, feedback)
+    project_events.create!(actor: user, action: action, feedback: feedback.presence || "Decided by the review team.")
+  end
+
   def record_checks(result)
     review = open_review
     return reviews.create!(round: next_round, checks: result, checks_run_at: Time.current) if review.nil?
@@ -92,16 +96,16 @@ class Project < ApplicationRecord
     (reviews.maximum(:round) || 0) + 1
   end
 
-  def approve!(actor, feedback:)
-    project_events.create!(actor: actor, action: :approved, feedback: feedback)
+  def approved_event!(feedback)
+    record_event(:approved, feedback)
   end
 
-  def reject!(actor, feedback:)
-    project_events.create!(actor: actor, action: :rejected, feedback: feedback)
+  def rejected_event!(feedback)
+    record_event(:rejected, feedback)
   end
 
-  def return_to_maker!(actor, feedback:)
-    project_events.create!(actor: actor, action: :returned, feedback: feedback)
+  def returned_event!(feedback)
+    record_event(:returned, feedback)
   end
 
   def banner_url
