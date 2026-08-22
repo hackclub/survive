@@ -1,6 +1,8 @@
 class User < ApplicationRecord
   class AuthenticationError < StandardError; end
 
+  ROLES = %w[reviewer fraud admin superadmin].freeze
+
   encrypts :hca_token
   encrypts :hackatime_token
 
@@ -12,6 +14,7 @@ class User < ApplicationRecord
   validates :hca_id, presence: true, uniqueness: true
   validates :email, presence: true, uniqueness: true
   validates :display_name, presence: true
+  validate :roles_are_known
 
   def self.exchange_hca_token(access_token)
     raise AuthenticationError, "No access token from HCA" if access_token.blank?
@@ -114,11 +117,26 @@ class User < ApplicationRecord
     roles.include?("reviewer") || admin?
   end
 
+  def fraud?
+    roles.include?("fraud") || admin?
+  end
+
   def admin?
-    roles.include?("admin")
+    roles.include?("admin") || superadmin?
+  end
+
+  def superadmin?
+    roles.include?("superadmin")
   end
 
   private
+
+  def roles_are_known
+    unknown = roles - ROLES
+    return if unknown.empty?
+
+    errors.add(:roles, "contains unknown values: #{unknown.join(", ")}")
+  end
 
   def pick(hash, keys)
     return "" unless hash.is_a?(Hash)

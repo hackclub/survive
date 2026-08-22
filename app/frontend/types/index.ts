@@ -9,7 +9,9 @@ export type AuthUser = {
   email: string
   avatar: string | null
   isReviewer: boolean
+  isFraud: boolean
   isAdmin: boolean
+  isSuperadmin: boolean
   hackatimeConnected: boolean
 }
 

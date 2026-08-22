@@ -36,8 +36,20 @@ class ApplicationPolicy
 
   private
 
+  def reviewer?
+    user&.reviewer?
+  end
+
+  def fraud?
+    user&.fraud?
+  end
+
   def admin?
     user&.admin?
+  end
+
+  def superadmin?
+    user&.superadmin?
   end
 
   def owner?

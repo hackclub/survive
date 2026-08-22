@@ -17,7 +17,9 @@ class ApplicationController < ActionController::Base
           email: u.email,
           avatar: u.avatar_url,
           isReviewer: u.reviewer?,
+          isFraud: u.fraud?,
           isAdmin: u.admin?,
+          isSuperadmin: u.superadmin?,
           hackatimeConnected: u.hackatime_uid.present?
         }
       }
