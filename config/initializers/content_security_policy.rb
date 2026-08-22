@@ -11,15 +11,22 @@ Rails.application.configure do
     policy.img_src     :self, :https, :data, "https://cachet.hackclub.com"
     policy.object_src  :none
     policy.script_src  :self, :https
+    policy.connect_src :self, :https
     # Allow @vite/client to hot reload javascript changes in development
-    policy.script_src *policy.script_src, :unsafe_eval, "http://#{ViteRuby.config.host_with_port}" if Rails.env.development?
+    if Rails.env.development?
+      vite_host = ViteRuby.config.host_with_port
+      policy.script_src *policy.script_src, :unsafe_eval, :unsafe_inline, "http://#{vite_host}"
+      policy.connect_src *policy.connect_src, "http://#{vite_host}", "ws://#{vite_host}"
+      policy.img_src *policy.img_src, "http://#{vite_host}"
+      policy.font_src *policy.font_src, "http://#{vite_host}"
+    end
 
     # You may need to enable this in production as well depending on your setup.
     policy.script_src *policy.script_src, :blob if Rails.env.test?
 
     policy.style_src :self, :https, "https://fonts.googleapis.com"
     # Allow @vite/client to hot reload style changes in development
-    policy.style_src *policy.style_src, :unsafe_inline if Rails.env.development?
+    policy.style_src *policy.style_src, :unsafe_inline, "http://#{ViteRuby.config.host_with_port}" if Rails.env.development?
 
     # Specify URI for violation reports
     # policy.report_uri "/csp-violation-report-endpoint"
