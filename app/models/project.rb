@@ -5,6 +5,7 @@ class Project < ApplicationRecord
   belongs_to :claimed_by, class_name: "User", optional: true
   has_many :hackatime_projects, dependent: :nullify
   has_many :project_events, dependent: :destroy
+  has_many :reviews, -> { order(:round) }, inverse_of: :project, dependent: :destroy
   has_one_attached :banner
 
   BANNER_CONTENT_TYPES = %w[image/png image/jpeg image/webp image/gif].freeze
@@ -56,7 +57,20 @@ class Project < ApplicationRecord
     transaction do
       update!(status: :pending)
       project_events.create!(actor: user, action: :submitted)
+      open_review || reviews.create!(round: next_round)
     end
+  end
+
+  def open_review
+    reviews.queued.order(round: :desc).first
+  end
+
+  def latest_review
+    reviews.order(round: :desc).first
+  end
+
+  def next_round
+    (reviews.maximum(:round) || 0) + 1
   end
 
   def approve!(actor, feedback:)
