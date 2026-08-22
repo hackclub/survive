@@ -56,11 +56,23 @@ class Admin::ReviewController < ApplicationController
     project = claimed.project
     owner = project.user
     seconds_by_name = HackatimeSyncService.call(owner)
+    claimed.seed_hour_entries!(seconds_by_name)
 
     render inertia: "Admin/Review/Show", props: {
       project: project.as_client_json,
       reviewId: claimed.id,
       round: claimed.round,
+      claimedSeconds: claimed.claimed_seconds,
+      hourEntries: claimed.hour_entries.map { |entry|
+        {
+          id: entry.id,
+          name: entry.hackatime_name,
+          claimedSeconds: entry.claimed_seconds,
+          approvedMinutes: entry.approved_minutes,
+          verdict: entry.verdict,
+          note: entry.note
+        }
+      },
       hackatimeProjects: owner.hackatime_projects.where(project_id: project.id).order(:name).map { |hackatime_project|
         {
           id: hackatime_project.id,
@@ -121,7 +133,7 @@ class Admin::ReviewController < ApplicationController
     authorize review
     return if blocked_by_claim?(review)
 
-    review.approve!(current_user, feedback: params[:feedback])
+    review.approve!(current_user, feedback: params[:feedback], entries: entry_params)
     redirect_to admin_review_path, notice: "Approved #{review.project.name}."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
@@ -132,7 +144,7 @@ class Admin::ReviewController < ApplicationController
     authorize review
     return if blocked_by_claim?(review)
 
-    review.reject!(current_user, feedback: params[:feedback])
+    review.reject!(current_user, feedback: params[:feedback], entries: entry_params)
     redirect_to admin_review_path, notice: "Rejected #{review.project.name}."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
@@ -151,6 +163,16 @@ class Admin::ReviewController < ApplicationController
   end
 
   private
+
+  def entry_params
+    return {} unless params[:entries].respond_to?(:each_pair)
+
+    params[:entries].each_pair.with_object({}) do |(entry_id, attrs), acc|
+      next unless attrs.respond_to?(:permit)
+
+      acc[entry_id.to_i] = attrs.permit(:approved_minutes, :verdict, :note)
+    end
+  end
 
   def claim(review)
     claimed = Review.atomic_claim!(review.id, current_user)
