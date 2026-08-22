@@ -25,12 +25,16 @@ const EVENT_LABEL: Record<ProjectEvent["action"], string> = {
 
 export default function Show({
   project,
+  reviewId,
+  round,
   hackatimeProjects,
   history,
   submitterHistory,
   skipList,
 }: {
   project: Project
+  reviewId: number
+  round: number
   hackatimeProjects: HackatimeProject[]
   history: ProjectEvent[]
   submitterHistory: SubmitterHistory
@@ -39,15 +43,15 @@ export default function Show({
   const [feedback, setFeedback] = useState("")
 
   function unclaim() {
-    router.delete(`/admin/review/${project.id}/claim`)
+    router.delete(`/admin/review/${reviewId}/claim`)
   }
 
   function skip() {
-    router.post(`/admin/review/${project.id}/skip`, { skip: skipList })
+    router.post(`/admin/review/${reviewId}/skip`, { skip: skipList })
   }
 
   function decide(action: "approve" | "reject") {
-    router.post(`/admin/review/${project.id}/${action}`, { feedback })
+    router.post(`/admin/review/${reviewId}/${action}`, { feedback })
   }
 
   const totalHours = hackatimeProjects.reduce((sum, hp) => sum + hp.seconds, 0)
@@ -60,7 +64,7 @@ export default function Show({
         <div className="review">
           <div className="review__header">
             <div>
-              <p className="review__eyebrow u-label">Reviewing</p>
+              <p className="review__eyebrow u-label">Reviewing &middot; round {round}</p>
               <h1 className="review__title">{project.name}</h1>
             </div>
             <div className="review__header-actions">

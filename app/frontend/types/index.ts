@@ -45,6 +45,7 @@ export type HackatimeProject = {
 
 export type ReviewQueueEntry = {
   id: number
+  round: number
   name: string
   ownerName: string
   repoLink: string | null

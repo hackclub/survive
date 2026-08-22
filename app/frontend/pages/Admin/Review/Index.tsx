@@ -5,11 +5,11 @@ import { formatHours } from "../../../lib/format"
 import type { Pagination, ReviewQueueEntry } from "../../../types"
 
 export default function Index({
-  projects,
+  reviews,
   pagination,
   query,
 }: {
-  projects: ReviewQueueEntry[]
+  reviews: ReviewQueueEntry[]
   pagination: Pagination
   query: string
 }) {
@@ -52,20 +52,20 @@ export default function Index({
           </button>
         </form>
 
-        {projects.length === 0 ? (
+        {reviews.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing waiting on review right now.</p>
           </div>
         ) : (
           <>
             <ul className="dashboard__list">
-              {projects.map((project) => (
-                <li key={project.id}>
-                  <Link className="dashboard__row dashboard__row--banner" href={`/admin/review/${project.id}`}>
-                    {project.bannerUrl ? (
+              {reviews.map((review) => (
+                <li key={review.id}>
+                  <Link className="dashboard__row dashboard__row--banner" href={`/admin/review/${review.id}`}>
+                    {review.bannerUrl ? (
                       <img
                         className="dashboard__row-banner-image"
-                        src={project.bannerUrl}
+                        src={review.bannerUrl}
                         alt=""
                       />
                     ) : (
@@ -74,9 +74,9 @@ export default function Index({
 
                     <div className="dashboard__row-glass">
                       <div className="dashboard__row-top">
-                        <span className="dashboard__name">{project.name}</span>
-                        <span className="u-sm u-faint">by {project.ownerName}</span>
-                        {project.claimedByYou && (
+                        <span className="dashboard__name">{review.name}</span>
+                        <span className="u-sm u-faint">by {review.ownerName}</span>
+                        {review.claimedByYou && (
                           <span className="dashboard__status dashboard__status--pending">
                             Claimed by you
                           </span>
@@ -84,10 +84,11 @@ export default function Index({
                       </div>
 
                       <div className="dashboard__row-meta u-sm u-faint">
-                        <span>{project.repoLink ? "Repo linked" : "No repo link yet"}</span>
-                        <span>{project.demoLink ? "Demo linked" : "No demo link yet"}</span>
-                        <span>{formatHours(project.hackatimeSeconds)}</span>
-                        <span>Submitted {project.submittedAt}</span>
+                        <span>{review.repoLink ? "Repo linked" : "No repo link yet"}</span>
+                        <span>{review.demoLink ? "Demo linked" : "No demo link yet"}</span>
+                        <span>{formatHours(review.hackatimeSeconds)}</span>
+                        <span>Round {review.round}</span>
+                        <span>Submitted {review.submittedAt}</span>
                       </div>
                     </div>
                   </Link>

@@ -52,6 +52,20 @@ class Review < ApplicationRecord
     approved? || rejected? || returned?
   end
 
+  def approve!(actor, feedback:)
+    transaction do
+      update!(state: :approved, reviewer: actor, decided_at: Time.current, maker_feedback: feedback)
+      project.approve!(actor, feedback: feedback)
+    end
+  end
+
+  def reject!(actor, feedback:)
+    transaction do
+      update!(state: :rejected, reviewer: actor, decided_at: Time.current, maker_feedback: feedback)
+      project.reject!(actor, feedback: feedback)
+    end
+  end
+
   def approved_minutes_total
     hour_entries.sum(:approved_minutes)
   end
