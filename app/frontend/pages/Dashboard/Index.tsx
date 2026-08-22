@@ -1,6 +1,8 @@
 import { Head, Link, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
+import { PipelineRail, railStates } from "../../components/PipelineRail"
+import { formatMinutes } from "../../lib/format"
 import type { Project, ProjectStatus, SharedProps } from "../../types"
 
 const STATUS_LABEL: Record<ProjectStatus, string> = {
@@ -79,13 +81,23 @@ export default function Index({ projects }: { projects: Project[] }) {
                         </span>
                       </div>
 
-                      <p className="dashboard__description u-sm u-soft">
-                        {project.description || "No description yet."}
-                      </p>
+                      {project.reviewState && railStates(project.reviewState) ? (
+                        <PipelineRail state={project.reviewState} invert />
+                      ) : (
+                        <p className="dashboard__description u-sm u-soft">
+                          {project.reviewFeedback || project.description || "No description yet."}
+                        </p>
+                      )}
 
                       <div className="dashboard__row-meta u-sm u-faint">
-                        <span>{project.repoLink ? "Repo linked" : "No repo link yet"}</span>
-                        <span>{project.demoLink ? "Demo linked" : "No demo link yet"}</span>
+                        {project.approvedMinutes !== null ? (
+                          <span className="u-mono">{formatMinutes(project.approvedMinutes)} approved</span>
+                        ) : project.claimedMinutes !== null ? (
+                          <span className="u-mono">{formatMinutes(project.claimedMinutes)} claimed</span>
+                        ) : (
+                          <span>{project.repoLink ? "Repo linked" : "No repo link yet"}</span>
+                        )}
+                        {project.round !== null && <span>Round {project.round}</span>}
                         <span>Updated {project.updatedAt}</span>
                       </div>
                     </div>

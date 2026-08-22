@@ -84,7 +84,7 @@ class Project < ApplicationRecord
   end
 
   def latest_review
-    reviews.reorder(round: :desc).first
+    reviews.loaded? ? reviews.max_by(&:round) : reviews.reorder(round: :desc).first
   end
 
   def next_round
@@ -115,7 +115,11 @@ class Project < ApplicationRecord
       demoLink: demo_link,
       bannerUrl: banner_url,
       updatedAt: updated_at.strftime("%b %d, %Y"),
-      reviewFeedback: (approved? || rejected?) ? project_events.where(action: %w[approved rejected]).first&.feedback : nil
+      round: latest_review&.round,
+      reviewState: latest_review&.state,
+      claimedMinutes: latest_review&.claimed_minutes_total,
+      approvedMinutes: latest_review&.approved_minutes,
+      reviewFeedback: latest_review&.decided? ? latest_review.maker_feedback : nil
     }
   end
 

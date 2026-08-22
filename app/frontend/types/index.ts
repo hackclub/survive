@@ -24,6 +24,8 @@ export type SharedProps = {
 
 export type ProjectStatus = "draft" | "pending" | "approved" | "rejected" | "returned"
 
+export type ReviewState = "pending" | "in_review" | "approved" | "rejected" | "returned"
+
 export type Project = {
   id: number
   name: string
@@ -33,6 +35,10 @@ export type Project = {
   demoLink: string | null
   bannerUrl: string | null
   updatedAt: string
+  round: number | null
+  reviewState: ReviewState | null
+  claimedMinutes: number | null
+  approvedMinutes: number | null
   reviewFeedback: string | null
 }
 
