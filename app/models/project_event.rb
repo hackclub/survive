@@ -2,7 +2,7 @@ class ProjectEvent < ApplicationRecord
   belongs_to :project
   belongs_to :actor, class_name: "User"
 
-  enum :action, { submitted: 0, approved: 1, rejected: 2, returned: 3 }
+  enum :action, { submitted: 0, approved: 1, rejected: 2, returned: 3, reverted: 4 }
 
   validates :feedback, presence: true, if: -> { approved? || rejected? || returned? }
 

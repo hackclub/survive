@@ -108,6 +108,10 @@ class Project < ApplicationRecord
     record_event(:returned, feedback)
   end
 
+  def reverted_event!(reason)
+    project_events.create!(actor: user, action: :reverted, feedback: reason)
+  end
+
   def banner_url
     return nil unless banner.attached?
 

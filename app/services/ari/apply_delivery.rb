@@ -8,6 +8,11 @@ module Ari
       "review.rejected" => :rejected
     }.freeze
 
+    ROLLBACK_PHASES = {
+      "review.reverted" => "reverted",
+      "review.requeued" => "review"
+    }.freeze
+
     PROJECT_ACTIONS = {
       approved: :approved,
       returned: :returned,
@@ -16,13 +21,36 @@ module Ari
 
     def call(delivery)
       state = DECISION_STATES[delivery.event]
-      return skip(delivery, "event #{delivery.event} is not a decision") if state.nil?
+      phase = ROLLBACK_PHASES[delivery.event]
+      return skip(delivery, "event #{delivery.event} is not a decision or a rollback") if state.nil? && phase.nil?
 
       review = delivery.review
       return skip(delivery, "no review matched #{delivery.external_id}") if review.nil?
 
-      apply(review, delivery, state)
+      state ? apply(review, delivery, state) : roll_back(review, delivery, phase)
       delivery.update!(processed_at: Time.current, error: nil)
+    end
+
+    def roll_back(review, delivery, phase)
+      review.transaction do
+        review.update!(
+          state: :pending,
+          decided_at: nil,
+          approved_minutes: nil,
+          minutes_breakdown: nil,
+          justification: nil,
+          maker_feedback: nil,
+          reviewer_notes: nil,
+          ari_decision: nil,
+          ari_reviewer_email: nil,
+          ari_reviewer_slack_id: nil,
+          ari_phase: phase
+        )
+
+        review.project.reverted_event!(delivery.event)
+      end
+
+      Rails.logger.warn("[Ari] #{delivery.event} rolled back review ##{review.id}, anything granted downstream must be undone")
     end
 
     def apply(review, delivery, state)

@@ -75,7 +75,7 @@ export type Pagination = {
   count: number
 }
 
-export type ProjectEventAction = "submitted" | "approved" | "rejected" | "returned"
+export type ProjectEventAction = "submitted" | "approved" | "rejected" | "returned" | "reverted"
 
 export type ProjectEvent = {
   id: number
