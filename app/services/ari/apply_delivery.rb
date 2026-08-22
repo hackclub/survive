@@ -48,6 +48,7 @@ module Ari
         )
 
         review.project.reverted_event!(delivery.event)
+        review.final_review&.void!
       end
 
       Rails.logger.warn("[Ari] #{delivery.event} rolled back review ##{review.id}, anything granted downstream must be undone")
@@ -76,6 +77,8 @@ module Ari
 
         review.project.public_send("#{PROJECT_ACTIONS.fetch(state)}_event!", feedback)
       end
+
+      review.open_final_review! if state == :approved
     end
 
     def minutes(body)

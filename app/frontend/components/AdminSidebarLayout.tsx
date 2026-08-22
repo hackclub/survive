@@ -8,6 +8,7 @@ type Section = { label: string; items: Item[] }
 
 const SECTIONS: Section[] = [
   { label: "Ari", items: [{ label: "Submissions", href: "/admin/reviews" }] },
+  { label: "Payouts", items: [{ label: "Final review", href: "/admin/final_reviews" }] },
 ]
 
 export function AdminSidebarLayout({ children }: { children: ReactNode }) {

@@ -68,7 +68,6 @@ export default function Index({
       <AdminSidebarLayout>
         <div className="dashboard__header">
           <div>
-            <p className="u-label u-faint">Everything sent to Ari</p>
             <h1 className="dashboard__title">Submissions</h1>
           </div>
         </div>

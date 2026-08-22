@@ -102,6 +102,44 @@ export type FilterTab = {
   count: number
 }
 
+export type FinalReviewStatus = "pending" | "passed" | "deducted" | "banned" | "voided"
+
+export type FinalReviewRow = {
+  id: number
+  projectId: number
+  projectName: string
+  makerName: string
+  round: number
+  status: FinalReviewStatus
+  approvedMinutes: number | null
+  netMinutes: number
+  flags: string[]
+  claimedByYou: boolean
+  heldByOther: boolean
+  waitingSince: string
+}
+
+export type FinalReviewDetail = FinalReviewRow & {
+  repoLink: string | null
+  demoLink: string | null
+  ariShipId: string | null
+  ariAuditNote: string | null
+  ariNoteToMaker: string | null
+  ariReviewer: string | null
+  minutesBreakdown: Record<string, number>
+  signals: Record<string, unknown>
+  decisionNote: string | null
+  deductionMinutes: number | null
+  maker: {
+    name: string
+    email: string
+    banned: boolean
+    approvedProjects: number
+    rejectedProjects: number
+    priorDeductions: number
+  }
+}
+
 export type Pagination = {
   page: number
   pages: number

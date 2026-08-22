@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_230042) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_235126) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -67,6 +67,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_230042) do
     t.index ["actor_id"], name: "index_audit_logs_on_actor_id"
     t.index ["created_at"], name: "index_audit_logs_on_created_at"
     t.index ["target_type", "target_id"], name: "index_audit_logs_on_target"
+  end
+
+  create_table "final_reviews", force: :cascade do |t|
+    t.datetime "claimed_at"
+    t.bigint "claimed_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "decided_at"
+    t.text "decision_note"
+    t.integer "deduction_minutes"
+    t.integer "flags", default: 0, null: false
+    t.bigint "review_id", null: false
+    t.bigint "reviewer_id"
+    t.jsonb "signals", default: {}, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["claimed_at"], name: "index_final_reviews_on_claimed_at"
+    t.index ["claimed_by_id"], name: "index_final_reviews_on_claimed_by_id"
+    t.index ["review_id"], name: "index_final_reviews_on_review_id", unique: true
+    t.index ["reviewer_id"], name: "index_final_reviews_on_reviewer_id"
+    t.index ["status"], name: "index_final_reviews_on_status"
   end
 
   create_table "hackatime_projects", force: :cascade do |t|
@@ -176,6 +196,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_230042) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ari_deliveries", "reviews"
   add_foreign_key "audit_logs", "users", column: "actor_id"
+  add_foreign_key "final_reviews", "reviews"
+  add_foreign_key "final_reviews", "users", column: "claimed_by_id"
+  add_foreign_key "final_reviews", "users", column: "reviewer_id"
   add_foreign_key "hackatime_projects", "projects"
   add_foreign_key "hackatime_projects", "users"
   add_foreign_key "project_events", "projects"

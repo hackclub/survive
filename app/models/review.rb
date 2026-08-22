@@ -3,6 +3,7 @@ class Review < ApplicationRecord
 
   belongs_to :project
   belongs_to :reviewer, class_name: "User", optional: true
+  has_one :final_review, dependent: :destroy
 
   enum :state, { pending: 0, in_review: 1, approved: 2, rejected: 3, returned: 4, withdrawn: 5 }
 
@@ -32,6 +33,20 @@ class Review < ApplicationRecord
 
   def ingested?
     ingested_at.present?
+  end
+
+  def net_approved_minutes
+    return nil if approved_minutes.nil?
+
+    deduction = final_review&.deducted? ? final_review.deduction_minutes.to_i : 0
+    [ approved_minutes - deduction, 0 ].max
+  end
+
+  def open_final_review!
+    return final_review if final_review.present?
+
+    outcome = FinalReviews::Signals.call(self)
+    create_final_review!(status: :pending, flags: outcome[:flags], signals: outcome[:signals])
   end
 
   def withdrawable?

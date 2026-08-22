@@ -25,6 +25,13 @@ Rails.application.routes.draw do
     resources :reviews, only: :index do
       member { post "withdraw" }
     end
+
+    resources :final_reviews, only: %i[index show] do
+      member do
+        post "decide"
+        delete "claim" => "final_reviews#unclaim"
+      end
+    end
   end
 
   get "dashboard" => "dashboard#index", as: :dashboard

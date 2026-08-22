@@ -17,6 +17,7 @@ import '../styles/rail.css'
 import '../styles/status.css'
 import '../styles/table.css'
 import '../styles/checklist.css'
+import '../styles/final-review.css'
 
 router.on("before", (event) => {
   const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content
