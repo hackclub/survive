@@ -8,6 +8,7 @@ const STATUS_LABEL: Record<ProjectStatus, string> = {
   pending: "In review",
   approved: "Approved",
   rejected: "Rejected",
+  returned: "Returned",
 }
 
 export default function Index({ projects }: { projects: Project[] }) {

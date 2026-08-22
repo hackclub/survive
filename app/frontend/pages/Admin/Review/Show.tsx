@@ -1,20 +1,37 @@
 import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
-import { formatHours } from "../../../lib/format"
+import { formatHours, formatMinutes } from "../../../lib/format"
 import type {
   HackatimeProject,
+  HourVerdict,
   Project,
   ProjectEvent,
   ProjectStatus,
+  ReviewHourEntry,
   SubmitterHistory,
 } from "../../../types"
+
+type EntryDraft = { approvedMinutes: string; note: string }
+
+const VERDICT_LABEL: Record<HourVerdict, string> = {
+  approved: "Approved",
+  reduced: "Reduced",
+  rejected: "Rejected",
+}
+
+function verdictFor(approved: number, claimedMinutes: number): HourVerdict {
+  if (approved <= 0) return "rejected"
+  if (approved >= claimedMinutes) return "approved"
+  return "reduced"
+}
 
 const STATUS_LABEL: Record<ProjectStatus, string> = {
   draft: "Draft",
   pending: "In review",
   approved: "Approved",
   rejected: "Rejected",
+  returned: "Returned",
 }
 
 const EVENT_LABEL: Record<ProjectEvent["action"], string> = {
@@ -27,6 +44,8 @@ export default function Show({
   project,
   reviewId,
   round,
+  claimedSeconds,
+  hourEntries,
   hackatimeProjects,
   history,
   submitterHistory,
@@ -35,12 +54,41 @@ export default function Show({
   project: Project
   reviewId: number
   round: number
+  claimedSeconds: number
+  hourEntries: ReviewHourEntry[]
   hackatimeProjects: HackatimeProject[]
   history: ProjectEvent[]
   submitterHistory: SubmitterHistory
   skipList: string
 }) {
   const [feedback, setFeedback] = useState("")
+  const [drafts, setDrafts] = useState<Record<number, EntryDraft>>(() =>
+    Object.fromEntries(
+      hourEntries.map((entry) => [
+        entry.id,
+        { approvedMinutes: String(entry.approvedMinutes), note: entry.note ?? "" },
+      ]),
+    ),
+  )
+
+  function setDraft(id: number, patch: Partial<EntryDraft>) {
+    setDrafts((current) => ({ ...current, [id]: { ...current[id], ...patch } }))
+  }
+
+  const rows = hourEntries.map((entry) => {
+    const draft = drafts[entry.id]
+    const claimedMinutes = Math.round(entry.claimedSeconds / 60)
+    const approved = Math.max(0, Number.parseInt(draft.approvedMinutes, 10) || 0)
+    const verdict = verdictFor(approved, claimedMinutes)
+    return { entry, draft, claimedMinutes, approved, verdict }
+  })
+
+  const claimedTotal = Math.round(claimedSeconds / 60)
+  const approvedTotal = rows.reduce((sum, row) => sum + row.approved, 0)
+  const deflated = Math.max(0, claimedTotal - approvedTotal)
+  const approvedShare = claimedTotal > 0 ? (approvedTotal / claimedTotal) * 100 : 0
+  const missingNote = rows.some((row) => row.verdict !== "approved" && !row.draft.note.trim())
+  const blocked = !feedback.trim() || missingNote
 
   function unclaim() {
     router.delete(`/admin/review/${reviewId}/claim`)
@@ -51,7 +99,13 @@ export default function Show({
   }
 
   function decide(action: "approve" | "reject") {
-    router.post(`/admin/review/${reviewId}/${action}`, { feedback })
+    const entries = Object.fromEntries(
+      rows.map((row) => [
+        row.entry.id,
+        { approved_minutes: row.approved, verdict: row.verdict, note: row.draft.note },
+      ]),
+    )
+    router.post(`/admin/review/${reviewId}/${action}`, { feedback, entries })
   }
 
   const totalHours = hackatimeProjects.reduce((sum, hp) => sum + hp.seconds, 0)
@@ -118,6 +172,86 @@ export default function Show({
                 </div>
               </div>
 
+              {hourEntries.length > 0 && (
+                <div className="ledger">
+                  <div className="ledger__head">
+                    <h2 className="u-h3">Hours</h2>
+                    <span className="u-xs u-faint u-mono">snapshotted at claim</span>
+                  </div>
+
+                  <table className="ledger__table">
+                    <thead>
+                      <tr>
+                        <th>Hackatime project</th>
+                        <th className="ledger__num">Claimed</th>
+                        <th className="ledger__num">Approve</th>
+                        <th>Verdict</th>
+                        <th>Reason</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {rows.map(({ entry, draft, claimedMinutes, verdict }) => (
+                        <tr key={entry.id}>
+                          <td className="u-mono">{entry.name}</td>
+                          <td className="ledger__num u-mono u-faint">{formatMinutes(claimedMinutes)}</td>
+                          <td className="ledger__num">
+                            <input
+                              className="ledger__input"
+                              type="number"
+                              min={0}
+                              max={claimedMinutes}
+                              value={draft.approvedMinutes}
+                              aria-label={`Approved minutes for ${entry.name}`}
+                              onChange={(e) => setDraft(entry.id, { approvedMinutes: e.target.value })}
+                            />
+                          </td>
+                          <td>
+                            <span className={`ledger__verdict ledger__verdict--${verdict}`}>
+                              {VERDICT_LABEL[verdict]}
+                            </span>
+                          </td>
+                          <td>
+                            <input
+                              className="ledger__input ledger__input--note"
+                              type="text"
+                              value={draft.note}
+                              aria-label={`Reason for ${entry.name}`}
+                              placeholder={verdict === "approved" ? "Optional" : "Required"}
+                              onChange={(e) => setDraft(entry.id, { note: e.target.value })}
+                            />
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  <div className="ledger__foot">
+                    <div className="ledger__meter-wrap">
+                      <div className="ledger__meter">
+                        <span className="ledger__meter-fill" style={{ width: `${approvedShare}%` }} />
+                      </div>
+                      <span className="u-xs u-faint">
+                        {Math.round(approvedShare)}% of claimed time approved
+                      </span>
+                    </div>
+                    <dl className="ledger__totals">
+                      <div>
+                        <dt className="u-label u-faint">Claimed</dt>
+                        <dd className="u-mono">{formatMinutes(claimedTotal)}</dd>
+                      </div>
+                      <div>
+                        <dt className="u-label u-faint">Approved</dt>
+                        <dd className="u-mono ledger__approved">{formatMinutes(approvedTotal)}</dd>
+                      </div>
+                      <div>
+                        <dt className="u-label u-faint">Deflation</dt>
+                        <dd className="u-mono ledger__deflated">{formatMinutes(deflated)}</dd>
+                      </div>
+                    </dl>
+                  </div>
+                </div>
+              )}
+
               <div className="review__action-bar">
                 <div className="field">
                   <label className="field__label" htmlFor="feedback">
@@ -136,20 +270,25 @@ export default function Show({
                   <button
                     className="btn btn--primary"
                     type="button"
-                    disabled={!feedback.trim()}
+                    disabled={blocked}
                     onClick={() => decide("approve")}
                   >
-                    Approve
+                    Approve {formatMinutes(approvedTotal)}
                   </button>
                   <button
                     className="btn btn--ghost"
                     type="button"
-                    disabled={!feedback.trim()}
+                    disabled={blocked}
                     onClick={() => decide("reject")}
                   >
                     Reject
                   </button>
                 </div>
+                {missingNote && (
+                  <p className="u-xs u-faint">
+                    Every reduced or rejected line needs a reason. It is sent on with the review.
+                  </p>
+                )}
               </div>
             </div>
 

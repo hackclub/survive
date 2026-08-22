@@ -22,7 +22,7 @@ export type SharedProps = {
   errors: Record<string, string[]>
 }
 
-export type ProjectStatus = "draft" | "pending" | "approved" | "rejected"
+export type ProjectStatus = "draft" | "pending" | "approved" | "rejected" | "returned"
 
 export type Project = {
   id: number
@@ -34,6 +34,17 @@ export type Project = {
   bannerUrl: string | null
   updatedAt: string
   reviewFeedback: string | null
+}
+
+export type HourVerdict = "approved" | "reduced" | "rejected"
+
+export type ReviewHourEntry = {
+  id: number
+  name: string
+  claimedSeconds: number
+  approvedMinutes: number
+  verdict: HourVerdict
+  note: string | null
 }
 
 export type HackatimeProject = {
