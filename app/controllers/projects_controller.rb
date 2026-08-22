@@ -71,6 +71,8 @@ class ProjectsController < ApplicationController
     else
       redirect_to dashboard_path, notice: "Project saved."
     end
+  rescue Project::NotReadyToSubmit => e
+    redirect_to project_path(@project), inertia: { errors: { base: e.reasons } }
   rescue ActiveRecord::RecordInvalid => e
     redirect_to project_path(@project), inertia: { errors: e.record.errors.messages }
   end

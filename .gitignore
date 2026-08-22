@@ -14,6 +14,9 @@ log/
 tmp/
 *.log
 
+/storage/*
+!/storage/.keep
+
 # Ignore key files for decrypting credentials and more.
 /config/*.key
 

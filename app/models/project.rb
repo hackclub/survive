@@ -1,4 +1,17 @@
 class Project < ApplicationRecord
+  class NotReadyToSubmit < StandardError
+    attr_reader :failures
+
+    def initialize(failures)
+      @failures = failures
+      super(reasons.join(" "))
+    end
+
+    def reasons
+      failures.map { |failure| failure["reasoning"] }
+    end
+  end
+
   belongs_to :user
   has_many :hackatime_projects, dependent: :nullify
   has_many :project_events, dependent: :destroy
@@ -29,10 +42,14 @@ class Project < ApplicationRecord
   before_save :set_normalized_repo_url, if: :will_save_change_to_repo_link?
 
   def submit!
+    result = SurviveCheckService.run(project: self)
+    raise NotReadyToSubmit, result["blocking"] if result["blocking"].any?
+
     transaction do
       project_events.create!(actor: user, action: :submitted)
-      open_review || reviews.create!(round: next_round)
+      review = record_checks(result)
       sync_status_from_reviews!
+      review
     end
   end
 
@@ -44,6 +61,14 @@ class Project < ApplicationRecord
     return if status == derived.to_s
 
     update_column(:status, self.class.statuses.fetch(derived.to_s))
+  end
+
+  def record_checks(result)
+    review = open_review
+    return reviews.create!(round: next_round, checks: result, checks_run_at: Time.current) if review.nil?
+
+    review.update!(checks: result, checks_run_at: Time.current)
+    review
   end
 
   def open_review
