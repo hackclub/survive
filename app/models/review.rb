@@ -12,6 +12,7 @@ class Review < ApplicationRecord
   validates :approved_minutes, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
 
   scope :open_rounds, -> { where(state: %i[pending in_review]) }
+  scope :awaiting_ari, -> { open_rounds.where.not(ingested_at: nil) }
 
   def decided?
     approved? || rejected? || returned?

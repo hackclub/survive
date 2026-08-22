@@ -13,9 +13,46 @@ module Ari
       end
     end
 
+    Status = Struct.new(:found, :ship_id, :phase, :decision, :version, :ingest_version, keyword_init: true)
+
     def ingest(review)
       body = JSON.generate(Payload.build(review))
       interpret(post(Config.ingest_url, body))
+    end
+
+    def withdraw(project)
+      body = JSON.generate({ "external_id" => project.ari_external_id })
+      response = post(Config.withdraw_url, body)
+
+      case response.status
+      when 200, 202
+        Result.new(status: :withdrawn, code: response.status)
+      when 404
+        Result.new(status: :not_queued, code: 404, message: "Ari has nothing open for this project.")
+      when 401
+        Result.new(status: :unauthorized, code: 401, message: "Ari rejected our signature.")
+      else
+        Result.new(status: :unavailable, code: response.status, message: "Ari returned #{response.status}.")
+      end
+    end
+
+    def status(external_id)
+      response = connection.get(Config.status_url) do |request|
+        request.params["external_id"] = external_id
+        request.headers["Authorization"] = "Bearer #{Config.ingest_secret}"
+      end
+
+      return Status.new(found: false) unless response.status == 200
+
+      body = parse(response.body)
+      Status.new(
+        found: true,
+        ship_id: body["id"].presence,
+        phase: body["phase"].presence,
+        decision: body["decision"].presence,
+        version: body["version"],
+        ingest_version: body["ingest_version"]
+      )
     end
 
     private
