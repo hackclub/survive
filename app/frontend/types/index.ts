@@ -26,6 +26,25 @@ export type SharedProps = {
 
 export type ProjectStatus = "draft" | "pending" | "approved" | "rejected" | "returned"
 
+export type CheckVerdict = "pass" | "fail" | "uncertain" | "skipped"
+
+export type CheckResult = {
+  key: string
+  name: string
+  source: string
+  verdict: CheckVerdict
+  reasoning: string
+  blocking: boolean
+}
+
+export type ChecksResult = {
+  overall: CheckVerdict
+  blocking: CheckResult[]
+  requirements: CheckResult[]
+  checked_at: string
+  engine: string
+}
+
 export type ReviewState = "pending" | "in_review" | "approved" | "rejected" | "returned"
 
 export type Project = {

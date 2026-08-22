@@ -3,17 +3,20 @@ import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
 import { BannerUpload } from "../../components/BannerUpload"
 import { HackatimeProjectPicker } from "../../components/HackatimeProjectPicker"
+import { Checklist } from "../../components/Checklist"
 import { ProjectStatusBadge, projectStatusLabel } from "../../components/Status"
 import { formatHours, humanizeField } from "../../lib/format"
-import type { HackatimeProject, Project, SharedProps } from "../../types"
+import type { ChecksResult, HackatimeProject, Project, SharedProps } from "../../types"
 
 export default function Show({
   project,
   can,
+  checks,
   hackatimeProjects,
 }: {
   project: Project
   can: { update: boolean; submitForReview: boolean }
+  checks: ChecksResult | null
   hackatimeProjects: HackatimeProject[]
 }) {
   const { auth, errors } = usePage<SharedProps>().props
@@ -198,18 +201,30 @@ export default function Show({
                 <button className="btn btn--ghost" type="submit" disabled={form.processing}>
                   {form.processing ? "Saving..." : "Save"}
                 </button>
-                {can.submitForReview && (
-                  <button
-                    className="btn btn--primary"
-                    type="button"
-                    onClick={submitForReview}
-                  >
-                    Submit for review
-                  </button>
-                )}
               </div>
             </form>
           ) : null}
+
+          {can.submitForReview && checks && (
+            <div className="field-group">
+              <Checklist checks={checks} />
+              <div className="checklist__gate">
+                <p className="u-sm u-soft">
+                  {checks.blocking.length === 0
+                    ? "Submitting locks the project until a reviewer decides."
+                    : "Fix everything above, then submit."}
+                </p>
+                <button
+                  className="btn btn--primary"
+                  type="button"
+                  disabled={checks.blocking.length > 0}
+                  onClick={submitForReview}
+                >
+                  Submit for review
+                </button>
+              </div>
+            </div>
+          )}
 
           {!can.update && (
             <div className="field-group">

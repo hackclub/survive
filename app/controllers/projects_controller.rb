@@ -44,6 +44,7 @@ class ProjectsController < ApplicationController
         update: policy(@project).update?,
         submitForReview: policy(@project).submit_for_review?
       },
+      checks: checks_for(@project),
       hackatimeProjects: current_user.hackatime_projects.where(project_id: [ nil, @project.id ]).order(:name).map { |hackatime_project|
         {
           id: hackatime_project.id,
@@ -99,6 +100,12 @@ class ProjectsController < ApplicationController
   end
 
   private
+
+  def checks_for(project)
+    return SurviveCheckService.cached_run(project: project) if policy(project).submit_for_review?
+
+    project.latest_review&.checks
+  end
 
   def set_project
     @project = Project.find(params[:id])

@@ -14,6 +14,24 @@ module SurviveCheckService
     SurviveChecks::UniqueRepo
   ].freeze
 
+  CACHE_TTL = 5.minutes
+
+  def cached_run(project:)
+    Rails.cache.fetch(run_cache_key(project), expires_in: CACHE_TTL) { run(project: project) }
+  end
+
+  def run_cache_key(project)
+    parts = [
+      project.id,
+      project.updated_at.to_i,
+      project.user.updated_at.to_i,
+      project.banner_attachment&.blob_id,
+      project.hackatime_projects.order(:id).pluck(:id).join("-")
+    ]
+
+    "survive_checks:#{Digest::SHA256.hexdigest(parts.join(":"))}"
+  end
+
   def run(project:, review: nil)
     context = SurviveChecks::Context.new(project: project, review: review)
     visible = CHECKS.map { |klass| safe_call(klass, context) }.reject { |result| result.verdict_value == "skipped" }
