@@ -27,18 +27,6 @@ Rails.application.routes.draw do
     end
   end
 
-  namespace :admin do
-    get "review" => "review#index", as: :review
-    get "review/next" => "review#next_project", as: :next_review
-    get "review/mystats" => "review#mystats", as: :review_mystats
-    get "review/:id" => "review#show", as: :review_project
-    post "review/:id/approve" => "review#approve", as: :approve_review
-    post "review/:id/reject" => "review#reject", as: :reject_review
-    post "review/:id/return" => "review#return_to_maker", as: :return_review
-    post "review/:id/skip" => "review#skip", as: :skip_review
-    delete "review/:id/claim" => "review#unclaim", as: :unclaim_review
-  end
-
   # Defines the root path route ("/")
   root "landing#index"
 end

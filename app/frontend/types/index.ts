@@ -44,35 +44,11 @@ export type Project = {
   reviewFeedback: string | null
 }
 
-export type HourVerdict = "approved" | "reduced" | "rejected"
-
-export type ReviewHourEntry = {
-  id: number
-  name: string
-  claimedSeconds: number
-  approvedMinutes: number
-  verdict: HourVerdict
-  note: string | null
-}
-
 export type HackatimeProject = {
   id: number
   name: string
   seconds: number
   linked?: boolean
-}
-
-export type ReviewQueueEntry = {
-  id: number
-  round: number
-  name: string
-  ownerName: string
-  repoLink: string | null
-  demoLink: string | null
-  bannerUrl: string | null
-  submittedAt: string
-  claimedByYou: boolean
-  hackatimeSeconds: number
 }
 
 export type Pagination = {
@@ -91,14 +67,3 @@ export type ProjectEvent = {
   createdAt: string
 }
 
-export type SubmitterHistory = {
-  approvedCount: number
-  rejectedCount: number
-}
-
-export type ReviewHistoryEntry = {
-  id: number
-  action: "approved" | "rejected"
-  projectName: string
-  createdAt: string
-}

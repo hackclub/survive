@@ -45,7 +45,7 @@ class Project < ApplicationRecord
   end
 
   def open_review
-    reviews.queued.reorder(round: :desc).first
+    reviews.open_rounds.reorder(round: :desc).first
   end
 
   def latest_review

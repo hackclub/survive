@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_220500) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_22_223545) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -91,24 +91,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_220500) do
     t.index ["user_id"], name: "index_projects_on_user_id"
   end
 
-  create_table "review_hour_entries", force: :cascade do |t|
-    t.integer "approved_minutes", default: 0, null: false
-    t.integer "claimed_seconds", default: 0, null: false
-    t.datetime "created_at", null: false
-    t.string "hackatime_name", null: false
-    t.text "note"
-    t.bigint "review_id", null: false
-    t.datetime "updated_at", null: false
-    t.integer "verdict", default: 0, null: false
-    t.index ["review_id", "hackatime_name"], name: "index_review_hour_entries_on_review_id_and_hackatime_name", unique: true
-  end
-
   create_table "reviews", force: :cascade do |t|
     t.integer "approved_minutes"
     t.jsonb "checks"
     t.datetime "checks_run_at"
-    t.datetime "claimed_at"
-    t.bigint "claimed_by_id"
     t.integer "claimed_seconds", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "decided_at"
@@ -119,8 +105,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_220500) do
     t.integer "round", null: false
     t.integer "state", default: 0, null: false
     t.datetime "updated_at", null: false
-    t.index ["claimed_at"], name: "index_reviews_on_claimed_at"
-    t.index ["claimed_by_id"], name: "index_reviews_on_claimed_by_id"
     t.index ["project_id", "round"], name: "index_reviews_on_project_id_and_round", unique: true
     t.index ["reviewer_id"], name: "index_reviews_on_reviewer_id"
     t.index ["state"], name: "index_reviews_on_state"
@@ -169,9 +153,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_220500) do
   add_foreign_key "project_events", "projects"
   add_foreign_key "project_events", "users", column: "actor_id"
   add_foreign_key "projects", "users"
-  add_foreign_key "review_hour_entries", "reviews"
   add_foreign_key "reviews", "projects"
-  add_foreign_key "reviews", "users", column: "claimed_by_id"
   add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "users", "users", column: "banned_by_id"
 end
