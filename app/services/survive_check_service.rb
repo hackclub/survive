@@ -7,7 +7,10 @@ module SurviveCheckService
     SurviveChecks::DemoPresent,
     SurviveChecks::ScreenshotValid,
     SurviveChecks::DescriptionPresent,
-    SurviveChecks::HackatimeLinked
+    SurviveChecks::HackatimeLinked,
+    SurviveChecks::MakerIdentityComplete,
+    SurviveChecks::MakerAgeEligible,
+    SurviveChecks::MakerNotBanned
   ].freeze
 
   def run(project:, review: nil)

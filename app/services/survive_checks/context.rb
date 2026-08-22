@@ -27,6 +27,10 @@ module SurviveChecks
       end
     end
 
+    def decided_on
+      (review&.decided_at || Time.current).to_date
+    end
+
     def approved_minutes
       review&.approved_minutes_total
     end

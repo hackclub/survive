@@ -34,9 +34,17 @@ module HackatimeSyncService
     HackatimeSyncJob.perform_later(user.id)
   end
 
+  def banned?(user)
+    return false if user.hackatime_uid.blank?
+
+    call(user)
+    Rails.cache.read(trust_key(user)) == true
+  end
+
   def fetch_and_link(user)
     result = HackatimeService.fetch_stats(user.hackatime_uid, access_token: user.hackatime_token)
     seconds_by_name = result&.dig(:projects) || {}
+    Rails.cache.write(trust_key(user), result&.dig(:banned) == true, expires_in: CACHE_TTL)
     return seconds_by_name if seconds_by_name.blank?
 
     HackatimeProject.insert_all(
@@ -49,6 +57,10 @@ module HackatimeSyncService
 
   def cache_key(user)
     "hackatime_stats:#{user.id}"
+  end
+
+  def trust_key(user)
+    "hackatime_trust:#{user.id}"
   end
 
   def lock_key(user)
