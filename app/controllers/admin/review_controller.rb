@@ -13,7 +13,7 @@ class Admin::ReviewController < ApplicationController
       scope.includes(project: [ :user, :hackatime_projects, { banner_attachment: :blob } ]).order(:created_at)
     )
 
-    seconds_by_owner = reviews.map { |review| review.project.user }.uniq.index_with { |owner| HackatimeSyncService.call(owner) }
+    seconds_by_owner = reviews.map { |review| review.project.user }.uniq.index_with { |owner| HackatimeSyncService.cached(owner) }
 
     render inertia: "Admin/Review/Index", props: {
       reviews: reviews.map { |review|
@@ -31,7 +31,7 @@ class Admin::ReviewController < ApplicationController
           bannerUrl: project.banner_url,
           submittedAt: review.created_at.strftime("%b %d, %Y"),
           claimedByYou: review.claimed_by?(current_user),
-          hackatimeSeconds: linked_seconds
+          hackatimeSeconds: review.claimed_seconds.positive? ? review.claimed_seconds : linked_seconds
         }
       },
       pagination: {
