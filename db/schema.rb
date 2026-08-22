@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_23_001137) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_23_004008) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -126,6 +126,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_001137) do
     t.index ["user_id"], name: "index_hackatime_projects_on_user_id"
   end
 
+  create_table "orders", force: :cascade do |t|
+    t.decimal "amount_usd", precision: 10, scale: 2
+    t.datetime "claimed_at"
+    t.bigint "claimed_by_id"
+    t.datetime "created_at", null: false
+    t.bigint "fraud_related_project_id"
+    t.text "frozen_address"
+    t.integer "frozen_coin_cost", null: false
+    t.string "frozen_item_name", null: false
+    t.datetime "fulfilled_at"
+    t.bigint "fulfilled_by_id"
+    t.string "hcb_grant_link"
+    t.integer "kind", default: 0, null: false
+    t.integer "quantity", default: 1, null: false
+    t.string "region"
+    t.text "rejection_reason"
+    t.text "review_notes"
+    t.datetime "reviewed_at"
+    t.bigint "reviewer_id"
+    t.bigint "shop_item_id"
+    t.integer "state", default: 0, null: false
+    t.string "tracking_number"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["claimed_by_id"], name: "index_orders_on_claimed_by_id"
+    t.index ["fraud_related_project_id"], name: "index_orders_on_fraud_related_project_id"
+    t.index ["fulfilled_by_id"], name: "index_orders_on_fulfilled_by_id"
+    t.index ["reviewer_id"], name: "index_orders_on_reviewer_id"
+    t.index ["shop_item_id"], name: "index_orders_on_shop_item_id"
+    t.index ["state"], name: "index_orders_on_state"
+    t.index ["user_id", "state"], name: "index_orders_on_user_id_and_state"
+    t.index ["user_id"], name: "index_orders_on_user_id"
+  end
+
   create_table "project_events", force: :cascade do |t|
     t.integer "action", null: false
     t.bigint "actor_id", null: false
@@ -198,6 +232,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_001137) do
     t.datetime "created_at", null: false
     t.text "description"
     t.boolean "enabled", default: true, null: false
+    t.decimal "grant_amount_usd", precision: 10, scale: 2
     t.decimal "internal_price_usd", precision: 10, scale: 2
     t.integer "kind", default: 0, null: false
     t.integer "max_quantity"
@@ -258,6 +293,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_23_001137) do
   add_foreign_key "final_reviews", "users", column: "reviewer_id"
   add_foreign_key "hackatime_projects", "projects"
   add_foreign_key "hackatime_projects", "users"
+  add_foreign_key "orders", "projects", column: "fraud_related_project_id"
+  add_foreign_key "orders", "shop_items"
+  add_foreign_key "orders", "users"
+  add_foreign_key "orders", "users", column: "claimed_by_id"
+  add_foreign_key "orders", "users", column: "fulfilled_by_id"
+  add_foreign_key "orders", "users", column: "reviewer_id"
   add_foreign_key "project_events", "projects"
   add_foreign_key "project_events", "users", column: "actor_id"
   add_foreign_key "projects", "users"

@@ -3,6 +3,7 @@ class ShopItem < ApplicationRecord
 
   has_one_attached :image
   has_many :shop_item_regions, dependent: :destroy
+  has_many :orders, dependent: :nullify
 
   accepts_nested_attributes_for :shop_item_regions, allow_destroy: true
 
@@ -13,7 +14,7 @@ class ShopItem < ApplicationRecord
   validates :max_quantity, numericality: { only_integer: true, greater_than: 0 }, allow_nil: true
   validates :stock, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
   validates :min_approved_hours, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
-  validates :internal_price_usd, numericality: { greater_than_or_equal_to: 0 }, allow_nil: true
+  validates :grant_amount_usd, numericality: { greater_than: 0 }, allow_nil: true
 
   scope :enabled, -> { where(enabled: true) }
   scope :sorted, -> { order(:coin_cost, :name) }
@@ -41,8 +42,22 @@ class ShopItem < ApplicationRecord
     stock.nil?
   end
 
+  def reserved_quantity
+    orders.held.sum(:quantity)
+  end
+
+  def available_stock
+    return nil if unlimited_stock?
+
+    [ stock.to_i - reserved_quantity, 0 ].max
+  end
+
+  def short_of?(quantity)
+    !unlimited_stock? && quantity > available_stock
+  end
+
   def in_stock?
-    unlimited_stock? || stock.to_i.positive?
+    unlimited_stock? || available_stock.positive?
   end
 
   def unlock_minutes

@@ -11,7 +11,6 @@ type Item = {
   description: string | null
   kind: string
   coinCost: number
-  internalPriceUsd: number | null
   enabled: boolean
   stock: number | null
   onePerPerson: boolean
@@ -29,7 +28,6 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
     description: item?.description ?? "",
     kind: item?.kind ?? kinds[0],
     coin_cost: item?.coinCost ?? 0,
-    internal_price_usd: item?.internalPriceUsd ?? "",
     enabled: item?.enabled ?? true,
     max_quantity: item?.maxQuantity ?? "",
     one_per_person: item?.onePerPerson ?? false,
@@ -113,12 +111,6 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
                     <input id="coin_cost" className="field__input" type="number" min={1}
                       value={form.data.coin_cost}
                       onChange={(e) => form.setData("coin_cost", Number(e.target.value))} />
-                  </div>
-                  <div className="field">
-                    <label className="field__label" htmlFor="usd">Landed cost, USD</label>
-                    <input id="usd" className="field__input" type="number" step="0.01" min={0}
-                      value={form.data.internal_price_usd}
-                      onChange={(e) => form.setData("internal_price_usd", e.target.value)} />
                   </div>
                 </div>
 

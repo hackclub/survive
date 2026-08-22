@@ -1,4 +1,4 @@
-import { Head } from "@inertiajs/react"
+import { Head, Link } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
 import { Status, Tag } from "../../components/Status"
@@ -65,8 +65,9 @@ export default function Index({
           ) : (
             <div className="shop-grid">
               {items.map((item) => (
-                <article
+                <Link
                   key={item.id}
+                  href={`/shop/items/${item.id}`}
                   className={`shop-card${item.unavailableReason ? " shop-card--locked" : ""}`}
                 >
                   {item.imageUrl ? (
@@ -98,14 +99,11 @@ export default function Index({
                       <Status tone="ok">You can afford this</Status>
                     )}
                   </div>
-                </article>
+                </Link>
               ))}
             </div>
           )}
 
-          <p className="u-xs u-faint" style={{ marginTop: "var(--sp-6)" }}>
-            Ordering opens soon.
-          </p>
         </div>
       </main>
     </>

@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_many :hackatime_projects, dependent: :destroy
   has_many :coin_payouts, dependent: :destroy
   has_many :coin_adjustments, dependent: :destroy
+  has_many :orders, dependent: :destroy
   belongs_to :banned_by, class_name: "User", optional: true
 
   after_commit -> { Rails.cache.delete("user/#{id}") }
@@ -110,7 +111,10 @@ class User < ApplicationRecord
   end
 
   def ban!(actor, reason:)
-    update!(is_banned: true, banned_at: Time.current, banned_by: actor, banned_reason: reason)
+    transaction do
+      update!(is_banned: true, banned_at: Time.current, banned_by: actor, banned_reason: reason)
+      orders.where(state: %i[pending approved]).find_each { |order| order.hold!(actor, notes: "Maker banned: #{reason}") }
+    end
   end
 
   def unban!
@@ -126,7 +130,14 @@ class User < ApplicationRecord
   end
 
   def coins_held
-    0
+    orders.held.sum("frozen_coin_cost * quantity")
+  end
+
+  def approved_minutes
+    approved = Review.approved.joins(:project).where(projects: { user_id: id }).sum(:approved_minutes)
+    deducted = FinalReview.deducted.joins(review: :project).where(projects: { user_id: id }).sum(:deduction_minutes)
+
+    [ approved - deducted, 0 ].max
   end
 
   def coin_balance

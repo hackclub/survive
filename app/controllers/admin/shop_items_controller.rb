@@ -63,7 +63,7 @@ class Admin::ShopItemsController < ApplicationController
 
   def item_params
     params.permit(
-      :name, :description, :kind, :coin_cost, :internal_price_usd,
+      :name, :description, :kind, :coin_cost,
       :enabled, :max_quantity, :one_per_person, :stock, :min_approved_hours,
       shop_item_regions_attributes: [ :id, :region, :coin_cost, :enabled, :_destroy ]
     )
@@ -81,7 +81,6 @@ class Admin::ShopItemsController < ApplicationController
       name: item.name,
       kind: item.kind,
       coinCost: item.coin_cost,
-      internalPriceUsd: item.internal_price_usd&.to_f,
       enabled: item.enabled,
       stock: item.stock,
       onePerPerson: item.one_per_person,

@@ -9,7 +9,6 @@ type Item = {
   name: string
   kind: string
   coinCost: number
-  internalPriceUsd: number | null
   enabled: boolean
   stock: number | null
   onePerPerson: boolean
@@ -47,7 +46,6 @@ export default function Index({ items }: { items: Item[] }) {
                   <th>Item</th>
                   <th>Kind</th>
                   <th className="data-table__num">Coins</th>
-                  <th className="data-table__num">Cost</th>
                   <th className="data-table__num">Stock</th>
                   <th>Limits</th>
                   <th>Regions</th>
@@ -68,9 +66,6 @@ export default function Index({ items }: { items: Item[] }) {
                       <Tag>{item.kind}</Tag>
                     </td>
                     <td className="data-table__num u-mono">{item.coinCost}</td>
-                    <td className="data-table__num u-mono u-faint">
-                      {item.internalPriceUsd === null ? "—" : `$${item.internalPriceUsd.toFixed(2)}`}
-                    </td>
                     <td className="data-table__num u-mono">{item.stock === null ? "∞" : item.stock}</td>
                     <td className="u-xs u-faint">
                       {[

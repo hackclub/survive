@@ -5,7 +5,6 @@ class CreateShopItems < ActiveRecord::Migration[8.1]
       t.text :description
       t.integer :kind, null: false, default: 0
       t.integer :coin_cost, null: false
-      t.decimal :internal_price_usd, precision: 10, scale: 2
       t.boolean :enabled, null: false, default: true
       t.integer :max_quantity
       t.boolean :one_per_person, null: false, default: false

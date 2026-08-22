@@ -2,7 +2,7 @@ class ShopController < ApplicationController
   def index
     region = ShopItem.region_for(current_user)
     balance = current_user.spendable_coins
-    minutes = approved_minutes
+    minutes = current_user.approved_minutes
 
     items = ShopItem.includes(:shop_item_regions, image_attachment: :blob).sorted.map do |item|
       next unless item.enabled? || item.region_row(region)&.enabled?
@@ -20,13 +20,27 @@ class ShopController < ApplicationController
     }
   end
 
+  def show
+    item = ShopItem.find(params[:id])
+    region = ShopItem.region_for(current_user)
+    balance = current_user.spendable_coins
+    quantity = 1
+
+    render inertia: "Shop/Show", props: {
+      item: serialize(item, region, balance, current_user.approved_minutes).merge(
+        maxQuantity: item.max_quantity,
+        grantAmountUsd: item.grant_amount_usd&.to_f
+      ),
+      balance: balance,
+      addressLines: address_lines,
+      refusal: Order.refusal_for(user: current_user, shop_item: item, quantity: quantity)
+    }
+  end
+
   private
 
-  def approved_minutes
-    approved = Review.approved.joins(:project).where(projects: { user_id: current_user.id }).sum(:approved_minutes)
-    deducted = FinalReview.deducted.joins(review: :project).where(projects: { user_id: current_user.id }).sum(:deduction_minutes)
-
-    [ approved - deducted, 0 ].max
+  def address_lines
+    Order::ADDRESS_FIELDS.filter_map { |field| current_user.public_send(field).presence }
   end
 
   def serialize(item, region, balance, minutes)

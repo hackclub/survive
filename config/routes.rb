@@ -28,6 +28,13 @@ Rails.application.routes.draw do
 
     resources :shop_items
 
+    resources :orders, only: :index do
+      member do
+        post "decide"
+        post "refund"
+      end
+    end
+
     resources :coins, only: %i[index show] do
       member { post "adjust" }
     end
@@ -53,6 +60,8 @@ Rails.application.routes.draw do
 
   get "dashboard" => "dashboard#index", as: :dashboard
   get "shop" => "shop#index", as: :shop
+  get "shop/items/:id" => "shop#show", as: :shop_item
+  resources :orders, only: %i[index create]
   resources :projects, only: %i[new create show update] do
     member do
       post "hackatime_projects/:hackatime_project_id/link" => "projects#link_hackatime_project", as: :link_hackatime_project
