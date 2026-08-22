@@ -9,6 +9,8 @@ class Review < ApplicationRecord
 
   enum :state, { pending: 0, in_review: 1, approved: 2, rejected: 3, returned: 4 }
 
+  after_save :sync_project_status, if: :saved_change_to_state?
+
   validates :round, numericality: { only_integer: true, greater_than: 0 }
   validates :round, uniqueness: { scope: :project_id }
   validates :claimed_seconds, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
@@ -64,6 +66,10 @@ class Review < ApplicationRecord
       update!(state: :rejected, reviewer: actor, decided_at: Time.current, maker_feedback: feedback)
       project.reject!(actor, feedback: feedback)
     end
+  end
+
+  def sync_project_status
+    project.sync_status_from_reviews!
   end
 
   def approved_minutes_total

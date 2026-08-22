@@ -17,7 +17,7 @@ class ProjectPolicy < ApplicationPolicy
   end
 
   def submit_for_review?
-    owner? && (record.draft? || record.rejected?)
+    owner? && editable?
   end
 
   def review?
@@ -27,7 +27,7 @@ class ProjectPolicy < ApplicationPolicy
   private
 
   def editable?
-    record.draft? || record.rejected?
+    record.draft? || record.rejected? || record.returned?
   end
 
   class Scope < ApplicationPolicy::Scope

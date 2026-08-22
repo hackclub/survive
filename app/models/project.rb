@@ -11,7 +11,15 @@ class Project < ApplicationRecord
   BANNER_CONTENT_TYPES = %w[image/png image/jpeg image/webp image/gif].freeze
   BANNER_MAX_SIZE = 5.megabytes
 
-  enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3 }
+  enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3, returned: 4 }
+
+  STATUS_FOR_REVIEW_STATE = {
+    "pending" => :pending,
+    "in_review" => :pending,
+    "approved" => :approved,
+    "rejected" => :rejected,
+    "returned" => :returned
+  }.freeze
 
   validates :name, presence: true
   validates :repo_link, format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) }, allow_blank: true
@@ -55,18 +63,28 @@ class Project < ApplicationRecord
 
   def submit!
     transaction do
-      update!(status: :pending)
       project_events.create!(actor: user, action: :submitted)
       open_review || reviews.create!(round: next_round)
+      sync_status_from_reviews!
     end
   end
 
+  def sync_status_from_reviews!
+    review = reviews.reload.reorder(round: :desc).first
+    return if review.nil?
+
+    derived = STATUS_FOR_REVIEW_STATE.fetch(review.state)
+    return if status == derived.to_s
+
+    update_column(:status, self.class.statuses.fetch(derived.to_s))
+  end
+
   def open_review
-    reviews.queued.order(round: :desc).first
+    reviews.queued.reorder(round: :desc).first
   end
 
   def latest_review
-    reviews.order(round: :desc).first
+    reviews.reorder(round: :desc).first
   end
 
   def next_round
@@ -74,17 +92,11 @@ class Project < ApplicationRecord
   end
 
   def approve!(actor, feedback:)
-    transaction do
-      update!(status: :approved)
-      project_events.create!(actor: actor, action: :approved, feedback: feedback)
-    end
+    project_events.create!(actor: actor, action: :approved, feedback: feedback)
   end
 
   def reject!(actor, feedback:)
-    transaction do
-      update!(status: :rejected)
-      project_events.create!(actor: actor, action: :rejected, feedback: feedback)
-    end
+    project_events.create!(actor: actor, action: :rejected, feedback: feedback)
   end
 
   def banner_url
