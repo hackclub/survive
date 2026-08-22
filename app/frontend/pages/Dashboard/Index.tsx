@@ -2,16 +2,9 @@ import { Head, Link, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
 import { PipelineRail, railStates } from "../../components/PipelineRail"
+import { ProjectStatusBadge } from "../../components/Status"
 import { formatMinutes } from "../../lib/format"
-import type { Project, ProjectStatus, SharedProps } from "../../types"
-
-const STATUS_LABEL: Record<ProjectStatus, string> = {
-  draft: "Draft",
-  pending: "In review",
-  approved: "Approved",
-  rejected: "Rejected",
-  returned: "Returned",
-}
+import type { Project, SharedProps } from "../../types"
 
 export default function Index({ projects }: { projects: Project[] }) {
   const { auth } = usePage<SharedProps>().props
@@ -76,9 +69,7 @@ export default function Index({ projects }: { projects: Project[] }) {
                     <div className="dashboard__row-glass">
                       <div className="dashboard__row-top">
                         <span className="dashboard__name">{project.name}</span>
-                        <span className={`dashboard__status dashboard__status--${project.status}`}>
-                          {STATUS_LABEL[project.status]}
-                        </span>
+                        <ProjectStatusBadge status={project.status} invert />
                       </div>
 
                       {project.reviewState && railStates(project.reviewState) ? (

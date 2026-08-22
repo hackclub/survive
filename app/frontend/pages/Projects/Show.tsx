@@ -3,16 +3,9 @@ import { Nav } from "../../components/Nav"
 import { Flash } from "../../components/Flash"
 import { BannerUpload } from "../../components/BannerUpload"
 import { HackatimeProjectPicker } from "../../components/HackatimeProjectPicker"
+import { ProjectStatusBadge, projectStatusLabel } from "../../components/Status"
 import { formatHours, humanizeField } from "../../lib/format"
-import type { HackatimeProject, Project, ProjectStatus, SharedProps } from "../../types"
-
-const STATUS_LABEL: Record<ProjectStatus, string> = {
-  draft: "Draft",
-  pending: "In review",
-  approved: "Approved",
-  rejected: "Rejected",
-  returned: "Returned",
-}
+import type { HackatimeProject, Project, SharedProps } from "../../types"
 
 export default function Show({
   project,
@@ -65,9 +58,7 @@ export default function Show({
 
           <div className="dashboard__header">
             <h1 className="project-form__title">{project.name}</h1>
-            <span className={`dashboard__status dashboard__status--${project.status}`}>
-              {STATUS_LABEL[project.status]}
-            </span>
+            <ProjectStatusBadge status={project.status} />
           </div>
 
           {Object.keys(errors).length > 0 && (
@@ -257,7 +248,7 @@ export default function Show({
               )}
 
               <p className="u-sm u-faint">
-                This project is locked from editing while {STATUS_LABEL[project.status].toLowerCase()}.
+                This project is locked from editing while {projectStatusLabel(project.status).toLowerCase()}.
               </p>
             </div>
           )}

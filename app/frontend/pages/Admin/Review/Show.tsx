@@ -1,13 +1,13 @@
 import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
+import { ProjectStatusBadge } from "../../../components/Status"
 import { formatHours, formatMinutes } from "../../../lib/format"
 import type {
   HackatimeProject,
   HourVerdict,
   Project,
   ProjectEvent,
-  ProjectStatus,
   ReviewHourEntry,
   SubmitterHistory,
 } from "../../../types"
@@ -24,14 +24,6 @@ function verdictFor(approved: number, claimedMinutes: number): HourVerdict {
   if (approved <= 0) return "rejected"
   if (approved >= claimedMinutes) return "approved"
   return "reduced"
-}
-
-const STATUS_LABEL: Record<ProjectStatus, string> = {
-  draft: "Draft",
-  pending: "In review",
-  approved: "Approved",
-  rejected: "Rejected",
-  returned: "Returned",
 }
 
 const EVENT_LABEL: Record<ProjectEvent["action"], string> = {
@@ -129,9 +121,7 @@ export default function Show({
               <h1 className="review__title">{project.name}</h1>
             </div>
             <div className="review__header-actions">
-              <span className={`dashboard__status dashboard__status--${project.status}`}>
-                {STATUS_LABEL[project.status]}
-              </span>
+              <ProjectStatusBadge status={project.status} />
               <button className="btn btn--ghost btn--sm" type="button" onClick={skip}>
                 Skip
               </button>

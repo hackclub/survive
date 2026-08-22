@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Head, Link, router } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
+import { Status } from "../../../components/Status"
 import { formatHours } from "../../../lib/format"
 import type { Pagination, ReviewQueueEntry } from "../../../types"
 
@@ -77,9 +78,9 @@ export default function Index({
                         <span className="dashboard__name">{review.name}</span>
                         <span className="u-sm u-faint">by {review.ownerName}</span>
                         {review.claimedByYou && (
-                          <span className="dashboard__status dashboard__status--pending">
+                          <Status tone="warn" invert>
                             Claimed by you
-                          </span>
+                          </Status>
                         )}
                       </div>
 
