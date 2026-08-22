@@ -45,12 +45,15 @@ class Project < ApplicationRecord
     result = SurviveCheckService.run(project: self)
     raise NotReadyToSubmit, result["blocking"] if result["blocking"].any?
 
-    transaction do
+    review = transaction do
       project_events.create!(actor: user, action: :submitted)
-      review = record_checks(result)
+      opened = record_checks(result)
       sync_status_from_reviews!
-      review
+      opened
     end
+
+    AriIngestJob.perform_later(review.id)
+    review
   end
 
   def sync_status_from_reviews!
@@ -67,7 +70,9 @@ class Project < ApplicationRecord
     review = open_review
     return reviews.create!(round: next_round, checks: result, checks_run_at: Time.current) if review.nil?
 
-    review.update!(checks: result, checks_run_at: Time.current)
+    attributes = { checks: result, checks_run_at: Time.current }
+    attributes[:ingest_version] = review.ingest_version + 1 if review.ingested?
+    review.update!(attributes)
     review
   end
 
