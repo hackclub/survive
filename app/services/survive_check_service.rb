@@ -2,7 +2,13 @@ module SurviveCheckService
   module_function
 
   ENGINE = "survive_checks_v1".freeze
-  CHECKS = [].freeze
+  CHECKS = [
+    SurviveChecks::RepoReachable,
+    SurviveChecks::DemoPresent,
+    SurviveChecks::ScreenshotValid,
+    SurviveChecks::DescriptionPresent,
+    SurviveChecks::HackatimeLinked
+  ].freeze
 
   def run(project:, review: nil)
     context = SurviveChecks::Context.new(project: project, review: review)
