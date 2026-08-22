@@ -26,6 +26,10 @@ Rails.application.routes.draw do
 
     resources :audit_logs, only: :index
 
+    resources :coins, only: %i[index show] do
+      member { post "adjust" }
+    end
+
     resources :users, only: %i[index update] do
       member do
         post "ban"

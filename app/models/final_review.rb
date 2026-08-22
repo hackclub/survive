@@ -73,11 +73,17 @@ class FinalReview < ApplicationRecord
   end
 
   def pass!(actor, note)
-    update!(status: :passed, reviewer: actor, decided_at: Time.current, decision_note: note.presence, deduction_minutes: nil)
+    transaction do
+      update!(status: :passed, reviewer: actor, decided_at: Time.current, decision_note: note.presence, deduction_minutes: nil)
+      CoinPayout.grant!(self)
+    end
   end
 
   def deduct!(actor, minutes:, note:)
-    update!(status: :deducted, reviewer: actor, decided_at: Time.current, deduction_minutes: minutes, decision_note: note)
+    transaction do
+      update!(status: :deducted, reviewer: actor, decided_at: Time.current, deduction_minutes: minutes, decision_note: note)
+      CoinPayout.grant!(self)
+    end
   end
 
   def ban!(actor, note:)
@@ -88,6 +94,26 @@ class FinalReview < ApplicationRecord
   end
 
   def void!
-    update!(status: :voided, decided_at: nil, deduction_minutes: nil, claimed_by: nil, claimed_at: nil)
+    transaction do
+      reverse_payout!
+      update!(status: :voided, decided_at: nil, deduction_minutes: nil, claimed_by: nil, claimed_at: nil)
+    end
+  end
+
+  def payout
+    CoinPayout.find_by(review_id: review_id)
+  end
+
+  private
+
+  def reverse_payout!
+    granted = payout
+    return if granted.nil? || granted.coins.zero?
+
+    CoinAdjustment.create!(
+      user: granted.user,
+      amount: -granted.coins,
+      reason: "Ari reverted round #{review.round} of #{review.project.name}, taking back #{granted.coins} coins"
+    )
   end
 end

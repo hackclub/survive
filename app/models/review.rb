@@ -4,6 +4,7 @@ class Review < ApplicationRecord
   belongs_to :project
   belongs_to :reviewer, class_name: "User", optional: true
   has_one :final_review, dependent: :destroy
+  has_one :coin_payout, dependent: :destroy
 
   enum :state, { pending: 0, in_review: 1, approved: 2, rejected: 3, returned: 4, withdrawn: 5 }
 

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_22_235126) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_23_000522) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -67,6 +67,32 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_235126) do
     t.index ["actor_id"], name: "index_audit_logs_on_actor_id"
     t.index ["created_at"], name: "index_audit_logs_on_created_at"
     t.index ["target_type", "target_id"], name: "index_audit_logs_on_target"
+  end
+
+  create_table "coin_adjustments", force: :cascade do |t|
+    t.bigint "actor_id"
+    t.integer "amount", null: false
+    t.datetime "created_at", null: false
+    t.text "reason", null: false
+    t.bigint "user_id", null: false
+    t.index ["actor_id"], name: "index_coin_adjustments_on_actor_id"
+    t.index ["created_at"], name: "index_coin_adjustments_on_created_at"
+    t.index ["user_id"], name: "index_coin_adjustments_on_user_id"
+  end
+
+  create_table "coin_payouts", force: :cascade do |t|
+    t.integer "coins", null: false
+    t.datetime "created_at", null: false
+    t.datetime "granted_at", null: false
+    t.integer "net_minutes", null: false
+    t.bigint "project_id", null: false
+    t.integer "rate_per_hour", null: false
+    t.bigint "review_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_coin_payouts_on_project_id"
+    t.index ["review_id"], name: "index_coin_payouts_on_review_id", unique: true
+    t.index ["user_id"], name: "index_coin_payouts_on_user_id"
   end
 
   create_table "final_reviews", force: :cascade do |t|
@@ -196,6 +222,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_22_235126) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "ari_deliveries", "reviews"
   add_foreign_key "audit_logs", "users", column: "actor_id"
+  add_foreign_key "coin_adjustments", "users"
+  add_foreign_key "coin_adjustments", "users", column: "actor_id"
+  add_foreign_key "coin_payouts", "projects"
+  add_foreign_key "coin_payouts", "reviews"
+  add_foreign_key "coin_payouts", "users"
   add_foreign_key "final_reviews", "reviews"
   add_foreign_key "final_reviews", "users", column: "claimed_by_id"
   add_foreign_key "final_reviews", "users", column: "reviewer_id"

@@ -8,6 +8,8 @@ class User < ApplicationRecord
 
   has_many :projects, dependent: :destroy
   has_many :hackatime_projects, dependent: :destroy
+  has_many :coin_payouts, dependent: :destroy
+  has_many :coin_adjustments, dependent: :destroy
   belongs_to :banned_by, class_name: "User", optional: true
 
   after_commit -> { Rails.cache.delete("user/#{id}") }
@@ -113,6 +115,28 @@ class User < ApplicationRecord
 
   def unban!
     update!(is_banned: false, banned_at: nil, banned_by: nil, banned_reason: nil)
+  end
+
+  def coins_earned
+    coin_payouts.sum(:coins)
+  end
+
+  def coins_adjusted
+    coin_adjustments.sum(:amount)
+  end
+
+  def coins_held
+    0
+  end
+
+  def coin_balance
+    coins_earned + coins_adjusted - coins_held
+  end
+
+  def spendable_coins
+    return 0 if is_banned?
+
+    [ coin_balance, 0 ].max
   end
 
   def avatar_url

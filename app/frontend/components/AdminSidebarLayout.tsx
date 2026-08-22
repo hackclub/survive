@@ -9,7 +9,8 @@ type Section = { label: string; items: Item[] }
 const SECTIONS: Section[] = [
   { label: "Overview", items: [{ label: "Dashboard", href: "/admin" }] },
   { label: "Ari", items: [{ label: "Submissions", href: "/admin/reviews" }] },
-  { label: "Payouts", items: [{ label: "Final review", href: "/admin/final_reviews" }] },
+  { label: "Payouts", items: [{ label: "Final review", href: "/admin/final_reviews" },
+      { label: "Coins", href: "/admin/coins" }] },
   {
     label: "Admin",
     items: [
