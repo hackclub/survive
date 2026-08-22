@@ -69,6 +69,38 @@ export type HackatimeProject = {
   linked?: boolean
 }
 
+export type AriPhase =
+  | "processing"
+  | "review"
+  | "under_review"
+  | "second_pass"
+  | "reviewed"
+  | "withdrawn"
+  | "reverted"
+
+export type SubmissionRow = {
+  id: number
+  projectId: number
+  projectName: string
+  makerName: string
+  round: number
+  state: ReviewState
+  ariShipId: string | null
+  ariPhase: AriPhase | null
+  ariDecision: string | null
+  approvedMinutes: number | null
+  ingestVersion: number
+  ingestedAt: string | null
+  ingestError: string | null
+  stuck: boolean
+}
+
+export type FilterTab = {
+  key: string
+  label: string
+  count: number
+}
+
 export type Pagination = {
   page: number
   pages: number

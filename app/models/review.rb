@@ -1,4 +1,6 @@
 class Review < ApplicationRecord
+  STUCK_AFTER = 48.hours
+
   belongs_to :project
   belongs_to :reviewer, class_name: "User", optional: true
 
@@ -13,6 +15,10 @@ class Review < ApplicationRecord
 
   scope :open_rounds, -> { where(state: %i[pending in_review]) }
   scope :awaiting_ari, -> { open_rounds.where.not(ingested_at: nil) }
+  scope :ingest_failed, -> { where(ingested_at: nil).where.not(ingest_error: nil) }
+  scope :awaiting_ingest, -> { where(ingested_at: nil, ingest_error: nil) }
+  scope :stuck, -> { awaiting_ari.where(ingested_at: ...STUCK_AFTER.ago) }
+  scope :in_phase, ->(phase) { where(ari_phase: phase) }
 
   def decided?
     approved? || rejected? || returned?

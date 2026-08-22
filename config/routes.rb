@@ -21,6 +21,10 @@ Rails.application.routes.draw do
 
   post "webhooks/ari" => "ari_webhooks#create", as: :ari_webhook
 
+  namespace :admin do
+    resources :reviews, only: :index
+  end
+
   get "dashboard" => "dashboard#index", as: :dashboard
   resources :projects, only: %i[new create show update] do
     member do
