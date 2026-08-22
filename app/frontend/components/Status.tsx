@@ -17,6 +17,7 @@ const REVIEW_STATE: Record<ReviewState, { label: string; tone: Tone }> = {
   approved: { label: "Approved", tone: "ok" },
   rejected: { label: "Rejected", tone: "bad" },
   returned: { label: "Returned", tone: "warn" },
+  withdrawn: { label: "Withdrawn", tone: "neutral" },
 }
 
 function classes(base: string, tone: Tone, invert?: boolean) {

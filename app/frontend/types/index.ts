@@ -45,7 +45,7 @@ export type ChecksResult = {
   engine: string
 }
 
-export type ReviewState = "pending" | "in_review" | "approved" | "rejected" | "returned"
+export type ReviewState = "pending" | "in_review" | "approved" | "rejected" | "returned" | "withdrawn"
 
 export type Project = {
   id: number
@@ -92,6 +92,7 @@ export type SubmissionRow = {
   ingestVersion: number
   ingestedAt: string | null
   ingestError: string | null
+  canWithdraw: boolean
   stuck: boolean
 }
 

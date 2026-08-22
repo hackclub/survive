@@ -12,7 +12,7 @@ const PROGRESS: Record<"pending" | "in_review" | "approved", StepState[]> = {
 
 export function railStates(state: ReviewState | null): StepState[] | null {
   if (state === null) return null
-  if (state === "rejected" || state === "returned") return null
+  if (state === "rejected" || state === "returned" || state === "withdrawn") return null
   return PROGRESS[state]
 }
 

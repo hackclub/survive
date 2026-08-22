@@ -15,6 +15,27 @@ class Admin::ReviewsController < ApplicationController
     }
   end
 
+  def withdraw
+    review = Review.find(params[:id])
+    authorize review
+
+    reason = params[:reason].to_s.strip
+    return redirect_to(admin_reviews_path, alert: "A reason is required to withdraw.") if reason.blank?
+    return redirect_to(admin_reviews_path, alert: "#{review.project.name} can no longer be withdrawn.") unless review.withdrawable?
+
+    result = Ari::Client.new.withdraw(review.project)
+
+    if result.status.in?(%i[withdrawn not_queued])
+      review.withdraw!(reason)
+      audit!("review.withdrawn", target: review, metadata: { reason: reason, ari: result.status.to_s })
+      redirect_to admin_reviews_path, notice: "Withdrew #{review.project.name} from Ari."
+    else
+      redirect_to admin_reviews_path, alert: "Ari refused the withdrawal: #{result.message}"
+    end
+  rescue Ari::NotConfigured => e
+    redirect_to admin_reviews_path, alert: e.message
+  end
+
   private
 
   def filter
@@ -61,6 +82,7 @@ class Admin::ReviewsController < ApplicationController
       ingestVersion: review.ingest_version,
       ingestedAt: review.ingested_at&.strftime("%b %d, %H:%M"),
       ingestError: review.ingest_error,
+      canWithdraw: review.withdrawable? && policy(review).withdraw?,
       stuck: review.ingested_at.present? && review.ingested_at < Review::STUCK_AFTER.ago && !review.decided?
     }
   end

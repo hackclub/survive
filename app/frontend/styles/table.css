@@ -88,3 +88,21 @@
 .tab.is-active .tab__count {
   opacity: 0.85;
 }
+
+.withdraw-row {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+  padding: var(--sp-2) 0;
+}
+
+.withdraw-row .field__input {
+  flex: 1;
+  min-width: 14rem;
+}
+
+.withdraw-row__actions {
+  display: flex;
+  gap: var(--sp-2);
+}

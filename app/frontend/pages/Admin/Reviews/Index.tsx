@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { Head, Link, router } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
@@ -44,6 +45,18 @@ export default function Index({
   filter: string
   pagination: Pagination
 }) {
+  const [withdrawing, setWithdrawing] = useState<number | null>(null)
+  const [reason, setReason] = useState("")
+
+  function withdraw(id: number) {
+    router.post(`/admin/reviews/${id}/withdraw`, { reason }, {
+      onFinish: () => {
+        setWithdrawing(null)
+        setReason("")
+      },
+    })
+  }
+
   function go(page: number) {
     router.get("/admin/reviews", { filter, page }, { preserveState: true })
   }
@@ -88,6 +101,7 @@ export default function Index({
                   <th className="data-table__num">Approved</th>
                   <th>Sent</th>
                   <th>Ship</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
@@ -130,6 +144,59 @@ export default function Index({
                       {row.ingestVersion > 1 && ` · v${row.ingestVersion}`}
                     </td>
                     <td className="u-mono u-xs u-faint">{row.ariShipId ?? "—"}</td>
+                    <td className="data-table__num">
+                      {row.canWithdraw && withdrawing !== row.id && (
+                        <button
+                          className="btn btn--ghost btn--sm"
+                          type="button"
+                          onClick={() => setWithdrawing(row.id)}
+                        >
+                          Withdraw
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+                {reviews
+                  .filter((row) => row.id === withdrawing)
+                  .map((row) => (
+                  <tr key={`withdraw-${row.id}`}>
+                    <td colSpan={9}>
+                      <div className="withdraw-row">
+                        <span className="u-sm u-soft">
+                          Pull <strong>{row.projectName}</strong> off Ari. The maker can fix it and
+                          submit again. They will see your reason.
+                        </span>
+                        <input
+                          className="field__input"
+                          type="text"
+                          autoFocus
+                          value={reason}
+                          placeholder="Why is this being withdrawn?"
+                          onChange={(e) => setReason(e.target.value)}
+                        />
+                        <div className="withdraw-row__actions">
+                          <button
+                            className="btn btn--primary btn--sm"
+                            type="button"
+                            disabled={!reason.trim()}
+                            onClick={() => withdraw(row.id)}
+                          >
+                            Withdraw
+                          </button>
+                          <button
+                            className="btn btn--quiet btn--sm"
+                            type="button"
+                            onClick={() => {
+                              setWithdrawing(null)
+                              setReason("")
+                            }}
+                          >
+                            Cancel
+                          </button>
+                        </div>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>

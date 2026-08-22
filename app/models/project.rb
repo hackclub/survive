@@ -28,7 +28,8 @@ class Project < ApplicationRecord
     "in_review" => :pending,
     "approved" => :approved,
     "rejected" => :rejected,
-    "returned" => :returned
+    "returned" => :returned,
+    "withdrawn" => :returned
   }.freeze
 
   validates :name, presence: true
