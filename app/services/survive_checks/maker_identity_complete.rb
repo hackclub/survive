@@ -4,6 +4,7 @@ module SurviveChecks
       first_name: "first name",
       last_name: "last name",
       email: "email",
+      slack_id: "Slack account",
       birthday: "date of birth",
       address_line1: "address",
       city: "city",
