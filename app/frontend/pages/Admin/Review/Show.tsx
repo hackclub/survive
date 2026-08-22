@@ -262,7 +262,7 @@ export default function Show({
               <div className="review__action-bar">
                 <div className="field">
                   <label className="field__label" htmlFor="feedback">
-                    Feedback &mdash; the maker reads this
+                    Feedback for the maker
                   </label>
                   <textarea
                     id="feedback"
@@ -276,7 +276,7 @@ export default function Show({
 
                 <div className="field">
                   <label className="field__label" htmlFor="reviewer-notes">
-                    Assessment &mdash; goes to the YSWS grant team
+                    Assessment for the YSWS grant team
                   </label>
                   <textarea
                     id="reviewer-notes"

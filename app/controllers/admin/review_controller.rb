@@ -134,6 +134,7 @@ class Admin::ReviewController < ApplicationController
     return if blocked_by_claim?(review)
 
     review.approve!(current_user, feedback: params[:feedback], notes: params[:reviewer_notes], entries: entry_params)
+    audit_decision!("review.approved", review)
     redirect_to admin_review_path, notice: "Approved #{review.project.name}."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
@@ -145,6 +146,7 @@ class Admin::ReviewController < ApplicationController
     return if blocked_by_claim?(review)
 
     review.reject!(current_user, feedback: params[:feedback], notes: params[:reviewer_notes], entries: entry_params)
+    audit_decision!("review.rejected", review)
     redirect_to admin_review_path, notice: "Rejected #{review.project.name}."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
@@ -156,6 +158,7 @@ class Admin::ReviewController < ApplicationController
     return if blocked_by_claim?(review)
 
     review.return_to_maker!(current_user, feedback: params[:feedback])
+    audit_decision!("review.returned", review)
     redirect_to admin_review_path, notice: "Returned #{review.project.name} to the maker."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_review_project_path(review), alert: e.record.errors.full_messages.to_sentence
@@ -174,6 +177,15 @@ class Admin::ReviewController < ApplicationController
   end
 
   private
+
+  def audit_decision!(action, review)
+    audit!(action, target: review, metadata: {
+      project_id: review.project_id,
+      round: review.round,
+      claimed_minutes: review.claimed_minutes_total,
+      approved_minutes: review.approved_minutes
+    })
+  end
 
   def entry_params
     return {} unless params[:entries].respond_to?(:each_pair)

@@ -29,6 +29,12 @@ class ApplicationController < ActionController::Base
 
   private
 
+  def audit!(action, target: nil, metadata: {})
+    return if current_user.nil?
+
+    AuditLog.create!(actor: current_user, action: action, target: target, metadata: metadata)
+  end
+
   def user_not_authorized
     redirect_back fallback_location: root_path, alert: "You are not authorized to perform this action."
   end
