@@ -73,7 +73,7 @@ export default function Index() {
           <div className="scene__content">
             <p className="scene__eyebrow">
               <img src={mark} alt="" />
-              Hack Club - You Ship, We Ship
+              Hack Club - Sponsored by Mihi
             </p>
 
             <h1 className="scene__title" data-split>
@@ -81,13 +81,13 @@ export default function Index() {
             </h1>
 
             <p className="scene__lede">
-              We're taking the internet away. Yes, all of it. No, you can't have it back.{" "}
-              <b>Your app shouldn't die</b>
+              Make offline and outdoors themed projects,{" "}
+              <b>win camping gear.</b>
             </p>
 
             <div className="scene__cta">
               <a className="btn btn--primary btn--lg" href="/dashboard">
-                Start building
+                Sign Up
                 <svg className="btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path
                     d="M5 12h13m0 0-5-5m5 5-5 5"
