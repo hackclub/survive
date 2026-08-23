@@ -51,6 +51,7 @@ env:
 
     POSTGRES_HOST: survive-db
     POSTGRES_PORT: 5432
+    POSTGRES_DB: survive_production
     POSTGRES_USER: survive
 
     HCA_CLIENT_ID: SET_ME_HCA_CLIENT_ID
@@ -127,7 +128,8 @@ accessories:
     port: "127.0.0.1:5432:5432"
     env:
       clear:
-        POSTGRES_USER: survive
+        POSTGRES_DB: survive_production
+    POSTGRES_USER: survive
         POSTGRES_DB: survive_production
       secret:
         - POSTGRES_PASSWORD

@@ -22,7 +22,7 @@ default: &default
 
 development:
   <<: *default
-  database: survive_development
+  database: <%= ENV.fetch("POSTGRES_DB", "survive_development") %>
   host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
   port: <%= ENV.fetch("POSTGRES_PORT", 5432) %>
   username: <%= ENV.fetch("POSTGRES_USER", "survive") %>
@@ -93,22 +93,9 @@ test:
 # for a full overview on how database connection configuration can be specified.
 #
 production:
-  primary: &primary_production
-    <<: *default
-    database: survive_production
-    host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
-    port: <%= ENV.fetch("POSTGRES_PORT", 5432) %>
-    username: <%= ENV.fetch("POSTGRES_USER", "survive") %>
-    password: <%= ENV["POSTGRES_PASSWORD"] %>
-  cache:
-    <<: *primary_production
-    database: survive_production_cache
-    migrations_paths: db/cache_migrate
-  queue:
-    <<: *primary_production
-    database: survive_production_queue
-    migrations_paths: db/queue_migrate
-  cable:
-    <<: *primary_production
-    database: survive_production_cable
-    migrations_paths: db/cable_migrate
+  <<: *default
+  database: <%= ENV.fetch("POSTGRES_DB", "survive_production") %>
+  host: <%= ENV.fetch("POSTGRES_HOST", "localhost") %>
+  port: <%= ENV.fetch("POSTGRES_PORT", 5432) %>
+  username: <%= ENV.fetch("POSTGRES_USER", "survive") %>
+  password: <%= ENV["POSTGRES_PASSWORD"] %>
