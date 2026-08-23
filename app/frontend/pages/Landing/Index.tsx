@@ -19,10 +19,10 @@ export default function Index() {
 
   return (
     <>
-      <Head title="Survive - Build something that works offline.">
+      <Head title="Survive - Build it. Ship it. Get paid for it.">
         <meta
           name="description"
-          content="A Hack Club You Ship, We Ship program. Build something that works with no internet, then ship it for review."
+          content="A Hack Club You Ship, We Ship program. Log your hours, ship a real project, and take coins for every approved hour."
         />
       </Head>
 

@@ -7,10 +7,11 @@ image: survive
 # Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
+    - SET_ME_WEB_HOST
+  # Split job processing onto its own machine once one server is not enough.
   # job:
   #   hosts:
-  #     - 192.168.0.1
+  #     - SET_ME_JOB_HOST
   #   cmd: bin/jobs
 
 # Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
@@ -20,27 +21,51 @@ servers:
 #
 # Don't use this when deploying to multiple web servers (then you have to terminate SSL at your load balancer).
 #
-# proxy:
-#   ssl: true
-#   host: app.example.com
+proxy:
+  ssl: true
+  host: survive.hackclub.com
+  healthcheck:
+    path: /up
 
 # Where you keep your container images.
 registry:
-  # Alternatives: hub.docker.com / registry.digitalocean.com / ghcr.io / ...
-  server: localhost:5555
+  server: ghcr.io
+  username: SET_ME_REGISTRY_USER
 
-  # Needed for authenticated registries.
-  # username: your-user
-
-  # Always use an access token rather than real password when possible.
-  # password:
-  #   - KAMAL_REGISTRY_PASSWORD
+  password:
+    - KAMAL_REGISTRY_PASSWORD
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
   secret:
     - RAILS_MASTER_KEY
+    - POSTGRES_PASSWORD
+    - HCA_CLIENT_SECRET
+    - HACKATIME_CLIENT_SECRET
+    - ARI_INGEST_SECRET
+    - ARI_WEBHOOK_SECRET
+    - R2_ACCESS_KEY_ID
+    - R2_SECRET_ACCESS_KEY
   clear:
+    APP_HOST: https://survive.hackclub.com
+
+    POSTGRES_HOST: survive-db
+    POSTGRES_PORT: 5432
+    POSTGRES_USER: survive
+
+    HCA_CLIENT_ID: SET_ME_HCA_CLIENT_ID
+    HCA_COMMUNITY: 0
+
+    HACKATIME_CLIENT_ID: SET_ME_HACKATIME_CLIENT_ID
+
+    ARI_PROGRAM_ID: SET_ME_ARI_PROGRAM_ID
+
+    COIN_RATE_PER_HOUR: 5
+
+    R2_ENDPOINT: https://65928e7e7265894b499567219490de12.r2.cloudflarestorage.com
+    R2_BUCKET: SET_ME_R2_BUCKET
+    R2_PUBLIC_HOST: survive.hackclub-assets.com
+
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
     SOLID_QUEUE_IN_PUMA: true
@@ -95,19 +120,19 @@ builder:
 #   user: app
 
 # Use accessory services (secrets come from .kamal/secrets).
-# accessories:
-#   db:
-#     image: mysql:8.0
-#     host: 192.168.0.2
-#     # Change to 3306 to expose port to the world instead of just local network.
-#     port: "127.0.0.1:3306:3306"
-#     env:
-#       clear:
-#         MYSQL_ROOT_HOST: '%'
-#       secret:
-#         - MYSQL_ROOT_PASSWORD
-#     files:
-#       - config/mysql/production.cnf:/etc/mysql/my.cnf
+accessories:
+  db:
+    image: postgres:17-alpine
+    host: SET_ME_WEB_HOST
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_USER: survive
+        POSTGRES_DB: survive_production
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
 #       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
 #     directories:
 #       - data:/var/lib/mysql

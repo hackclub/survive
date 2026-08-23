@@ -4,7 +4,6 @@ import raccoon from "../../images/raccoon.webp"
 const SURVIVE_LINKS = [
   { label: "How it works", href: "/#how" },
   { label: "FAQ", href: "/#faq" },
-  { label: "Gallery", href: "/gallery" },
   { label: "Ship a project", href: "/dashboard" },
   { label: "Your dashboard", href: "/dashboard" },
 ]
@@ -45,9 +44,6 @@ export function Footer() {
                   strokeLinejoin="round"
                 />
               </svg>
-            </a>
-            <a className="btn btn--outline-invert btn--lg" href="/gallery">
-              Browse the gallery
             </a>
           </div>
         </div>

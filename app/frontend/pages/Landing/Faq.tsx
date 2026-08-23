@@ -1,7 +1,7 @@
 const QUESTIONS = [
   {
     q: "Can it use the internet to install dependencies?",
-    a: "Yes. Install whatever you need at build time. What matters is thar your project works offline.",
+    a: "Yes. Install whatever you need.",
   },
   {
     q: "How much time should I spend working on my project?",

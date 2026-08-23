@@ -16,7 +16,7 @@ const STEPS = [
   },
   {
     title: "Get reviewed",
-    body: "We'll review your project and make sure it works offline and you'll get the verdict! (hopefully accepted)",
+    body: "We'll review your project and you'll get the verdict! (hopefully accepted)",
   },
 ]
 
