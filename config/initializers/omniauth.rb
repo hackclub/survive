@@ -24,6 +24,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     client_options: {
       site: "https://hackatime.hackclub.com",
       authorize_url: "/oauth/authorize",
-      token_url: "/oauth/token"
+      token_url: "/oauth/token",
+      auth_scheme: :request_body
     }
 end
