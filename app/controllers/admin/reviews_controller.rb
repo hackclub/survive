@@ -16,6 +16,20 @@ class Admin::ReviewsController < ApplicationController
     }
   end
 
+  def ingest
+    review = Review.find(params[:id])
+    authorize review, :withdraw?
+
+    if review.ingested?
+      return redirect_to(admin_reviews_path, alert: "#{review.project.name} is already with Ari.")
+    end
+
+    review.update!(ingest_error: nil)
+    AriIngestJob.perform_later(review.id)
+    audit!("review.ingest_retried", target: review, metadata: { project: review.project.name })
+    redirect_to admin_reviews_path, notice: "Sending #{review.project.name} to Ari."
+  end
+
   def withdraw
     review = Review.find(params[:id])
     authorize review

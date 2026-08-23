@@ -9,7 +9,10 @@ class AriIngestJob < ApplicationJob
     return if review.nil?
 
     unless Ari::Config.ingest_configured?
-      Rails.logger.warn("[Ari] ingest skipped for review ##{review.id}, ARI_PROGRAM_ID or ARI_INGEST_SECRET is not set")
+      missing = %w[ARI_PROGRAM_ID ARI_INGEST_SECRET].select { |name| ENV[name].blank? }
+      review.update_columns(ingest_error: "Not sent: #{missing.to_sentence} #{missing.one? ? 'is' : 'are'} not set.",
+        updated_at: Time.current)
+      Rails.logger.warn("[Ari] ingest skipped for review ##{review.id}, #{missing.join(' and ')} not set")
       return
     end
 

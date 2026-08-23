@@ -158,8 +158,17 @@ export default function Index({
                       {row.ingestedAt ?? "not yet"}
                       {row.ingestVersion > 1 && ` · v${row.ingestVersion}`}
                     </td>
-                    <td className="u-mono u-xs u-faint">{row.ariShipId ?? "—"}</td>
+                    <td className="u-mono u-xs u-faint">{row.ariShipId ?? "none"}</td>
                     <td className="data-table__num">
+                      {!row.ingestedAt && (
+                        <button
+                          className="btn btn--primary btn--sm"
+                          type="button"
+                          onClick={() => router.post(`/admin/reviews/${row.id}/ingest`)}
+                        >
+                          Send now
+                        </button>
+                      )}
                       {row.canWithdraw && withdrawing !== row.id && (
                         <button
                           className="btn btn--ghost btn--sm"

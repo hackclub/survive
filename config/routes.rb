@@ -51,7 +51,10 @@ Rails.application.routes.draw do
     end
 
     resources :reviews, only: :index do
-      member { post "withdraw" }
+      member do
+        post "withdraw"
+        post "ingest"
+      end
     end
 
     resources :final_reviews, only: %i[index show] do
