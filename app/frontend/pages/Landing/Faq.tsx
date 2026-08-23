@@ -1,7 +1,7 @@
 const QUESTIONS = [
   {
-    q: "Can it use the internet to install dependencies?",
-    a: "Yes. Install whatever you need.",
+    q: "What type of projects can I make?",
+    a: "Anything that works entirelly offline, or is themed outside. This could be a sandbox game, an adventure game, or a tool that works entirely offline",
   },
   {
     q: "How much time should I spend working on my project?",
@@ -9,7 +9,7 @@ const QUESTIONS = [
   },
   {
     q: "Can I work with someone else?",
-    a: "TBD lol",
+    a: "Yes! Just make individual projects and only record the time you do.",
   },
   {
     q: "My project was rejected. Now what?",
