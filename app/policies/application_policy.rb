@@ -44,6 +44,10 @@ class ApplicationPolicy
     user&.fraud?
   end
 
+  def fulfiller?
+    user&.fulfiller?
+  end
+
   def admin?
     user&.admin?
   end

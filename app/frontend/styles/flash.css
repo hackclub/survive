@@ -1,24 +1,101 @@
-.flash {
+.toasts {
+  position: fixed;
+  inset-block-end: var(--sp-5);
+  inset-inline-end: var(--sp-5);
+  z-index: var(--z-sheet);
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
-  margin-bottom: var(--sp-5);
+  align-items: flex-end;
+  pointer-events: none;
 }
 
-.flash__banner {
-  padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-md);
+.toast {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--r-sm);
+  background: var(--slate-800);
+  color: var(--bone);
   font-size: var(--fs-sm);
+  font-weight: 700;
+  box-shadow: var(--shadow-3);
+  max-width: 22rem;
+  overflow: hidden;
+  pointer-events: auto;
+  animation: toast-in 0.32s var(--ease-spring);
 }
 
-.flash__banner--notice {
-  background: var(--lime-50);
-  border: 1px solid var(--lime-200);
-  color: var(--lime-700);
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
 }
 
-.flash__banner--alert {
-  background: var(--rust-50);
-  border: 1px solid var(--rust-200);
-  color: var(--rust-800);
+.toast__dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.toast--notice .toast__dot {
+  background: var(--lime-400);
+}
+
+.toast--alert .toast__dot {
+  background: var(--rust-400);
+}
+
+.toast--coins {
+  background: linear-gradient(120deg, var(--rust-700), var(--ember-700));
+  border: 1px solid rgba(242, 163, 63, 0.4);
+}
+
+.toast__close {
+  margin-inline-start: auto;
+  font-family: var(--font-mono);
+  font-size: var(--fs-label);
+  color: rgba(232, 230, 223, 0.6);
+}
+
+.toast__close:hover {
+  color: var(--bone);
+}
+
+.toast__timer {
+  position: absolute;
+  inset-inline-start: 0;
+  inset-block-end: 0;
+  height: 2px;
+  background: rgba(232, 230, 223, 0.4);
+  animation: toast-timer 6s linear forwards;
+}
+
+@keyframes toast-timer {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@media (max-width: 700px) {
+  .toasts {
+    inset-inline: var(--sp-4);
+    inset-block-end: 4.5rem;
+    align-items: stretch;
+  }
+
+  .toast {
+    max-width: none;
+  }
 }

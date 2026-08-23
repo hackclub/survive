@@ -35,11 +35,7 @@ export default function Index({
     <>
       <Head title="Audit log - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <h1 className="dashboard__title">Audit log</h1>
-        </div>
-
+      <AdminSidebarLayout eyebrow="Admin" title="Audit log">
         <div className="dashboard__search">
           <select
             className="field__input"

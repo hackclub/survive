@@ -32,14 +32,15 @@ export default function Index({
     <>
       <Head title="Coins - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <h1 className="dashboard__title">Coins</h1>
-          <p className="u-sm u-faint u-mono">
+      <AdminSidebarLayout
+        eyebrow="Payouts"
+        title="Coins"
+        actions={
+          <span className="u-sm u-mono" style={{ color: "rgba(232, 230, 223, 0.55)" }}>
             {totals.earned} earned · {totals.adjusted} adjusted
-          </p>
-        </div>
-
+          </span>
+        }
+      >
         <form
           className="dashboard__search"
           onSubmit={(e) => {

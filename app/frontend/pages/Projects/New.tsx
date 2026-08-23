@@ -1,6 +1,5 @@
 import { Head, useForm, usePage } from "@inertiajs/react"
-import { Nav } from "../../components/Nav"
-import { Flash } from "../../components/Flash"
+import { AppShell } from "../../components/AppShell"
 import { BannerUpload } from "../../components/BannerUpload"
 import { HackatimeProjectPicker } from "../../components/HackatimeProjectPicker"
 import { humanizeField } from "../../lib/format"
@@ -27,17 +26,12 @@ export default function New({ hackatimeProjects }: { hackatimeProjects: Hackatim
     <>
       <Head title="New project - Survive" />
 
-      <Nav />
-
-      <main id="main" className="project-form">
-        <div className="project-form__shell">
-          <Flash />
-
-          <h1 className="project-form__title">Start a project</h1>
-          <p className="u-lead u-soft project-form__note">
-            Save it as a draft now, add your repo and demo links once you're ready to submit for
-            review.
-          </p>
+      <AppShell
+        eyebrow="Camp · new"
+        title="Start a project"
+        narrow
+        lede="Save it as a draft now, add your repo and demo links once you are ready to submit for review."
+      >
 
           {Object.keys(errors).length > 0 && (
             <div className="project-form__errors">
@@ -155,8 +149,7 @@ export default function New({ hackatimeProjects }: { hackatimeProjects: Hackatim
               {form.processing ? "Saving..." : "Save draft"}
             </button>
           </form>
-        </div>
-      </main>
+      </AppShell>
     </>
   )
 }

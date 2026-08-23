@@ -1,7 +1,7 @@
 import { Head, Link } from "@inertiajs/react"
-import { Nav } from "../../components/Nav"
-import { Flash } from "../../components/Flash"
-import { Status, Tag } from "../../components/Status"
+import { AppShell } from "../../components/AppShell"
+import { Empty } from "../../components/Empty"
+import { Status } from "../../components/Status"
 
 type Order = {
   id: number
@@ -30,11 +30,20 @@ const TONE: Record<string, "neutral" | "ok" | "warn" | "bad"> = {
 
 const LABEL: Record<string, string> = {
   pending: "Awaiting review",
-  approved: "Approved, being prepared",
+  approved: "Being prepared",
   on_hold: "On hold",
   rejected: "Turned down",
   fulfilled: "Sent",
   refunded: "Refunded",
+}
+
+const EDGE: Record<string, string> = {
+  pending: " order-row--live",
+  approved: " order-row--live",
+  on_hold: " order-row--live",
+  rejected: " order-row--bad",
+  fulfilled: " order-row--done",
+  refunded: "",
 }
 
 export default function Index({
@@ -50,72 +59,73 @@ export default function Index({
     <>
       <Head title="Orders - Survive" />
 
-      <Nav />
-
-      <main id="main" className="dashboard">
-        <div className="dashboard__shell">
-          <Flash />
-
-          <div className="dashboard__header">
-            <div>
-              <h1 className="dashboard__title">Your orders</h1>
-              <p className="u-sm u-soft">
-                {balance} coins to spend{held > 0 && `, ${held} held by open orders`}.
-              </p>
-            </div>
-            <Link className="btn btn--primary btn--sm" href="/shop">
-              Shop
-            </Link>
-          </div>
-
-          {orders.length === 0 ? (
-            <div className="dashboard__empty">
-              <p className="u-lead">You haven't ordered anything yet.</p>
+      <AppShell
+        eyebrow="Orders"
+        title={held > 0 ? `${held} coins held` : "Your orders"}
+        narrow
+        lede={
+          held > 0
+            ? `${balance} spendable once these clear or are refunded.`
+            : `${balance} coins spendable.`
+        }
+      >
+        {orders.length === 0 ? (
+          <Empty
+            title="No orders yet"
+            action={
               <Link className="btn btn--primary btn--sm" href="/shop">
-                Browse the shop
+                Open the shop
               </Link>
-            </div>
-          ) : (
-            <ul className="dashboard__list">
-              {orders.map((order) => (
-                <li key={order.id} className="dashboard__row">
-                  <div className="dashboard__row-top">
-                    <span className="dashboard__name">
-                      {order.name}
-                      {order.quantity > 1 && ` × ${order.quantity}`}
-                    </span>
-                    <Tag tone={order.held ? "warn" : "neutral"}>{order.coins} coins</Tag>
-                    <Status tone={TONE[order.state] ?? "neutral"}>
-                      {LABEL[order.state] ?? order.state}
-                    </Status>
-                  </div>
+            }
+          />
+        ) : (
+          <div className="camp__grid">
+            {orders.map((order) => (
+              <div key={order.id} className={`panel order-row${EDGE[order.state]}`}>
+                <div className="panel__head">
+                  <h2 className="panel__title">
+                    {order.name}
+                    {order.quantity > 1 && ` × ${order.quantity}`}
+                  </h2>
+                  <Status tone={TONE[order.state] ?? "neutral"}>{LABEL[order.state]}</Status>
+                </div>
 
-                  {order.rejectionReason && (
-                    <p className="u-sm u-soft">
-                      {order.rejectionReason} The {order.coins} coins are back in your balance.
-                    </p>
-                  )}
+                <p className="u-xs u-faint">
+                  Ordered {order.placedAt} · {order.coins} coins
+                  {order.held && order.state !== "fulfilled" && " held"}
+                  {order.amountUsd !== null && ` · $${order.amountUsd.toFixed(2)}`}
+                </p>
 
-                  {order.trackingNumber && (
-                    <p className="u-sm u-soft u-mono">{order.trackingNumber}</p>
-                  )}
+                {order.addressLines.length > 0 && order.state !== "rejected" && (
+                  <p className="u-xs u-faint">Ships to {order.addressLines.join(", ")}</p>
+                )}
 
-                  {order.grantLink && (
-                    <a className="u-sm u-accent" href={order.grantLink}>
-                      Open your grant
-                    </a>
-                  )}
+                {order.trackingNumber && (
+                  <p className="u-sm u-mono" style={{ marginTop: "var(--sp-2)" }}>
+                    {order.trackingNumber}
+                  </p>
+                )}
 
-                  <div className="dashboard__row-meta u-sm u-faint">
-                    <span>Ordered {order.placedAt}</span>
-                    {order.addressLines.length > 0 && <span>{order.addressLines.join(", ")}</span>}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </main>
+                {order.grantLink && (
+                  <a
+                    className="u-sm u-accent"
+                    href={order.grantLink}
+                    style={{ marginTop: "var(--sp-2)", display: "inline-block" }}
+                  >
+                    Open your grant
+                  </a>
+                )}
+
+                {order.rejectionReason && (
+                  <p className="u-xs u-soft" style={{ marginTop: "var(--sp-2)" }}>
+                    {order.rejectionReason} <b>{order.coins} coins went back to your purse.</b>
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </AppShell>
     </>
   )
 }

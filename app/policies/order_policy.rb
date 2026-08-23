@@ -12,4 +12,8 @@ class OrderPolicy < ApplicationPolicy
   end
 
   alias_method :decide?, :manage?
+
+  def fulfill?
+    user&.fulfiller?
+  end
 end

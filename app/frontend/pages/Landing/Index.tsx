@@ -26,10 +26,10 @@ export default function Index() {
         />
       </Head>
 
-      <Nav />
-
       <main id="main">
         <header className="scene" data-scene>
+          <Nav over />
+
           <div className="scene__stack" aria-hidden="true">
             <div className="layer layer--clouds" data-depth="0.58" data-grow="0.02" data-sway="26">
               <img src={clouds} alt="" fetchPriority="high" />

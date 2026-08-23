@@ -63,11 +63,7 @@ export default function Index({
     <>
       <Head title="Orders - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <h1 className="dashboard__title">Orders</h1>
-        </div>
-
+      <AdminSidebarLayout eyebrow="Payouts" title="Orders">
         <div style={{ marginBottom: "var(--sp-4)" }}>
           <Tabs
             items={tabs.map((tab) => ({

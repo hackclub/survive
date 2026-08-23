@@ -35,17 +35,11 @@ export default function Show({ maker, entries }: { maker: Maker; entries: Entry[
     <>
       <Head title={`Coins: ${maker.name} - Survive`} />
 
-      <AdminSidebarLayout>
-        <div className="review__header">
-          <div>
-            <p className="review__eyebrow u-label">{maker.email}</p>
-            <h1 className="review__title">{maker.name}</h1>
-          </div>
-          <div className="review__header-actions">
-            {maker.banned && <Status tone="bad">Banned, balance frozen</Status>}
-          </div>
-        </div>
-
+      <AdminSidebarLayout
+        eyebrow={maker.email}
+        title={maker.name}
+        actions={maker.banned ? <Status tone="bad">Banned, balance frozen</Status> : undefined}
+      >
         <div className="mystats__grid">
           <div className="mystats__tile">
             <span className="mystats__number">{maker.earned}</span>

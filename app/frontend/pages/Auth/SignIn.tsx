@@ -1,6 +1,8 @@
 import { Head } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
+import { Embers } from "../../components/Embers"
 import { Flash } from "../../components/Flash"
+import { Scout } from "../../components/Scout"
 
 export default function SignIn() {
   const csrfToken =
@@ -12,25 +14,28 @@ export default function SignIn() {
     <>
       <Head title="Sign in - Survive" />
 
-      <Nav />
+      <div className="shell">
+        <header className="band signin">
+          <div className="band__deco" aria-hidden="true">
+            <Embers />
+            <div className="band__glow" />
+          </div>
 
-      <main id="main" className="signin">
-        <div className="signin__card">
-          <Flash />
+          <Nav />
 
-          <h1 className="signin__title">Sign in to Survive</h1>
-          <p className="signin__note">
-            One click with your Hack Club account. If you don't have one yet, making it takes
-            about a minute.
-          </p>
-          <form action="/auth/hack_club" method="post">
-            <input type="hidden" name="authenticity_token" value={csrfToken} />
-            <button className="btn btn--primary btn--lg" type="submit">
-              Continue with Hack Club
-            </button>
-          </form>
-        </div>
-      </main>
+          <div className="signin__card">
+            <Scout className="signin__scout" />
+            <form action="/auth/hack_club" method="post">
+              <input type="hidden" name="authenticity_token" value={csrfToken} />
+              <button className="btn btn--primary btn--lg" type="submit">
+                Continue with Hack Club
+              </button>
+            </form>
+          </div>
+        </header>
+
+        <Flash />
+      </div>
     </>
   )
 }

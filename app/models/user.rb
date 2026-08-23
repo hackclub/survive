@@ -1,7 +1,7 @@
 class User < ApplicationRecord
   class AuthenticationError < StandardError; end
 
-  ROLES = %w[reviewer fraud admin superadmin].freeze
+  ROLES = %w[reviewer fraud fulfiller admin superadmin].freeze
 
   encrypts :hca_token
   encrypts :hackatime_token
@@ -164,6 +164,10 @@ class User < ApplicationRecord
 
   def fraud?
     roles.include?("fraud") || admin?
+  end
+
+  def fulfiller?
+    roles.include?("fulfiller") || admin?
   end
 
   def admin?

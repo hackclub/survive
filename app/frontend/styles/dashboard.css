@@ -1,6 +1,6 @@
 .dashboard {
   min-height: 100vh;
-  padding: clamp(6rem, 10vw, 8rem) clamp(1.5rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+  padding: var(--sp-6) clamp(1.5rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
   background: var(--paper);
 }
 
@@ -188,25 +188,54 @@
 }
 
 .mystats__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
-  gap: var(--sp-3);
-  margin-bottom: var(--sp-6);
+  display: flex;
+  flex-wrap: wrap;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--bg-raised);
+  overflow: hidden;
+  margin-bottom: var(--sp-5);
+}
+
+.mystats__grid > a {
+  display: flex;
+  flex: 1 1 8rem;
+  min-width: 0;
+}
+
+.mystats__grid > a:hover .mystats__tile {
+  background: rgba(242, 163, 63, 0.07);
 }
 
 .mystats__tile {
+  flex: 1 1 8rem;
+  min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--sp-1);
-  padding: var(--sp-5);
-  border-radius: var(--r-md);
-  background: var(--bg-raised);
-  border: 1px solid var(--line);
+  gap: 0.05rem;
+  padding: 0.62rem 0.9rem;
+  border-inline-end: 1px solid var(--line);
+  transition: background var(--dur-fast) var(--ease);
+}
+
+.mystats__grid > *:last-child .mystats__tile,
+.mystats__grid > .mystats__tile:last-child {
+  border-inline-end: 0;
+}
+
+.mystats__tile--alarming {
+  background: var(--rust-50);
+}
+
+.mystats__tile--alarming .mystats__number {
+  color: var(--rust-600);
 }
 
 .mystats__number {
-  font-family: var(--font-display);
-  font-size: var(--fs-d2);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
 }

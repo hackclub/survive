@@ -35,6 +35,10 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :fulfillment, only: :index do
+      member { post "fulfill" }
+    end
+
     resources :coins, only: %i[index show] do
       member { post "adjust" }
     end
@@ -59,6 +63,7 @@ Rails.application.routes.draw do
   end
 
   get "dashboard" => "dashboard#index", as: :dashboard
+  get "account" => "accounts#show", as: :account
   get "shop" => "shop#index", as: :shop
   get "shop/items/:id" => "shop#show", as: :shop_item
   resources :orders, only: %i[index create]

@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useQueueKeys } from "../../../lib/useQueueKeys"
 import { Head, Link, router } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
@@ -48,6 +49,17 @@ export default function Index({
   const [withdrawing, setWithdrawing] = useState<number | null>(null)
   const [reason, setReason] = useState("")
 
+  const { cursor } = useQueueKeys({
+    count: reviews.length,
+    onEscape: () => setWithdrawing(null),
+    onOpen: (index) => {
+      const row = reviews[index]
+      if (row) router.get(`/projects/${row.projectId}`)
+    },
+    tabs: tabs.map((tab) => `/admin/reviews?filter=${tab.key}`),
+    onTab: (href) => router.get(href),
+  })
+
   function withdraw(id: number) {
     router.post(`/admin/reviews/${id}/withdraw`, { reason }, {
       onFinish: () => {
@@ -65,13 +77,7 @@ export default function Index({
     <>
       <Head title="Submissions - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <div>
-            <h1 className="dashboard__title">Submissions</h1>
-          </div>
-        </div>
-
+      <AdminSidebarLayout eyebrow="Ari" title="Submissions">
         <div style={{ marginBottom: "var(--sp-4)" }}>
           <Tabs
             items={tabs.map((tab) => ({
@@ -104,8 +110,18 @@ export default function Index({
                 </tr>
               </thead>
               <tbody>
-                {reviews.map((row) => (
-                  <tr key={row.id} className={row.stuck ? "data-table__row--flagged" : undefined}>
+                {reviews.map((row, index) => (
+                  <tr
+                    key={row.id}
+                    className={
+                      [
+                        row.stuck ? "data-table__row--flagged" : null,
+                        index === cursor ? "data-table__row--cursor" : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" ") || undefined
+                    }
+                  >
                     <td>
                       <Link className="u-accent" href={`/projects/${row.projectId}`}>
                         {row.projectName}

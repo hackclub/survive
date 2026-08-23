@@ -31,26 +31,22 @@ export default function Show({ record }: { record: FinalReviewDetail }) {
     <>
       <Head title={`Final review: ${record.projectName} - Survive`} />
 
-      <AdminSidebarLayout>
-        <div className="review__header">
-          <div>
-            <p className="review__eyebrow u-label">
-              Round {record.round} &middot; {record.makerName} &middot; {record.ariShipId ?? "no ship id"}
-            </p>
-            <h1 className="review__title">{record.projectName}</h1>
-          </div>
-          <div className="review__header-actions">
+      <AdminSidebarLayout
+        eyebrow={`Round ${record.round} · ${record.makerName} · ${record.ariShipId ?? "no ship id"}`}
+        title={record.projectName}
+        actions={
+          <>
             <Status tone={record.status === "pending" ? "warn" : "ok"}>{record.status}</Status>
             <button
-              className="btn btn--ghost btn--sm"
+              className="nav__ghost"
               type="button"
               onClick={() => router.delete(`/admin/final_reviews/${record.id}/claim`)}
             >
               Release
             </button>
-          </div>
-        </div>
-
+          </>
+        }
+      >
         <div className="review__grid">
           <div className="review__main">
             <section className="review__card">

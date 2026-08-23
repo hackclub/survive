@@ -27,8 +27,10 @@ class Order < ApplicationRecord
   validates :frozen_coin_cost, numericality: { only_integer: true, greater_than: 0 }
   validates :frozen_item_name, presence: true
   validates :rejection_reason, presence: true, if: :rejected?
+  validates :hcb_grant_link, format: { with: %r{\Ahttps://[^\s]+\z}i }, allow_blank: true
 
   scope :held, -> { where(state: HELD_STATES) }
+  scope :awaiting_fulfillment, -> { where(state: :approved) }
   scope :open_orders, -> { where(state: %i[pending on_hold]) }
   scope :recent, -> { order(created_at: :desc) }
   scope :unclaimed_or_claimed_by, ->(user) {
@@ -145,6 +147,16 @@ class Order < ApplicationRecord
       rejection_reason: reason,
       fraud_related_project: fraud_project
     )
+  end
+
+  def fulfill!(actor, reference: nil)
+    raise NotAllowed, "#{frozen_item_name} is not waiting to be sent." unless approved?
+
+    reference = reference.to_s.strip.presence
+    attributes = { state: :fulfilled, fulfilled_by: actor, fulfilled_at: Time.current }
+    attributes[grant? ? :hcb_grant_link : :tracking_number] = reference if reference
+
+    update!(attributes)
   end
 
   def refund!(actor, reason:)

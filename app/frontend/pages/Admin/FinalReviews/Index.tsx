@@ -1,4 +1,5 @@
 import { Head, Link, router } from "@inertiajs/react"
+import { useQueueKeys } from "../../../lib/useQueueKeys"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
 import { Tabs } from "../../../components/Tabs"
@@ -24,17 +25,21 @@ export default function Index({
   filter: string
   pagination: Pagination
 }) {
+  const { cursor } = useQueueKeys({
+    count: rows.length,
+    onOpen: (index) => {
+      const row = rows[index]
+      if (row) router.get(`/admin/final_reviews/${row.id}`)
+    },
+    tabs: tabs.map((tab) => `/admin/final_reviews?filter=${tab.key}`),
+    onTab: (href) => router.get(href),
+  })
+
   return (
     <>
       <Head title="Final review - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <div>
-            <h1 className="dashboard__title">Final review</h1>
-          </div>
-        </div>
-
+      <AdminSidebarLayout eyebrow="Payouts" title="Final review">
         <div style={{ marginBottom: "var(--sp-4)" }}>
           <Tabs
             items={tabs.map((tab) => ({
@@ -66,8 +71,18 @@ export default function Index({
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row) => (
-                  <tr key={row.id} className={row.flags.length > 0 ? "data-table__row--flagged" : undefined}>
+                {rows.map((row, index) => (
+                  <tr
+                    key={row.id}
+                    className={
+                      [
+                        row.flags.length > 0 ? "data-table__row--flagged" : null,
+                        index === cursor ? "data-table__row--cursor" : null,
+                      ]
+                        .filter(Boolean)
+                        .join(" ") || undefined
+                    }
+                  >
                     <td>
                       <Link className="u-accent" href={`/admin/final_reviews/${row.id}`}>
                         {row.projectName}

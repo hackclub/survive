@@ -1,0 +1,177 @@
+.ptrail {
+  position: relative;
+  padding: 2.6rem 0.4rem 0.2rem;
+}
+
+.ptrail__line {
+  position: absolute;
+  inset-inline: 6%;
+  inset-block-start: 3.5rem;
+  height: 3px;
+  border-radius: 3px;
+  background: rgba(44, 54, 67, 0.13);
+  overflow: hidden;
+}
+
+.ptrail__fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--lime-500), var(--ember));
+  box-shadow: 0 0 10px rgba(242, 163, 63, 0.55);
+  transition: width var(--dur-slow) var(--ease);
+}
+
+.ptrail--done .ptrail__fill {
+  background: var(--lime-500);
+  box-shadow: 0 0 10px rgba(139, 180, 55, 0.5);
+}
+
+.ptrail--back .ptrail__fill {
+  background: var(--rust-500);
+  box-shadow: none;
+}
+
+.ptrail__stops {
+  position: relative;
+  display: flex;
+  padding-inline: 6%;
+}
+
+.ptrail__stop {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.42rem;
+  text-align: center;
+  padding-inline: 0.2rem;
+}
+
+.ptrail__pin {
+  position: relative;
+  z-index: 2;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 3px solid rgba(44, 54, 67, 0.16);
+}
+
+.ptrail__stop.is-done .ptrail__pin {
+  border-color: var(--lime-500);
+  background: var(--lime-500);
+}
+
+.ptrail__stop.is-now .ptrail__pin {
+  border-color: var(--ember);
+  background: var(--paper);
+  box-shadow: 0 0 0 5px rgba(242, 163, 63, 0.2);
+}
+
+.ptrail__stop.is-now .ptrail__pin::after {
+  content: "";
+  position: absolute;
+  inset: -9px;
+  border-radius: 50%;
+  border: 2px solid var(--ember);
+  opacity: 0.5;
+  animation: pin-pulse 2.2s var(--ease) infinite;
+}
+
+.ptrail--back .ptrail__stop.is-now .ptrail__pin {
+  border-color: var(--rust-500);
+  box-shadow: 0 0 0 5px rgba(194, 96, 58, 0.18);
+}
+
+.ptrail--back .ptrail__stop.is-now .ptrail__pin::after {
+  border-color: var(--rust-500);
+}
+
+@keyframes pin-pulse {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.5);
+  }
+}
+
+.ptrail__label {
+  font-size: var(--fs-label);
+  line-height: 1.25;
+  font-weight: 700;
+  color: var(--ink-faint);
+}
+
+.ptrail__stop.is-done .ptrail__label,
+.ptrail__stop.is-now .ptrail__label {
+  color: var(--ink-soft);
+}
+
+.ptrail__stop.is-now .ptrail__label {
+  color: var(--ember-700);
+}
+
+.ptrail--back .ptrail__stop.is-now .ptrail__label {
+  color: var(--rust-600);
+}
+
+.ptrail__scout {
+  position: absolute;
+  inset-block-start: 1rem;
+  width: 40px;
+  z-index: 3;
+  transform-origin: 50% 100%;
+  filter: drop-shadow(0 6px 10px rgba(16, 22, 30, 0.22));
+  transition: inset-inline-start var(--dur-slow) var(--ease);
+  animation: scout-walk 2.6s var(--ease) infinite;
+}
+
+.ptrail__scout::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 50%;
+  inset-block-end: -4px;
+  width: 22px;
+  height: 6px;
+  translate: -50% 0;
+  border-radius: 50%;
+  background: rgba(16, 22, 30, 0.16);
+  filter: blur(3px);
+}
+
+.ptrail--back .ptrail__scout {
+  transform: scaleX(-1);
+  animation: none;
+}
+
+.ptrail--idle .ptrail__scout {
+  filter: grayscale(0.7) drop-shadow(0 4px 8px rgba(16, 22, 30, 0.18));
+  animation: none;
+  opacity: 0.75;
+}
+
+@keyframes scout-walk {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-2deg);
+  }
+  50% {
+    transform: translateY(-4px) rotate(2deg);
+  }
+}
+
+.ptrail__note {
+  text-align: center;
+  margin-block: var(--sp-3) 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ptrail__scout {
+    animation: none;
+  }
+}

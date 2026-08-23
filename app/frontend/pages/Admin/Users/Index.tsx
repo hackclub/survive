@@ -43,11 +43,7 @@ export default function Index({
     <>
       <Head title="Users - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <h1 className="dashboard__title">Users</h1>
-        </div>
-
+      <AdminSidebarLayout eyebrow="Admin" title="Users">
         <form
           className="dashboard__search"
           onSubmit={(e) => {

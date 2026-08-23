@@ -91,7 +91,7 @@
 
   --font-display: "Bricolage Grotesque", "Phantom Sans", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Phantom Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: "Space Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-mono: var(--font-sans);
 
   --fs-hero: clamp(3.6rem, 12vw, 13rem);
   --fs-d1: clamp(2.75rem, 6.4vw, 5.25rem);
@@ -323,4 +323,11 @@ p {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
+}
+
+:root {
+  --dusk-1: #232c38;
+  --dusk-2: #3a3440;
+  --dusk-3: #5c3524;
+  --emberlight: rgba(242, 163, 63, 0.36);
 }

@@ -1,6 +1,7 @@
 import { Head, Link } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../components/AdminSidebarLayout"
-import { Status, Tag } from "../../components/Status"
+
+type Ari = { unprocessedDeliveries: number }
 
 type Counts = {
   total: number
@@ -19,16 +20,6 @@ type FinalReviews = {
   oldestWaitingDays: number | null
 }
 
-type Ari = {
-  configured: boolean
-  webhookConfigured: boolean
-  lastDeliveryAt: string | null
-  lastDeliveryEvent: string | null
-  unprocessedDeliveries: number
-  lastStatusRefreshAt: string | null
-}
-
-type Activity = { id: number; action: string; actor: string | null; target: string; at: string }
 
 function Tile({
   label,
@@ -55,22 +46,16 @@ export default function Overview({
   submissions,
   finalReviews,
   ari,
-  recent,
 }: {
   submissions: Counts
   finalReviews: FinalReviews
   ari: Ari
-  recent: Activity[]
 }) {
   return (
     <>
       <Head title="Admin - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <h1 className="dashboard__title">Overview</h1>
-        </div>
-
+      <AdminSidebarLayout eyebrow="Admin" title="Camp status">
         <h2 className="u-h3" style={{ marginBottom: "var(--sp-3)" }}>
           Needs a person
         </h2>
@@ -120,72 +105,6 @@ export default function Overview({
           <Tile label="Banned" value={finalReviews.banned} href="/admin/final_reviews?filter=banned" />
         </div>
 
-        <div className="admin-split">
-          <section className="review__card">
-            <h2 className="review__card-title u-h3">Ari</h2>
-            <dl className="signal-list">
-              <div>
-                <dt className="u-label u-faint">Sending</dt>
-                <dd>
-                  {ari.configured ? (
-                    <Status tone="ok">Configured</Status>
-                  ) : (
-                    <Status tone="bad">No program id or secret</Status>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="u-label u-faint">Receiving</dt>
-                <dd>
-                  {ari.webhookConfigured ? (
-                    <Status tone="ok">Configured</Status>
-                  ) : (
-                    <Status tone="bad">No webhook secret</Status>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="u-label u-faint">Last delivery</dt>
-                <dd className="u-sm">
-                  {ari.lastDeliveryAt ? (
-                    <>
-                      {ari.lastDeliveryAt} <Tag>{ari.lastDeliveryEvent}</Tag>
-                    </>
-                  ) : (
-                    <span className="u-faint">Nothing yet</span>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="u-label u-faint">Last status check</dt>
-                <dd className="u-sm">
-                  {ari.lastStatusRefreshAt ?? <span className="u-faint">Never run</span>}
-                </dd>
-              </div>
-            </dl>
-          </section>
-
-          <section className="review__card">
-            <h2 className="review__card-title u-h3">Recent</h2>
-            {recent.length === 0 ? (
-              <p className="u-sm u-faint">Nothing yet.</p>
-            ) : (
-              <ul className="activity">
-                {recent.map((entry) => (
-                  <li key={entry.id} className="activity__row">
-                    <span className="u-sm">
-                      <strong>{entry.actor ?? "system"}</strong> {entry.action}
-                    </span>
-                    <span className="u-xs u-faint u-mono">{entry.at}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-            <Link className="btn btn--quiet btn--sm" href="/admin/audit_logs" style={{ marginTop: "var(--sp-3)" }}>
-              Full audit log
-            </Link>
-          </section>
-        </div>
       </AdminSidebarLayout>
     </>
   )

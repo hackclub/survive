@@ -1,7 +1,6 @@
 import { Head, Link } from "@inertiajs/react"
-import { Nav } from "../../components/Nav"
-import { Flash } from "../../components/Flash"
-import { Status, Tag } from "../../components/Status"
+import { AppShell } from "../../components/AppShell"
+import { Empty } from "../../components/Empty"
 import { formatMinutes } from "../../lib/format"
 
 type Item = {
@@ -35,40 +34,31 @@ export default function Index({
     <>
       <Head title="Shop - Survive" />
 
-      <Nav />
+      <AppShell
+        eyebrow="Shop"
+        title={frozen ? "Spending is paused" : `${balance} coins to spend`}
+        tone={frozen ? "returned" : undefined}
+        narrow
+        lede={
+          frozen
+            ? `Your account is suspended, so your ${trueBalance} coins cannot be spent right now. Open orders are on hold, not cancelled.`
+            : `${formatMinutes(approvedMinutes)} approved so far.`
+        }
+      >
+        {items.length === 0 ? (
+          <Empty title="The shelves are bare" text="Nothing in the shop yet. Check back." idle />
+        ) : (
+          <div className="shop-grid" style={frozen ? { opacity: 0.45 } : undefined}>
+            {items.map((item) => {
+              const locked = item.unavailableReason !== null
+              const progress =
+                item.shortBy > 0 ? Math.min(100, (balance / item.coinCost) * 100) : 100
 
-      <main id="main" className="dashboard">
-        <div className="dashboard__shell">
-          <Flash />
-
-          <div className="dashboard__header">
-            <div>
-              <h1 className="dashboard__title">{balance} coins</h1>
-              <p className="u-sm u-soft">
-                {formatMinutes(approvedMinutes)} approved so far.
-              </p>
-            </div>
-          </div>
-
-          {frozen && (
-            <div className="dashboard__hackatime-banner">
-              <p className="u-sm u-soft">
-                Your account is suspended, so your {trueBalance} coins cannot be spent.
-              </p>
-            </div>
-          )}
-
-          {items.length === 0 ? (
-            <div className="dashboard__empty">
-              <p className="u-lead">Nothing in the shop yet. Check back.</p>
-            </div>
-          ) : (
-            <div className="shop-grid">
-              {items.map((item) => (
+              return (
                 <Link
                   key={item.id}
                   href={`/shop/items/${item.id}`}
-                  className={`shop-card${item.unavailableReason ? " shop-card--locked" : ""}`}
+                  className={`shop-card${locked ? " shop-card--locked" : ""}`}
                 >
                   {item.imageUrl ? (
                     <img className="shop-card__image" src={item.imageUrl} alt="" />
@@ -77,35 +67,51 @@ export default function Index({
                   )}
 
                   <div className="shop-card__body">
-                    <div className="shop-card__top">
-                      <span className="shop-card__name">{item.name}</span>
-                      <Tag tone={item.unavailableReason ? "neutral" : "ok"}>{item.coinCost}</Tag>
-                    </div>
+                    <span className="shop-card__name">{item.name}</span>
 
                     {item.description && (
                       <p className="u-xs u-soft shop-card__description">{item.description}</p>
                     )}
 
-                    <div className="shop-card__meta">
-                      {item.onePerPerson && <span className="u-xs u-faint">One per person</span>}
-                      {item.stock !== null && item.stock > 0 && (
-                        <span className="u-xs u-faint">{item.stock} left</span>
-                      )}
-                    </div>
+                    {item.onePerPerson && <span className="u-xs u-faint">One per person</span>}
 
-                    {item.unavailableReason ? (
-                      <Status>{item.unavailableReason}</Status>
-                    ) : (
-                      <Status tone="ok">You can afford this</Status>
+                    {item.shortBy > 0 && (
+                      <>
+                        <div className="meter">
+                          <b style={{ width: `${progress}%` }} />
+                        </div>
+                        <span className="shop-card__lock">{item.shortBy} more coins</span>
+                      </>
                     )}
+
+                    {locked && item.shortBy === 0 && (
+                      <span
+                        className={`shop-card__lock${
+                          item.unavailableReason === "Out of stock" ? " shop-card__lock--out" : ""
+                        }`}
+                      >
+                        {item.unavailableReason}
+                      </span>
+                    )}
+
+                    <div className="shop-card__price">
+                      <span className="coin" aria-hidden="true" />
+                      <b>{item.coinCost}</b>
+                      <span
+                        className="btn btn--primary btn--sm"
+                        aria-disabled={locked ? "true" : undefined}
+                        style={locked ? { opacity: 0.45 } : undefined}
+                      >
+                        Order
+                      </span>
+                    </div>
                   </div>
                 </Link>
-              ))}
-            </div>
-          )}
-
-        </div>
-      </main>
+              )
+            })}
+          </div>
+        )}
+      </AppShell>
     </>
   )
 }

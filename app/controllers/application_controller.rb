@@ -18,9 +18,18 @@ class ApplicationController < ActionController::Base
           avatar: u.avatar_url,
           isReviewer: u.reviewer?,
           isFraud: u.fraud?,
+          isFulfiller: u.fulfiller?,
           isAdmin: u.admin?,
           isSuperadmin: u.superadmin?,
-          hackatimeConnected: u.hackatime_uid.present?
+          hackatimeConnected: u.hackatime_uid.present?,
+          ordersChanged: u.orders.where(state: %i[approved fulfilled]).where(updated_at: 3.days.ago..).exists?,
+          coins: {
+            earned: u.coins_earned,
+            adjusted: u.coins_adjusted,
+            held: u.coins_held,
+            heldOrders: u.orders.held.count,
+            spendable: u.spendable_coins
+          }
         }
       }
     }

@@ -1,6 +1,6 @@
 .project-form {
   min-height: 100vh;
-  padding: clamp(6rem, 10vw, 8rem) clamp(1.5rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
+  padding: var(--sp-6) clamp(1.5rem, 4vw, 3rem) clamp(3rem, 6vw, 5rem);
   background: var(--paper);
 }
 

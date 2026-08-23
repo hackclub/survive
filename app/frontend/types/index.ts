@@ -10,15 +10,25 @@ export type AuthUser = {
   avatar: string | null
   isReviewer: boolean
   isFraud: boolean
+  isFulfiller: boolean
   isAdmin: boolean
   isSuperadmin: boolean
   hackatimeConnected: boolean
+  ordersChanged: boolean
+  coins: {
+    earned: number
+    adjusted: number
+    held: number
+    heldOrders: number
+    spendable: number
+  }
 }
 
 export type SharedProps = {
   auth: {
     user: AuthUser | null
   }
+  flash: FlashData
   signInPath: string
   signOutPath: string
   errors: Record<string, string[]>
@@ -60,7 +70,12 @@ export type Project = {
   reviewState: ReviewState | null
   approvedMinutes: number | null
   reviewFeedback: string | null
+  trailStage: TrailStage
+  trailNote: string | null
+  paidCoins: number | null
 }
+
+export type TrailStage = "draft" | "sent" | "approved" | "changes" | "rejected"
 
 export type HackatimeProject = {
   id: number

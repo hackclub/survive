@@ -132,8 +132,31 @@ class Project < ApplicationRecord
       round: latest_review&.round,
       reviewState: latest_review&.state,
       approvedMinutes: latest_review&.approved_minutes,
-      reviewFeedback: latest_review&.decided? ? latest_review.maker_feedback : nil
+      reviewFeedback: latest_review&.decided? ? latest_review.maker_feedback : nil,
+      trailStage: trail_stage,
+      trailNote: trail_note,
+      paidCoins: latest_review&.coin_payout&.coins
     }
+  end
+
+  def trail_stage
+    review = latest_review
+    return "draft" if review.nil?
+    return "changes" if review.returned?
+    return "rejected" if review.rejected?
+    return "approved" if review.approved? && review.coin_payout.present?
+
+    "sent"
+  end
+
+  def trail_note
+    review = latest_review
+    return "Add a banner and a repo link, then send it for review." if review.nil?
+
+    case trail_stage
+    when "sent" then "Sent for review #{review.created_at.strftime('%A %-d %B')}. Nothing is needed from you."
+    else nil
+    end
   end
 
   private

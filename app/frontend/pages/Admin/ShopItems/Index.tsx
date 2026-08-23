@@ -23,14 +23,15 @@ export default function Index({ items }: { items: Item[] }) {
     <>
       <Head title="Shop items - Survive" />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <h1 className="dashboard__title">Shop items</h1>
+      <AdminSidebarLayout
+        eyebrow="Payouts"
+        title="Shop items"
+        actions={
           <Link className="btn btn--primary btn--sm" href="/admin/shop_items/new">
             New item
           </Link>
-        </div>
-
+        }
+      >
         {items.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing in the shop yet.</p>

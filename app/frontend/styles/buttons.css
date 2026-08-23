@@ -4,8 +4,8 @@
   align-items: center;
   justify-content: center;
   gap: 0.55rem;
-  padding: 0.72rem 1.35rem;
-  border-radius: var(--r-pill);
+  padding: 0.5rem 1.05rem;
+  border-radius: var(--r-sm);
   font-size: var(--fs-sm);
   font-weight: 700;
   letter-spacing: -0.005em;
@@ -100,12 +100,12 @@
 }
 
 .btn--lg {
-  padding: 0.95rem 1.85rem;
-  font-size: var(--fs-body);
+  padding: 0.66rem 1.35rem;
+  font-size: var(--fs-sm);
 }
 
 .btn--sm {
-  padding: 0.5rem 0.95rem;
+  padding: 0.32rem 0.72rem;
   font-size: var(--fs-xs);
 }
 

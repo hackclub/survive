@@ -1,6 +1,7 @@
 class Admin::ReviewsController < ApplicationController
   PHASES = %w[processing review under_review second_pass reviewed withdrawn reverted].freeze
-  SPECIAL = %w[stuck ingest_failed awaiting_ingest].freeze
+  SPECIAL = %w[stuck ingest_failed awaiting_ingest in_ari decided].freeze
+  OPEN_PHASES = %w[processing review under_review second_pass].freeze
 
   def index
     authorize :review
@@ -49,19 +50,20 @@ class Admin::ReviewsController < ApplicationController
     when "stuck" then Review.stuck
     when "ingest_failed" then Review.ingest_failed
     when "awaiting_ingest" then Review.awaiting_ingest
+    when "in_ari" then Review.where(ari_phase: OPEN_PHASES)
+    when "decided" then Review.where.not(decided_at: nil)
     else Review.in_phase(filter)
     end
   end
 
   def tabs
-    counts = Review.group(:ari_phase).count
-
     [
       { key: "all", label: "All", count: Review.count },
-      { key: "awaiting_ingest", label: "Not sent", count: Review.awaiting_ingest.count },
-      { key: "ingest_failed", label: "Send failed", count: Review.ingest_failed.count },
+      { key: "in_ari", label: "In Ari", count: Review.where(ari_phase: OPEN_PHASES).count },
       { key: "stuck", label: "Stuck", count: Review.stuck.count },
-      *PHASES.map { |phase| { key: phase, label: phase.humanize, count: counts[phase].to_i } }
+      { key: "awaiting_ingest", label: "Not sent", count: Review.awaiting_ingest.count },
+      { key: "ingest_failed", label: "Failed", count: Review.ingest_failed.count },
+      { key: "decided", label: "Decided", count: Review.where.not(decided_at: nil).count }
     ]
   end
 

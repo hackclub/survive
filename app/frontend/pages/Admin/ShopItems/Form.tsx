@@ -66,14 +66,15 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
     <>
       <Head title={`${item ? "Edit" : "New"} shop item - Survive`} />
 
-      <AdminSidebarLayout>
-        <div className="dashboard__header">
-          <h1 className="dashboard__title">{item ? item.name : "New item"}</h1>
-          <Link className="btn btn--ghost btn--sm" href="/admin/shop_items">
+      <AdminSidebarLayout
+        eyebrow="Shop items"
+        title={item ? item.name : "New item"}
+        actions={
+          <Link className="nav__ghost" href="/admin/shop_items">
             Back
           </Link>
-        </div>
-
+        }
+      >
         <div className="review__grid">
           <div className="review__main">
             <section className="review__card">
@@ -168,10 +169,6 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
                 <p className="u-sm u-faint">Save the item first, then add regional prices.</p>
               ) : (
                 <>
-                  <p className="u-xs u-faint">
-                    A region with no row uses the price above. Region is matched against the maker&apos;s
-                    country, case insensitive.
-                  </p>
                   {regions.filter((r) => !r._destroy).map((row, index) => (
                     <div key={row.id ?? `new-${index}`} className="region-row">
                       <input className="field__input" placeholder="country" value={row.region}
@@ -201,9 +198,6 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
               <div className="review__card">
                 <h2 className="review__card-title u-label u-faint">Status</h2>
                 {item.enabled ? <Status tone="ok">Enabled</Status> : <Status>Disabled</Status>}
-                <p className="u-xs u-faint" style={{ marginTop: "var(--sp-2)" }}>
-                  Disabling hides it from the shop. Orders already placed are untouched.
-                </p>
               </div>
             )}
           </aside>
