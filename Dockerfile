@@ -32,8 +32,14 @@ FROM base AS build
 
 # Install packages needed to build gems
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips libyaml-dev pkg-config && \
+    apt-get install --no-install-recommends -y build-essential git libpq-dev libvips libyaml-dev pkg-config unzip && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install Bun, which builds the frontend during assets:precompile
+ARG BUN_VERSION=1.2.19
+ENV BUN_INSTALL="/usr/local/bun"
+ENV PATH="/usr/local/bun/bin:$PATH"
+RUN curl -fsSL https://bun.sh/install | bash -s -- "bun-v${BUN_VERSION}"
 
 # Install application gems
 COPY vendor/* ./vendor/
@@ -43,6 +49,10 @@ RUN bundle install && \
     rm -rf ~/.bundle/ "${BUNDLE_PATH}"/ruby/*/cache "${BUNDLE_PATH}"/ruby/*/bundler/gems/*/.git && \
     # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
     bundle exec bootsnap precompile -j 1 --gemfile
+
+# Install JS dependencies
+COPY package.json bun.lock ./
+RUN bun install --frozen-lockfile
 
 # Copy application code
 COPY . .

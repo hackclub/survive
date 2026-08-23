@@ -22,6 +22,7 @@ tmp/
 
 
 # Vite Ruby
+/public/assets
 /public/vite*
 node_modules
 # Vite uses dotenv and suggests to ignore local-only env files. See
