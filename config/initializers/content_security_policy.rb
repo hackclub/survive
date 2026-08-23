@@ -8,7 +8,7 @@ Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self, :https
     policy.font_src    :self, :https, :data, "https://fonts.gstatic.com", "https://assets.hackclub.com"
-    policy.img_src     :self, :https, :data, "https://cachet.hackclub.com"
+    policy.img_src     :self, :https, :data, :blob, "https://cachet.hackclub.com"
     policy.object_src  :none
     policy.script_src  :self, :https
     policy.connect_src :self, :https
@@ -24,7 +24,7 @@ Rails.application.configure do
     # You may need to enable this in production as well depending on your setup.
     policy.script_src *policy.script_src, :blob if Rails.env.test?
 
-    policy.style_src :self, :https, "https://fonts.googleapis.com"
+    policy.style_src :self, :https, :unsafe_inline, "https://fonts.googleapis.com"
     # Allow @vite/client to hot reload style changes in development
     policy.style_src *policy.style_src, :unsafe_inline, "http://#{ViteRuby.config.host_with_port}" if Rails.env.development?
 
