@@ -64,6 +64,7 @@ Rails.application.routes.draw do
 
   get "dashboard" => "dashboard#index", as: :dashboard
   get "account" => "accounts#show", as: :account
+  patch "account" => "accounts#update"
   get "shop" => "shop#index", as: :shop
   get "shop/items/:id" => "shop#show", as: :shop_item
   resources :orders, only: %i[index create]

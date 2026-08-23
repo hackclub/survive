@@ -20,6 +20,7 @@ class User < ApplicationRecord
   validates :display_name, presence: true
   validate :roles_are_known
   validates :banned_reason, presence: true, if: :is_banned?
+  validate :birthday_is_plausible
 
   def self.exchange_hca_token(access_token)
     raise AuthenticationError, "No access token from HCA" if access_token.blank?
@@ -179,6 +180,16 @@ class User < ApplicationRecord
   end
 
   private
+
+  def birthday_is_plausible
+    return if birthday.blank?
+
+    if birthday > Date.current
+      errors.add(:birthday, "cannot be in the future")
+    elsif birthday < 120.years.ago.to_date
+      errors.add(:birthday, "does not look right")
+    end
+  end
 
   def roles_are_known
     unknown = roles - ROLES

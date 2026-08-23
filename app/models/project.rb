@@ -151,7 +151,7 @@ class Project < ApplicationRecord
 
   def trail_note
     review = latest_review
-    return "Add a banner and a repo link, then send it for review." if review.nil?
+    return nil if review.nil?
 
     case trail_stage
     when "sent" then "Sent for review #{review.created_at.strftime('%A %-d %B')}. Nothing is needed from you."
