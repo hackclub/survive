@@ -86,7 +86,7 @@ export default function Index() {
             </p>
 
             <div className="scene__cta">
-              <a className="btn btn--primary btn--lg" href="/signin">
+              <a className="btn btn--primary btn--lg" href="/dashboard">
                 Sign Up
                 <svg className="btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                   <path
