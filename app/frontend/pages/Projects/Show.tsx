@@ -120,7 +120,7 @@ export default function Show({
               <b className="payout__amount">{project.paidCoins}</b>
             </div>
             <p className="u-sm u-soft">
-              coins landed, from <b>{formatMinutes(project.approvedMinutes ?? 0)}</b> approved
+              wood landed, from <b>{formatMinutes(project.approvedMinutes ?? 0)}</b> approved
             </p>
             <Link className="btn btn--go btn--sm" href="/shop" style={{ marginTop: "var(--sp-3)" }}>
               Spend them
@@ -184,7 +184,7 @@ export default function Show({
                       (linked.reduce((total, option) => total + option.seconds, 0) / 3600) * 5
                     )}
                 </b>
-                <span className="u-xs u-faint">coins</span>
+                <span className="u-xs u-faint">wood</span>
               </div>
               <p className="u-xs u-soft" style={{ marginTop: "var(--sp-2)" }}>
                 Approved hours can be adjusted before anything is paid.

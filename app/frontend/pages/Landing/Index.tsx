@@ -22,7 +22,7 @@ export default function Index() {
       <Head title="Survive - Build it. Ship it. Get paid for it.">
         <meta
           name="description"
-          content="A Hack Club You Ship, We Ship program. Log your hours, ship a real project, and take coins for every approved hour."
+          content="A Hack Club You Ship, We Ship program. Log your hours, ship a real project, and take wood for every approved hour."
         />
       </Head>
 

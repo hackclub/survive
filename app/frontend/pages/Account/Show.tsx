@@ -84,7 +84,7 @@ export default function Show({
         {maker.banned && (
           <div className="panel panel--bad" style={{ marginBottom: "var(--sp-4)" }}>
             <p className="u-sm">
-              Your account is suspended, so your {coins.earned + coins.adjusted} coins cannot be
+              Your account is suspended, so your {coins.earned + coins.adjusted} wood cannot be
               spent. Open orders are on hold, not cancelled.
             </p>
             {maker.bannedReason && (
@@ -264,7 +264,7 @@ export default function Show({
 
           <div className="panel">
             <div className="panel__head">
-              <h2 className="panel__title">Coins</h2>
+              <h2 className="panel__title">Wood</h2>
               <Link className="btn btn--ghost btn--sm" href="/orders">
                 Your orders
               </Link>

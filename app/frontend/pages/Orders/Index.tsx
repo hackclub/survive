@@ -61,12 +61,12 @@ export default function Index({
 
       <AppShell
         eyebrow="Orders"
-        title={held > 0 ? `${held} coins held` : "Your orders"}
+        title={held > 0 ? `${held} wood held` : "Your orders"}
         narrow
         lede={
           held > 0
             ? `${balance} spendable once these clear or are refunded.`
-            : `${balance} coins spendable.`
+            : `${balance} wood spendable.`
         }
       >
         {orders.length === 0 ? (
@@ -91,7 +91,7 @@ export default function Index({
                 </div>
 
                 <p className="u-xs u-faint">
-                  Ordered {order.placedAt} · {order.coins} coins
+                  Ordered {order.placedAt} · {order.coins} wood
                   {order.held && order.state !== "fulfilled" && " held"}
                   {order.amountUsd !== null && ` · $${order.amountUsd.toFixed(2)}`}
                 </p>
@@ -118,7 +118,7 @@ export default function Index({
 
                 {order.rejectionReason && (
                   <p className="u-xs u-soft" style={{ marginTop: "var(--sp-2)" }}>
-                    {order.rejectionReason} <b>{order.coins} coins went back to your purse.</b>
+                    {order.rejectionReason} <b>{order.coins} wood went back to your purse.</b>
                   </p>
                 )}
               </div>

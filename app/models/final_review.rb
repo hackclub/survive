@@ -113,7 +113,7 @@ class FinalReview < ApplicationRecord
     CoinAdjustment.create!(
       user: granted.user,
       amount: -granted.coins,
-      reason: "Ari reverted round #{review.round} of #{review.project.name}, taking back #{granted.coins} coins"
+      reason: "Ari reverted round #{review.round} of #{review.project.name}, taking back #{granted.coins} wood"
     )
   end
 end

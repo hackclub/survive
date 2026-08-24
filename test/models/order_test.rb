@@ -137,7 +137,7 @@ class OrderTest < ActiveSupport::TestCase
       Order.place!(user: maker, shop_item: build_item(coin_cost: 100), quantity: 1)
     end
 
-    assert_match "Needs 100 more coins", error.message
+    assert_match "Needs 100 more wood", error.message
   end
 
   test "fulfill! only works on an approved order and stores the reference" do
