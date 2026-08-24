@@ -30,11 +30,11 @@ export default function Index({
 
   return (
     <>
-      <Head title="Coins - Survive" />
+      <Head title="Wood - Survive" />
 
       <AdminSidebarLayout
         eyebrow="Payouts"
-        title="Coins"
+        title="Wood"
         actions={
           <span className="u-sm u-mono" style={{ color: "rgba(232, 230, 223, 0.55)" }}>
             {totals.earned} earned · {totals.adjusted} adjusted

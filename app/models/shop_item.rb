@@ -72,7 +72,7 @@ class ShopItem < ApplicationRecord
     return "Unlocks at #{min_approved_hours} approved hours" if min_approved_hours.present? && approved_minutes < unlock_minutes
 
     cost = coin_cost_for(region)
-    return "Needs #{cost - balance} more coins" if balance < cost
+    return "Needs #{cost - balance} more wood" if balance < cost
 
     nil
   end

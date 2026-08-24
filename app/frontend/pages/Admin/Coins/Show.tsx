@@ -33,7 +33,7 @@ export default function Show({ maker, entries }: { maker: Maker; entries: Entry[
 
   return (
     <>
-      <Head title={`Coins: ${maker.name} - Survive`} />
+      <Head title={`Wood: ${maker.name} - Survive`} />
 
       <AdminSidebarLayout
         eyebrow={maker.email}
@@ -67,7 +67,7 @@ export default function Show({ maker, entries }: { maker: Maker; entries: Entry[
                   <tr>
                     <th>When</th>
                     <th>What</th>
-                    <th className="data-table__num">Coins</th>
+                    <th className="data-table__num">Wood</th>
                     <th className="data-table__num">Running</th>
                   </tr>
                 </thead>
@@ -111,7 +111,7 @@ export default function Show({ maker, entries }: { maker: Maker; entries: Entry[
               </p>
               <div className="field">
                 <label className="field__label" htmlFor="amount">
-                  Coins
+                  Wood
                 </label>
                 <input
                   id="amount"

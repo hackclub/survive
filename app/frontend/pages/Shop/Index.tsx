@@ -36,12 +36,12 @@ export default function Index({
 
       <AppShell
         eyebrow="Shop"
-        title={frozen ? "Spending is paused" : `${balance} coins to spend`}
+        title={frozen ? "Spending is paused" : `${balance} wood to spend`}
         tone={frozen ? "returned" : undefined}
         narrow
         lede={
           frozen
-            ? `Your account is suspended, so your ${trueBalance} coins cannot be spent right now. Open orders are on hold, not cancelled.`
+            ? `Your account is suspended, so your ${trueBalance} wood cannot be spent right now. Open orders are on hold, not cancelled.`
             : `${formatMinutes(approvedMinutes)} approved so far.`
         }
       >
@@ -80,7 +80,7 @@ export default function Index({
                         <div className="meter">
                           <b style={{ width: `${progress}%` }} />
                         </div>
-                        <span className="shop-card__lock">{item.shortBy} more coins</span>
+                        <span className="shop-card__lock">{item.shortBy} more wood</span>
                       </>
                     )}
 

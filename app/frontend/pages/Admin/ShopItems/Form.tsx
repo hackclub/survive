@@ -108,7 +108,7 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
                     </select>
                   </div>
                   <div className="field">
-                    <label className="field__label" htmlFor="coin_cost">Coins</label>
+                    <label className="field__label" htmlFor="coin_cost">Wood</label>
                     <input id="coin_cost" className="field__input" type="number" min={1}
                       value={form.data.coin_cost}
                       onChange={(e) => form.setData("coin_cost", Number(e.target.value))} />
@@ -173,7 +173,7 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
                     <div key={row.id ?? `new-${index}`} className="region-row">
                       <input className="field__input" placeholder="country" value={row.region}
                         onChange={(e) => setRegions(regions.map((r) => (r === row ? { ...r, region: e.target.value } : r)))} />
-                      <input className="field__input" type="number" placeholder="coins" value={row.coinCost}
+                      <input className="field__input" type="number" placeholder="wood" value={row.coinCost}
                         onChange={(e) => setRegions(regions.map((r) => (r === row ? { ...r, coinCost: e.target.value } : r)))} />
                       <label className="checkbox">
                         <input type="checkbox" checked={row.enabled}

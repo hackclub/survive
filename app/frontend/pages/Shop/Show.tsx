@@ -122,7 +122,7 @@ export default function Show({
                 disabled={blocked}
                 onClick={() => router.post("/orders", { shop_item_id: item.id, quantity })}
               >
-                Spend {total} coins
+                Spend {total} wood
               </button>
             )}
           </div>

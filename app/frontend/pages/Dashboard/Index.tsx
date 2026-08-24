@@ -50,7 +50,7 @@ function Card({ project, tall }: { project: Project; tall?: boolean }) {
         <span className="gcard__state">
           <i style={{ background: TONE[stage] }} />
           {stage === "approved" && project.paidCoins
-            ? `Paid, ${project.paidCoins} coins`
+            ? `Paid, ${project.paidCoins} wood`
             : LABEL[stage]}
         </span>
         {project.round && <span className="gcard__tag">Round {project.round}</span>}
@@ -98,7 +98,7 @@ export default function Index({ projects, stats }: { projects: Project[]; stats:
         stats={
           projects.length > 0
             ? [
-              { label: "Coins earned", value: stats.earned, tone: "go" },
+              { label: "Wood earned", value: stats.earned, tone: "go" },
               { label: "Approved", value: hours(stats.approvedMinutes) },
               { label: "In review", value: stats.inReview, tone: "live" },
               { label: "Held by orders", value: stats.held },

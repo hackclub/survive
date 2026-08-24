@@ -43,7 +43,7 @@ class Admin::OrdersController < ApplicationController
 
     order.refund!(current_user, reason: reason)
     audit!("order.refunded", target: order, metadata: metadata(order).merge(reason: reason))
-    redirect_to admin_orders_path, notice: "Refunded #{order.total_coins} coins to #{order.user.display_name}."
+    redirect_to admin_orders_path, notice: "Refunded #{order.total_coins} wood to #{order.user.display_name}."
   end
 
   private
@@ -66,7 +66,7 @@ class Admin::OrdersController < ApplicationController
 
     order.reject!(current_user, reason: reason, fraud_project: fraud_project)
     audit!("order.rejected", target: order, metadata: metadata(order).merge(reason: reason))
-    redirect_to admin_orders_path, notice: "Rejected #{order.frozen_item_name}. #{order.total_coins} coins released."
+    redirect_to admin_orders_path, notice: "Rejected #{order.frozen_item_name}. #{order.total_coins} wood released."
   end
 
   def fraud_project

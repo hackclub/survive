@@ -51,13 +51,13 @@ export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) 
         type="button"
         className="purse"
         aria-expanded={open}
-        aria-label={`${spendable} coins to spend`}
+        aria-label={`${spendable} wood to spend`}
         onClick={() => setOpen((value) => !value)}
         onFocus={() => setOpen(true)}
       >
         <span className="coin" aria-hidden="true" />
         <b className={`purse__amount${landing ? " is-landing" : ""}`}>{spendable}</b>
-        <span className="purse__unit">coins</span>
+        <span className="purse__unit">wood</span>
       </button>
 
       {open && (
