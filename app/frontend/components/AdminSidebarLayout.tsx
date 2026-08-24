@@ -15,7 +15,7 @@ const SECTIONS: Section[] = [
     label: "Payouts",
     items: [
       { label: "Final review", href: "/admin/final_reviews", role: "fraud" },
-      { label: "Coins", href: "/admin/coins", role: "admin" },
+      { label: "Wood", href: "/admin/coins", role: "admin" },
       { label: "Shop items", href: "/admin/shop_items", role: "admin" },
       { label: "Orders", href: "/admin/orders", role: "admin" },
     ],

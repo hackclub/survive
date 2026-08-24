@@ -86,7 +86,7 @@ export default function Index({
                 <tr>
                   <th>Item</th>
                   <th>Maker</th>
-                  <th className="data-table__num">Coins</th>
+                  <th className="data-table__num">Wood</th>
                   <th className="data-table__num">Balance</th>
                   <th>Earned via</th>
                   <th>Region</th>

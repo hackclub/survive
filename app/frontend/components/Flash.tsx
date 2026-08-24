@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { usePage } from "@inertiajs/react"
 import type { SharedProps } from "../types"
 
-const COIN_HINT = /\bcoins?\b/i
+const COIN_HINT = /\bwood\b/i
 
 export function Flash() {
   const { flash } = usePage<SharedProps>().props

@@ -17,7 +17,7 @@ class OrdersController < ApplicationController
     item = ShopItem.find(params[:shop_item_id])
     order = Order.place!(user: current_user, shop_item: item, quantity: params[:quantity].to_i.clamp(1, 100))
 
-    redirect_to orders_path, notice: "Ordered #{order.frozen_item_name}. #{order.total_coins} coins are held until it is decided."
+    redirect_to orders_path, notice: "Ordered #{order.frozen_item_name}. #{order.total_coins} wood is held until it is decided."
   rescue Order::NotAllowed => e
     redirect_to shop_item_path(params[:shop_item_id]), alert: e.message
   rescue ActiveRecord::RecordInvalid => e

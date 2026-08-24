@@ -47,7 +47,7 @@ class Admin::CoinsController < ApplicationController
     CoinAdjustment.create!(user: user, actor: current_user, amount: amount, reason: reason)
     audit!("coins.adjusted", target: user, metadata: { amount: amount, reason: reason, balance: user.coin_balance })
 
-    redirect_to admin_coin_path(user), notice: "Adjusted #{user.display_name} by #{amount} coins."
+    redirect_to admin_coin_path(user), notice: "Adjusted #{user.display_name} by #{amount} wood."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to admin_coin_path(user), alert: e.record.errors.full_messages.to_sentence
   end

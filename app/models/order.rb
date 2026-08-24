@@ -75,7 +75,7 @@ class Order < ApplicationRecord
     missing = shop_item.physical? ? missing_address(user) : []
     return "We need #{missing.to_sentence} on file before this can ship." if missing.any?
 
-    return "That costs #{total} coins and you have #{user.spendable_coins}." if total > user.spendable_coins
+    return "That costs #{total} wood and you have #{user.spendable_coins}." if total > user.spendable_coins
 
     nil
   end

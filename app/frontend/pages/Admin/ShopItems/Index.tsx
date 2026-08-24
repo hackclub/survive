@@ -46,7 +46,7 @@ export default function Index({ items }: { items: Item[] }) {
                 <tr>
                   <th>Item</th>
                   <th>Kind</th>
-                  <th className="data-table__num">Coins</th>
+                  <th className="data-table__num">Wood</th>
                   <th className="data-table__num">Stock</th>
                   <th>Limits</th>
                   <th>Regions</th>
