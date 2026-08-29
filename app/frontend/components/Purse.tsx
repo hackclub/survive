@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 
-const woodCoin =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAyElEQVR4nGNgoDXY2ej3H588Iy5NWiZmGOLXzpxicK/fhKIHw4DHW1v+MzAwMDx7dAfDACk5FQYGBgYGWe8auD4UA5A1m2cuwDD85PSE/+iGMCE7G1kzut93Nvr9N89cwAhzGUbYPN7a8v/k9IT/WCXRLDk5PeE/zLUs2BTCAurLzS1wg3jUfRjRAxDuBUJRhQvsbPT7z4RsI6nAvX4TIxM2CZiLeNR9GGGYoEt3Nvr9xxeQ6AEI41OcDqibEpGdS2xeIAgIRTEAXSaFGevTqTYAAAAASUVORK5CYII="
-
 type Props = {
   spendable: number
   earned: number
@@ -56,7 +53,7 @@ export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) 
         onClick={() => setOpen((value) => !value)}
         onFocus={() => setOpen(true)}
       >
-        <img src={woodCoin} alt="" width={16} height={16} style={{ flexShrink: 0, imageRendering: "pixelated" }} />
+        <span className="coin" aria-hidden="true" />
         <b className={`purse__amount${landing ? " is-landing" : ""}`}>{spendable}</b>
         <span className="purse__unit">wood</span>
       </button>
