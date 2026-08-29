@@ -1,6 +1,8 @@
 import { useState } from "react"
 import { useQueueKeys } from "../../../lib/useQueueKeys"
 import { Head, Link, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
 import { Tabs } from "../../../components/Tabs"
@@ -73,6 +75,8 @@ export default function Index({
     router.get("/admin/reviews", { filter, page }, { preserveState: true })
   }
 
+  const visiting = useVisiting()
+
   return (
     <>
       <Head title="Submissions - Survive" />
@@ -89,7 +93,7 @@ export default function Index({
           />
         </div>
 
-        {reviews.length === 0 ? (
+        {!visiting && reviews.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing here.</p>
           </div>
@@ -110,7 +114,8 @@ export default function Index({
                 </tr>
               </thead>
               <tbody>
-                {reviews.map((row, index) => (
+              {visiting && <SkeletonTableRows columns={9} rows={6} />}
+                {(visiting ? [] : reviews).map((row, index) => (
                   <tr
                     key={row.id}
                     className={
@@ -181,8 +186,7 @@ export default function Index({
                     </td>
                   </tr>
                 ))}
-                {reviews
-                  .filter((row) => row.id === withdrawing)
+                {(visiting ? [] : reviews).filter((row) => row.id === withdrawing)
                   .map((row) => (
                   <tr key={`withdraw-${row.id}`}>
                     <td colSpan={9}>

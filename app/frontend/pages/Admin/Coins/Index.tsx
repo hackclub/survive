@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Head, Link, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status } from "../../../components/Status"
 import type { Pagination } from "../../../types"
@@ -27,6 +29,8 @@ export default function Index({
   pagination: Pagination
 }) {
   const [search, setSearch] = useState(query)
+
+  const visiting = useVisiting()
 
   return (
     <>
@@ -73,7 +77,8 @@ export default function Index({
               </tr>
             </thead>
             <tbody>
-              {users.map((row) => (
+              {visiting && <SkeletonTableRows columns={6} rows={6} />}
+              {(visiting ? [] : users).map((row) => (
                 <tr key={row.id} className={row.banned ? "data-table__row--flagged" : undefined}>
                   <td>
                     <div style={{ fontWeight: 600 }}>{row.name}</div>

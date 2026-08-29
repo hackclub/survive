@@ -1,68 +1,14 @@
-.sunrise {
-  position: absolute;
-  inset-block-start: 0;
-  inset-inline: 0;
-  z-index: -3;
-  height: clamp(22rem, 50vh, 36rem);
-  background: linear-gradient(
-    180deg,
-    var(--slate-900) 0%,
-    #1b2431 9%,
-    #34435c 22%,
-    #5f76a0 36%,
-    #93a8ca 51%,
-    #bccbe6 66%,
-    #dbe2f0 79%,
-    #edeff4 90%,
-    var(--paper) 100%
-  );
-}
-
-.sunrise__ridge {
-  position: absolute;
-  inset-block-start: clamp(6rem, 14vh, 10rem);
-  inset-inline: 0;
-  z-index: -2;
-  height: clamp(16rem, 38vh, 27rem);
-  opacity: 0.6;
-  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, transparent 96%);
-  mask-image: linear-gradient(to bottom, transparent 0%, #000 30%, transparent 96%);
-}
-
-.sunrise__ridge img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 50% 34%;
-}
-
-.sunrise__sun {
-  position: absolute;
-  inset-block-start: clamp(4rem, 12vh, 9rem);
-  inset-inline-end: 8%;
-  z-index: -1;
-  width: min(60vw, 620px);
-  aspect-ratio: 1;
-  background: radial-gradient(
-    circle,
-    rgba(255, 238, 203, 0.85),
-    rgba(242, 163, 63, 0.2) 38%,
-    transparent 64%
-  );
-  pointer-events: none;
-}
-
 .trail {
   position: relative;
   isolation: isolate;
-  padding-block: clamp(20rem, 46vh, 33rem) clamp(2.5rem, 5vw, 4rem);
+  padding-block: var(--sp-8);
   background: var(--paper);
 }
 
 .trail__grid {
   display: grid;
   grid-template-columns: clamp(90px, 11vw, 150px) minmax(0, 1fr);
-  gap: clamp(1.5rem, 4vw, 4rem);
+  gap: var(--sp-6);
   align-items: start;
 }
 
@@ -72,29 +18,15 @@
 }
 
 .trail__walker {
-  position: sticky;
-  inset-block-start: 42vh;
   width: 100%;
   height: auto;
-  filter: drop-shadow(0 20px 30px rgba(29, 36, 46, 0.22));
-  animation: bob 6.5s ease-in-out infinite;
-}
-
-@keyframes bob {
-  0%,
-  100% {
-    translate: 0 0;
-  }
-  50% {
-    translate: 0 -14px;
-  }
 }
 
 .trail__steps {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: clamp(1.5rem, 3vw, 2.5rem);
+  gap: var(--sp-4);
 }
 
 .trail__steps::before {
@@ -102,19 +34,15 @@
   position: absolute;
   inset-block: 34px 34px;
   inset-inline-start: 27px;
-  width: 2px;
-  background: repeating-linear-gradient(
-    to bottom,
-    var(--line-strong) 0 7px,
-    transparent 7px 17px
-  );
+  width: 0;
+  border-left: 1px dashed var(--line-strong);
 }
 
 .tstep {
   position: relative;
   display: grid;
   grid-template-columns: 56px minmax(0, 1fr);
-  gap: clamp(1rem, 2.5vw, 1.75rem);
+  gap: var(--sp-4);
   align-items: start;
 }
 
@@ -125,48 +53,42 @@
   place-items: center;
   width: 56px;
   height: 56px;
-  border-radius: 50%;
+  border-radius: var(--r);
   background: var(--slate-800);
   color: var(--bone);
   font-family: var(--font-display);
-  font-size: 1.45rem;
-  font-weight: 800;
-  box-shadow: 0 0 0 8px var(--paper), var(--shadow-1);
-  transition: transform var(--dur) var(--ease-spring), background var(--dur) var(--ease);
+  font-size: 1.1rem;
+  font-weight: 700;
 }
 
 .tstep:last-child .tstep__dot {
   background: var(--rust-500);
 }
 
-.tstep:hover .tstep__dot {
-  transform: scale(1.08) rotate(-6deg);
-}
-
 .tstep__card {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: clamp(1rem, 3vw, 2.5rem);
+  gap: var(--sp-4);
   flex-wrap: wrap;
-  padding: clamp(1.25rem, 2.6vw, 1.9rem) clamp(1.35rem, 2.8vw, 2.1rem);
-  border-radius: var(--r-lg);
+  padding: var(--sp-4) var(--sp-5);
+  border-radius: var(--r);
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-1);
-  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
-    border-color var(--dur) var(--ease);
 }
 
 .tstep:hover .tstep__card {
-  transform: translateX(8px);
-  box-shadow: var(--shadow-2);
   border-color: var(--line-strong);
 }
 
 .tstep__title {
   font-size: var(--fs-h3);
   margin-block-end: 0.4rem;
+}
+
+.tstep__title a {
+  color: var(--rust-600);
+  text-decoration: underline;
 }
 
 .tstep__body {
@@ -195,7 +117,6 @@
     width: 44px;
     height: 44px;
     font-size: 1.15rem;
-    box-shadow: 0 0 0 6px var(--paper), var(--shadow-1);
   }
 
   .trail__steps::before {

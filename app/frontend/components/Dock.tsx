@@ -3,7 +3,7 @@ import { Link, usePage } from "@inertiajs/react"
 const ITEMS = [
   {
     label: "Camp",
-    href: "/dashboard",
+    href: "/camp",
     path: "M3 10.5 12 4l9 6.5V20a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1z",
   },
   {
@@ -24,7 +24,7 @@ const ITEMS = [
 ]
 
 function isActive(path: string, href: string) {
-  if (href === "/dashboard") return path === "/dashboard" || path.startsWith("/projects")
+  if (href === "/camp") return path === "/camp" || path.startsWith("/projects")
   return path.startsWith(href)
 }
 

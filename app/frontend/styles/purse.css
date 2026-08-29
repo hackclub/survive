@@ -1,29 +1,18 @@
 .coin {
-  position: relative;
-  width: 1.2rem;
-  height: 1.2rem;
-  border-radius: 50%;
+  --coin-h: 1.2rem;
+  display: inline-block;
+  height: var(--coin-h);
+  width: calc(var(--coin-h) * 312 / 170);
   flex-shrink: 0;
-  background: radial-gradient(circle at 32% 28%, #ffd487, var(--ember) 52%, #c47d13);
-  box-shadow: 0 0 0 1px rgba(122, 82, 12, 0.45) inset, 0 0 10px rgba(242, 163, 63, 0.5);
-}
-
-.coin::after {
-  content: "";
-  position: absolute;
-  inset: 0.22em;
-  border-radius: 50%;
-  border: 1.4px solid rgba(122, 82, 12, 0.5);
+  background: url("../images/logs.png") center / contain no-repeat;
 }
 
 .coin--lg {
-  width: 1.5rem;
-  height: 1.5rem;
+  --coin-h: 1.5rem;
 }
 
 .coin--xl {
-  width: 2rem;
-  height: 2rem;
+  --coin-h: 2rem;
 }
 
 .purse {
@@ -32,16 +21,14 @@
   align-items: center;
   gap: 0.42rem;
   padding: 0.3rem 0.72rem 0.3rem 0.42rem;
-  border-radius: var(--r-pill);
-  background: rgba(242, 163, 63, 0.14);
-  border: 1px solid rgba(242, 163, 63, 0.34);
+  border-radius: var(--r);
+  background: rgba(16, 22, 30, 0.62);
   cursor: pointer;
-  transition: background var(--dur-fast) var(--ease);
 }
 
 .purse:hover,
 .purse:focus-visible {
-  background: rgba(242, 163, 63, 0.2);
+  background: rgba(16, 22, 30, 0.78);
 }
 
 .purse__amount {
@@ -52,30 +39,10 @@
   color: #ffdca6;
 }
 
-.purse__amount.is-landing {
-  animation: coin-pop 0.5s var(--ease-spring);
-}
-
-@keyframes coin-pop {
-  0% {
-    transform: translateY(6px) scale(0.8);
-    opacity: 0;
-  }
-  55% {
-    transform: translateY(-3px) scale(1.12);
-    opacity: 1;
-  }
-  100% {
-    transform: none;
-    opacity: 1;
-  }
-}
-
 .purse__unit {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: rgba(255, 220, 166, 0.6);
 }
 
@@ -85,11 +52,10 @@
   inset-inline-end: 0;
   width: 15rem;
   padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-sm);
+  border-radius: var(--r);
   background: var(--white);
   color: var(--ink);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-3);
   z-index: var(--z-sheet);
   text-align: start;
 }
@@ -118,7 +84,7 @@
   width: 2rem;
   height: 2rem;
   border-radius: 50%;
-  background: linear-gradient(140deg, var(--rust-400), var(--rust-600));
+  background: var(--rust-500);
   display: grid;
   place-items: center;
   font-size: var(--fs-xs);
@@ -138,10 +104,9 @@
 .rolechip {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   padding: 0.2rem 0.5rem;
-  border-radius: var(--r-pill);
+  border-radius: var(--r);
   background: rgba(139, 180, 55, 0.18);
   border: 1px solid rgba(139, 180, 55, 0.4);
   color: var(--lime-300);

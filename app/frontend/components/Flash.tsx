@@ -49,7 +49,6 @@ export function Flash() {
             >
               close
             </button>
-            {item.kind === "notice" && <span className="toast__timer" aria-hidden="true" />}
           </div>
         )
       })}

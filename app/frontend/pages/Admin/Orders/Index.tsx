@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
 import { Tabs } from "../../../components/Tabs"
@@ -59,6 +61,8 @@ export default function Index({
     })
   }
 
+  const visiting = useVisiting()
+
   return (
     <>
       <Head title="Orders - Survive" />
@@ -75,7 +79,7 @@ export default function Index({
           />
         </div>
 
-        {orders.length === 0 ? (
+        {!visiting && orders.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing here.</p>
           </div>
@@ -95,7 +99,8 @@ export default function Index({
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+              {visiting && <SkeletonTableRows columns={8} rows={6} />}
+                {(visiting ? [] : orders).map((order) => (
                   <tr key={order.id} className={order.makerBanned ? "data-table__row--flagged" : undefined}>
                     <td>
                       <div style={{ fontWeight: 600 }}>
@@ -150,8 +155,7 @@ export default function Index({
                     </td>
                   </tr>
                 ))}
-                {orders
-                  .filter((order) => order.id === open)
+                {(visiting ? [] : orders).filter((order) => order.id === open)
                   .map((order) => (
                     <tr key={`decide-${order.id}`}>
                       <td colSpan={8}>

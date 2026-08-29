@@ -28,7 +28,7 @@ class ProjectsController < ApplicationController
         HackatimeProject.link(user: current_user, project: project, name: params[:hackatime_project_name])
       end
 
-      redirect_to dashboard_path, notice: "Project created as a draft."
+      redirect_to camp_path, notice: "Project created as a draft."
     else
       redirect_back fallback_location: new_project_path, inertia: { errors: project.errors.messages }
     end
@@ -70,7 +70,7 @@ class ProjectsController < ApplicationController
       @project.submit!
       redirect_to project_path(@project), notice: "Submitted for review!"
     else
-      redirect_to dashboard_path, notice: "Project saved."
+      redirect_to camp_path, notice: "Project saved."
     end
   rescue Project::NotReadyToSubmit => e
     redirect_to project_path(@project), inertia: { errors: { base: e.reasons } }

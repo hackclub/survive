@@ -24,12 +24,25 @@ import '../styles/table.css'
 import '../styles/checklist.css'
 import '../styles/final-review.css'
 import '../styles/shop.css'
+import '../styles/hub.css'
 
 router.on("before", (event) => {
   const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content
   if (csrfToken) {
     event.detail.visit.headers["X-CSRF-Token"] = csrfToken
   }
+})
+
+router.on("success", () => {
+  const root = document.getElementById("app")
+  if (!root) return
+
+  root.dataset.entering = "true"
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      delete root.dataset.entering
+    })
+  })
 })
 
 void createInertiaApp({

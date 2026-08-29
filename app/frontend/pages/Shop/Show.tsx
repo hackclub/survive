@@ -52,9 +52,9 @@ export default function Show({
         <div className="camp__pair">
           <div>
             {item.imageUrl ? (
-              <img className="shop-card__image" src={item.imageUrl} alt="" />
+              <img className="shop-detail__image" src={item.imageUrl} alt="" />
             ) : (
-              <div className="shop-card__image shop-card__image--placeholder" />
+              <div className="shop-detail__image shop-detail__image--placeholder" />
             )}
 
             {item.grantAmountUsd !== null && (

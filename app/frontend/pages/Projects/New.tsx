@@ -121,7 +121,7 @@ export default function New({ hackatimeProjects }: { hackatimeProjects: Hackatim
               {!auth.user?.hackatimeConnected ? (
                 <p className="u-sm u-soft">
                   Connect Hackatime from your{" "}
-                  <a className="u-accent" href="/dashboard">
+                  <a className="u-accent" href="/camp">
                     dashboard
                   </a>{" "}
                   to link one now, or do it later from the project page.

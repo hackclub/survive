@@ -5,7 +5,8 @@ import mark from "../images/mark.webp"
 import type { SharedProps } from "../types"
 
 const LINKS = [
-  { label: "Camp", href: "/dashboard" },
+  { label: "Dashboard", href: "/dashboard" },
+  { label: "Camp", href: "/camp" },
   { label: "Shop", href: "/shop" },
   { label: "Orders", href: "/orders" },
 ]
@@ -21,7 +22,8 @@ function initials(name: string) {
 }
 
 function isActive(path: string, href: string) {
-  if (href === "/dashboard") return path === "/dashboard" || path.startsWith("/projects")
+  if (href === "/camp") return path === "/camp" || path.startsWith("/projects")
+  if (href === "/dashboard") return path === "/dashboard"
   return path.startsWith(href)
 }
 
@@ -65,7 +67,7 @@ export function Nav({ over, admin }: { over?: boolean; admin?: boolean } = {}) {
       </Link>
 
       {user && admin && (
-        <Link className="nav__ghost" href="/dashboard">
+        <Link className="nav__ghost" href="/camp">
           Back to camp
         </Link>
       )}
@@ -142,9 +144,6 @@ export function Nav({ over, admin }: { over?: boolean; admin?: boolean } = {}) {
           </>
         ) : (
           <>
-            <a className="nav__ghost" href="/#how">
-              How it works
-            </a>
             <a className="btn btn--primary btn--sm" href={signInPath}>
               Sign in
             </a>
