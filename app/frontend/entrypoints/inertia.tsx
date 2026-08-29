@@ -25,6 +25,7 @@ import '../styles/checklist.css'
 import '../styles/final-review.css'
 import '../styles/shop.css'
 import '../styles/hub.css'
+import '../styles/docs.css'
 
 router.on("before", (event) => {
   const csrfToken = document.querySelector<HTMLMetaElement>('meta[name="csrf-token"]')?.content
