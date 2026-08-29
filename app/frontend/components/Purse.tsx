@@ -1,8 +1,5 @@
 import { useEffect, useRef, useState } from "react"
 
-const woodCoin =
-  "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAyElEQVR4nGNgoDXY2ej3H588Iy5NWiZmGOLXzpxicK/fhKIHw4DHW1v+MzAwMDx7dAfDACk5FQYGBgYGWe8auD4UA5A1m2cuwDD85PSE/+iGMCE7G1kzut93Nvr9N89cwAhzGUbYPN7a8v/k9IT/WCXRLDk5PeE/zLUs2BTCAurLzS1wg3jUfRjRAxDuBUJRhQvsbPT7z4RsI6nAvX4TIxM2CZiLeNR9GGGYoEt3Nvr9xxeQ6AEI41OcDqibEpGdS2xeIAgIRTEAXSaFGevTqTYAAAAASUVORK5CYII="
-
 type Props = {
   spendable: number
   earned: number
@@ -11,7 +8,35 @@ type Props = {
   heldOrders: number
 }
 
-export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) {
+// The wood image is embedded directly in this file.
+// Replace WOOD_IMAGE_DATA with the Base64 data from the PNG.
+const WOOD_IMAGE_DATA = "data:image/png;base64,PASTE_BASE64_HERE"
+
+function WoodIcon({ size = 30 }: { size?: number }) {
+  return (
+    <img
+      src={WOOD_IMAGE_DATA}
+      alt=""
+      aria-hidden="true"
+      width={size}
+      height={size}
+      draggable={false}
+      style={{
+        display: "block",
+        objectFit: "contain",
+        flexShrink: 0,
+      }}
+    />
+  )
+}
+
+export function Purse({
+  spendable,
+  earned,
+  adjusted,
+  held,
+  heldOrders,
+}: Props) {
   const [open, setOpen] = useState(false)
   const [landing, setLanding] = useState(false)
   const box = useRef<HTMLDivElement>(null)
@@ -19,22 +44,30 @@ export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) 
 
   useEffect(() => {
     if (previous.current === spendable) return
+
     previous.current = spendable
     setLanding(true)
+
     const timer = window.setTimeout(() => setLanding(false), 520)
     return () => window.clearTimeout(timer)
   }, [spendable])
 
   useEffect(() => {
     if (!open) return
+
     const onAway = (event: MouseEvent) => {
-      if (!box.current?.contains(event.target as Node)) setOpen(false)
+      if (!box.current?.contains(event.target as Node)) {
+        setOpen(false)
+      }
     }
+
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") setOpen(false)
     }
+
     document.addEventListener("mousedown", onAway)
     document.addEventListener("keydown", onKey)
+
     return () => {
       document.removeEventListener("mousedown", onAway)
       document.removeEventListener("keydown", onKey)
@@ -56,16 +89,22 @@ export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) 
         onClick={() => setOpen((value) => !value)}
         onFocus={() => setOpen(true)}
       >
-        <img src={woodCoin} alt="" width={16} height={16} style={{ flexShrink: 0, imageRendering: "pixelated" }} />
-        <b className={`purse__amount${landing ? " is-landing" : ""}`}>{spendable}</b>
+        <WoodIcon size={30} />
+
+        <b className={`purse__amount${landing ? " is-landing" : ""}`}>
+          {spendable}
+        </b>
+
         <span className="purse__unit">wood</span>
       </button>
+
       {open && (
         <div className="purse__pop">
           <div className="purse__row">
             <span className="u-soft">Earned</span>
             <span>{earned}</span>
           </div>
+
           {adjusted !== 0 && (
             <div className="purse__row">
               <span className="u-soft">Adjusted</span>
@@ -75,14 +114,17 @@ export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) 
               </span>
             </div>
           )}
+
           {held > 0 && (
             <div className="purse__row">
               <span className="u-soft">
-                Held by {heldOrders} {heldOrders === 1 ? "order" : "orders"}
+                Held by {heldOrders}{" "}
+                {heldOrders === 1 ? "order" : "orders"}
               </span>
               <span>&minus;{held}</span>
             </div>
           )}
+
           <div className="purse__row purse__row--total">
             <span>Spendable</span>
             <span>{spendable}</span>
