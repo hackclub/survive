@@ -1,5 +1,6 @@
 class DocsController < ApplicationController
   def show
-    render inertia: "Docs/Show"
+    docs = Doc.published
+    render inertia: "Docs/Show", props: { docs: docs.map(&:as_client_json) }
   end
 end
