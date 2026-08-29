@@ -84,6 +84,12 @@ export function Nav({ over, admin }: { over?: boolean; admin?: boolean } = {}) {
               {link.href === "/orders" && user.ordersChanged && <span className="nav__dot" />}
             </Link>
           ))}
+          <Link
+            className={`nav__link${path === "/docs" ? " is-active" : ""}`}
+            href="/docs"
+          >
+            Docs
+          </Link>
         </div>
       )}
 
