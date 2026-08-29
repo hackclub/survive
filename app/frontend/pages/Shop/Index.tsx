@@ -1,6 +1,8 @@
 import { Head, Link } from "@inertiajs/react"
 import { AppShell } from "../../components/AppShell"
 import { Empty } from "../../components/Empty"
+import { SkeletonShopList } from "../../components/Skeleton"
+import { useVisiting } from "../../lib/useVisiting"
 import { formatMinutes } from "../../lib/format"
 
 type Item = {
@@ -30,6 +32,8 @@ export default function Index({
   frozen: boolean
   approvedMinutes: number
 }) {
+  const visiting = useVisiting()
+
   return (
     <>
       <Head title="Shop - Survive" />
@@ -38,21 +42,21 @@ export default function Index({
         eyebrow="Shop"
         title={frozen ? "Spending is paused" : `${balance} wood to spend`}
         tone={frozen ? "returned" : undefined}
-        narrow
+        wide
         lede={
           frozen
             ? `Your account is suspended, so your ${trueBalance} wood cannot be spent right now. Open orders are on hold, not cancelled.`
             : `${formatMinutes(approvedMinutes)} approved so far.`
         }
       >
-        {items.length === 0 ? (
+        {visiting ? (
+          <SkeletonShopList rows={items.length || 8} />
+        ) : items.length === 0 ? (
           <Empty title="The shelves are bare" text="Nothing in the shop yet. Check back." idle />
         ) : (
           <div className="shop-grid" style={frozen ? { opacity: 0.45 } : undefined}>
             {items.map((item) => {
               const locked = item.unavailableReason !== null
-              const progress =
-                item.shortBy > 0 ? Math.min(100, (balance / item.coinCost) * 100) : 100
 
               return (
                 <Link
@@ -70,26 +74,21 @@ export default function Index({
                     <span className="shop-card__name">{item.name}</span>
 
                     {item.description && (
-                      <p className="u-xs u-soft shop-card__description">{item.description}</p>
+                      <p className="shop-card__description">{item.description}</p>
                     )}
 
-                    {item.onePerPerson && <span className="u-xs u-faint">One per person</span>}
+                    {item.onePerPerson && <span className="shop-card__note">One per person</span>}
+
+                    {item.stock !== null && (
+                      <span className="shop-card__note">{item.stock} left</span>
+                    )}
 
                     {item.shortBy > 0 && (
-                      <>
-                        <div className="meter">
-                          <b style={{ width: `${progress}%` }} />
-                        </div>
-                        <span className="shop-card__lock">{item.shortBy} more wood</span>
-                      </>
+                      <span className="shop-card__short">{item.shortBy} more wood</span>
                     )}
 
                     {locked && item.shortBy === 0 && (
-                      <span
-                        className={`shop-card__lock${
-                          item.unavailableReason === "Out of stock" ? " shop-card__lock--out" : ""
-                        }`}
-                      >
+                      <span className="shop-card__short shop-card__short--out">
                         {item.unavailableReason}
                       </span>
                     )}

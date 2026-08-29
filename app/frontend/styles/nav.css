@@ -20,20 +20,13 @@
 .brand__mark {
   width: 30px;
   height: auto;
-  transform-origin: 50% 90%;
-  transition: transform var(--dur) var(--ease-spring);
-}
-
-.brand:hover .brand__mark {
-  transform: rotate(-7deg) scale(1.08);
 }
 
 .brand__name {
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 1.05rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
 }
 
 .nav__seg {
@@ -41,7 +34,7 @@
   gap: 0.1rem;
   margin-inline-start: 0.8rem;
   padding: 0.18rem;
-  border-radius: var(--r-pill);
+  border-radius: var(--r);
   background: rgba(232, 230, 223, 0.08);
   border: 1px solid rgba(232, 230, 223, 0.1);
 }
@@ -49,12 +42,11 @@
 .nav__link {
   position: relative;
   padding: 0.36rem 0.85rem;
-  border-radius: var(--r-pill);
+  border-radius: var(--r);
   font-size: var(--fs-sm);
   font-weight: 700;
   color: rgba(232, 230, 223, 0.62);
   white-space: nowrap;
-  transition: color var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
 }
 
 .nav__link:hover {
@@ -72,7 +64,7 @@
   inset-inline-end: 0.34rem;
   width: 5px;
   height: 5px;
-  border-radius: 50%;
+  border-radius: var(--r);
   background: var(--ember);
 }
 
@@ -91,13 +83,12 @@
   display: inline-flex;
   align-items: center;
   padding: 0.36rem 0.85rem;
-  border-radius: var(--r-pill);
+  border-radius: var(--r);
   font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--bone);
   background: rgba(232, 230, 223, 0.1);
   border: 1px solid rgba(232, 230, 223, 0.26);
-  transition: background var(--dur-fast) var(--ease);
 }
 
 .nav__ghost:hover {
@@ -114,11 +105,10 @@
   inset-inline-end: 0;
   min-width: 12rem;
   padding: var(--sp-2);
-  border-radius: var(--r-sm);
+  border-radius: var(--r);
   background: var(--white);
   color: var(--ink);
   border: 1px solid var(--line);
-  box-shadow: var(--shadow-3);
   z-index: var(--z-sheet);
   display: flex;
   flex-direction: column;
@@ -131,7 +121,7 @@
   width: 100%;
   text-align: start;
   padding: 0.42rem 0.6rem;
-  border-radius: var(--r-xs);
+  border-radius: var(--r);
   font-size: var(--fs-sm);
   font-weight: 700;
   color: var(--ink);
@@ -163,8 +153,6 @@
   padding: 0.45rem 0.5rem 0.6rem;
   background: rgba(247, 245, 239, 0.92);
   border-top: 1px solid var(--line);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
 }
 
 @media (max-width: 700px) {
@@ -194,7 +182,7 @@
   inset-block-start: -0.45rem;
   width: 26px;
   height: 2px;
-  border-radius: 2px;
+  border-radius: var(--r);
   background: var(--rust-500);
 }
 
@@ -213,4 +201,5 @@
   inset-inline: 0;
   inset-block-start: 0;
   z-index: var(--z-nav);
+  color: var(--bone);
 }

@@ -1,4 +1,6 @@
 import { Head, Link, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { useQueueKeys } from "../../../lib/useQueueKeys"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
@@ -35,6 +37,8 @@ export default function Index({
     onTab: (href) => router.get(href),
   })
 
+  const visiting = useVisiting()
+
   return (
     <>
       <Head title="Final review - Survive" />
@@ -51,7 +55,7 @@ export default function Index({
           />
         </div>
 
-        {rows.length === 0 ? (
+        {!visiting && rows.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing waiting.</p>
           </div>
@@ -71,7 +75,8 @@ export default function Index({
                 </tr>
               </thead>
               <tbody>
-                {rows.map((row, index) => (
+              {visiting && <SkeletonTableRows columns={8} rows={6} />}
+                {(visiting ? [] : rows).map((row, index) => (
                   <tr
                     key={row.id}
                     className={

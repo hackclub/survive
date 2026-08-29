@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
 import { formatMinutes } from "../../../lib/format"
@@ -39,6 +41,8 @@ export default function Index({
     router.patch(`/admin/users/${row.id}`, { roles: next, q: query })
   }
 
+  const visiting = useVisiting()
+
   return (
     <>
       <Head title="Users - Survive" />
@@ -76,7 +80,8 @@ export default function Index({
               </tr>
             </thead>
             <tbody>
-              {users.map((row) => (
+              {visiting && <SkeletonTableRows columns={6} rows={6} />}
+              {(visiting ? [] : users).map((row) => (
                 <tr key={row.id} className={row.banned ? "data-table__row--flagged" : undefined}>
                   <td>
                     <div style={{ fontWeight: 600 }}>
@@ -135,8 +140,7 @@ export default function Index({
                   </td>
                 </tr>
               ))}
-              {users
-                .filter((row) => row.id === managing)
+              {(visiting ? [] : users).filter((row) => row.id === managing)
                 .map((row) => (
                   <tr key={`ban-${row.id}`}>
                     <td colSpan={6}>
@@ -185,7 +189,7 @@ export default function Index({
           </table>
         </div>
 
-        {users.some((row) => row.banned && row.bannedReason) && (
+        {!visiting && users.some((row) => row.banned && row.bannedReason) && (
           <div className="review__card" style={{ marginTop: "var(--sp-4)" }}>
             <h2 className="review__card-title u-label u-faint">Ban reasons</h2>
             {users

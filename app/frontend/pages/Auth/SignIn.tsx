@@ -1,6 +1,5 @@
 import { Head } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
-import { Embers } from "../../components/Embers"
 import { Flash } from "../../components/Flash"
 import { Scout } from "../../components/Scout"
 
@@ -16,11 +15,6 @@ export default function SignIn() {
 
       <div className="shell">
         <header className="band signin">
-          <div className="band__deco" aria-hidden="true">
-            <Embers />
-            <div className="band__glow" />
-          </div>
-
           <Nav />
 
           <div className="signin__card">

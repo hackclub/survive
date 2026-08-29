@@ -26,7 +26,7 @@
 .rail__dot {
   width: 0.62rem;
   height: 0.62rem;
-  border-radius: var(--r-pill);
+  border-radius: var(--r);
   flex-shrink: 0;
   border: 2px solid var(--line-strong);
   background: var(--bg-raised);
@@ -58,7 +58,6 @@
 .rail__step--now .rail__dot {
   border-color: var(--rust-500);
   background: var(--rust-500);
-  box-shadow: 0 0 0 3px var(--rust-50);
 }
 
 .rail__step--now .rail__label {
@@ -92,7 +91,6 @@
 .rail--invert .rail__step--now .rail__dot {
   border-color: var(--ember);
   background: var(--ember);
-  box-shadow: 0 0 0 3px rgba(242, 163, 63, 0.22);
 }
 
 .rail--invert .rail__step--now .rail__label {

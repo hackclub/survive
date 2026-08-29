@@ -3,7 +3,7 @@
   flex-direction: column;
   gap: var(--sp-4);
   padding: var(--sp-5);
-  border-radius: var(--r-md);
+  border-radius: var(--r);
   background: var(--bg-raised);
   border: 1px solid var(--line);
 }
@@ -17,7 +17,7 @@
 
 .checklist__meter {
   height: 6px;
-  border-radius: var(--r-pill);
+  border-radius: var(--r);
   background: rgba(44, 54, 67, 0.1);
   overflow: hidden;
 }
@@ -26,7 +26,6 @@
   display: block;
   height: 100%;
   background: var(--lime-500);
-  transition: width var(--dur) var(--ease);
 }
 
 .checklist__rows {
@@ -59,7 +58,7 @@
   height: 1.15rem;
   margin-top: 0.1rem;
   flex-shrink: 0;
-  border-radius: var(--r-pill);
+  border-radius: var(--r);
   font-size: var(--fs-xs);
   font-weight: 700;
 }
@@ -104,7 +103,7 @@
   gap: var(--sp-4);
   flex-wrap: wrap;
   padding: var(--sp-3) var(--sp-4);
-  border-radius: var(--r-sm);
+  border-radius: var(--r);
   background: var(--bg-sunken);
   border: 1px solid var(--line);
 }

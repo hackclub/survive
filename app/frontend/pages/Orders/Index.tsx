@@ -2,6 +2,8 @@ import { Head, Link } from "@inertiajs/react"
 import { AppShell } from "../../components/AppShell"
 import { Empty } from "../../components/Empty"
 import { Status } from "../../components/Status"
+import { SkeletonPanels } from "../../components/Skeleton"
+import { useVisiting } from "../../lib/useVisiting"
 
 type Order = {
   id: number
@@ -55,6 +57,8 @@ export default function Index({
   balance: number
   held: number
 }) {
+  const visiting = useVisiting()
+
   return (
     <>
       <Head title="Orders - Survive" />
@@ -69,7 +73,9 @@ export default function Index({
             : `${balance} wood spendable.`
         }
       >
-        {orders.length === 0 ? (
+        {visiting ? (
+          <SkeletonPanels count={orders.length || 3} lines={2} />
+        ) : orders.length === 0 ? (
           <Empty
             title="No orders yet"
             action={

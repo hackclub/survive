@@ -1,4 +1,6 @@
 import { Head, Link, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
 
@@ -19,6 +21,7 @@ type Item = {
 }
 
 export default function Index({ items }: { items: Item[] }) {
+  const visiting = useVisiting()
   return (
     <>
       <Head title="Shop items - Survive" />
@@ -32,7 +35,7 @@ export default function Index({ items }: { items: Item[] }) {
           </Link>
         }
       >
-        {items.length === 0 ? (
+        {!visiting && items.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing in the shop yet.</p>
             <Link className="btn btn--primary btn--sm" href="/admin/shop_items/new">
@@ -55,7 +58,8 @@ export default function Index({ items }: { items: Item[] }) {
                 </tr>
               </thead>
               <tbody>
-                {items.map((item) => (
+              {visiting && <SkeletonTableRows columns={8} rows={6} />}
+                {(visiting ? [] : items).map((item) => (
                   <tr key={item.id} className={item.enabled ? undefined : "data-table__row--muted"}>
                     <td>
                       <div className="shop-cell">

@@ -15,11 +15,11 @@
 
 .section {
   position: relative;
-  padding-block: clamp(4.5rem, 11vw, 9.5rem);
+  padding-block: var(--sp-8);
 }
 
 .section--tight {
-  padding-block: clamp(3rem, 7vw, 5.5rem);
+  padding-block: var(--sp-7);
 }
 
 .section--paper {
@@ -45,13 +45,7 @@
   flex-direction: column;
   gap: var(--sp-4);
   max-width: 62ch;
-  margin-bottom: clamp(2.5rem, 5vw, 4.5rem);
-}
-
-.section__head--center {
-  margin-inline: auto;
-  align-items: center;
-  text-align: center;
+  margin-bottom: var(--sp-6);
 }
 
 .eyebrow {
@@ -61,8 +55,7 @@
   font-family: var(--font-mono);
   font-size: var(--fs-label);
   font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: var(--rust-600);
 }
 
@@ -71,11 +64,7 @@
   width: 26px;
   height: 2px;
   background: currentColor;
-  border-radius: 2px;
-}
-
-.eyebrow--center::before {
-  display: none;
+  border-radius: var(--r);
 }
 
 .section--deep .eyebrow {
@@ -84,7 +73,7 @@
 
 .grid {
   display: grid;
-  gap: clamp(1rem, 2.2vw, 1.75rem);
+  gap: var(--sp-4);
 }
 
 .grid--2 {
@@ -116,3 +105,11 @@
   justify-content: space-between;
 }
 
+#app {
+  transition: opacity 140ms ease-out;
+}
+
+#app[data-entering="true"] {
+  opacity: 0;
+  transition: none;
+}

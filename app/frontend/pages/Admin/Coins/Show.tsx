@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status, Tag } from "../../../components/Status"
 
@@ -30,6 +32,8 @@ export default function Show({ maker, entries }: { maker: Maker; entries: Entry[
   const [reason, setReason] = useState("")
 
   const parsed = Number.parseInt(amount, 10) || 0
+
+  const visiting = useVisiting()
 
   return (
     <>
@@ -72,14 +76,15 @@ export default function Show({ maker, entries }: { maker: Maker; entries: Entry[
                   </tr>
                 </thead>
                 <tbody>
-                  {entries.length === 0 ? (
+                  {visiting && <SkeletonTableRows columns={4} rows={6} />}
+                  {!visiting && entries.length === 0 ? (
                     <tr>
                       <td colSpan={4} className="data-table__empty">
                         Nothing earned or adjusted yet.
                       </td>
                     </tr>
                   ) : (
-                    entries.map((entry) => (
+                    (visiting ? [] : entries).map((entry) => (
                       <tr key={entry.id}>
                         <td className="u-mono u-xs u-faint">{entry.at}</td>
                         <td>

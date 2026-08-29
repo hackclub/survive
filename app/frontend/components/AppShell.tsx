@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
 import { Nav } from "./Nav"
 import { Dock } from "./Dock"
-import { Embers } from "./Embers"
 import { Flash } from "./Flash"
 import { usePage } from "@inertiajs/react"
 import type { SharedProps } from "../types"
@@ -15,6 +14,7 @@ type Props = {
   actions?: ReactNode
   stats?: Stat[]
   narrow?: boolean
+  wide?: boolean
   tone?: "cool" | "returned" | "paid"
   children: ReactNode
 }
@@ -26,6 +26,7 @@ export function AppShell({
   actions,
   stats,
   narrow,
+  wide,
   tone,
   children,
 }: Props) {
@@ -34,14 +35,9 @@ export function AppShell({
   return (
     <div className="shell">
       <header className={`band${tone ? ` band--${tone}` : ""}`}>
-        <div className="band__deco" aria-hidden="true">
-          {tone !== "cool" && <Embers />}
-          <div className="band__glow" />
-        </div>
-
         <Nav />
 
-        <div className={`band__inner${narrow ? " band__inner--narrow" : ""}`}>
+        <div className={`band__inner${narrow ? " band__inner--narrow" : ""}${wide ? " band__inner--wide" : ""}`}>
           <div className="band__id">
             <div>
               {eyebrow && <p className="band__eyebrow">{eyebrow}</p>}
@@ -67,7 +63,7 @@ export function AppShell({
         </div>
       </header>
 
-      <main id="main" className={`shell__body${narrow ? " shell__body--narrow" : ""}`}>
+      <main id="main" className={`shell__body${narrow ? " shell__body--narrow" : ""}${wide ? " shell__body--wide" : ""}`}>
         {children}
       </main>
 

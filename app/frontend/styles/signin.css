@@ -5,40 +5,28 @@
   padding-block-end: 0;
 }
 
-.signin .band__glow {
-  inset-inline: 0;
-  inset-inline-start: 50%;
-  translate: -50% 0;
-  inset-block-end: -30%;
-  width: min(46vw, 520px);
-  height: min(46vw, 520px);
-}
-
 .signin__card {
   position: relative;
   z-index: 3;
-  margin: auto;
-  padding: var(--sp-6) var(--gutter) var(--sp-9);
-  text-align: center;
+  width: 100%;
+  max-width: var(--wrap);
+  margin-inline: auto;
+  padding: var(--sp-8) var(--gutter);
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: var(--sp-3);
-  max-width: 34rem;
+  gap: var(--sp-4);
 }
 
 .signin__scout {
-  width: 120px;
+  width: 72px;
   height: auto;
-  animation: scout-bob 5s var(--ease) infinite;
-  filter: drop-shadow(0 8px 26px rgba(242, 163, 63, 0.36));
 }
 
 .signin__title {
   font-family: var(--font-display);
   font-size: var(--fs-d2);
-  font-weight: 800;
-  letter-spacing: -0.035em;
+  font-weight: 700;
   color: var(--bone);
 }
 

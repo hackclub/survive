@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Tag } from "../../../components/Status"
 import type { Pagination } from "../../../types"
@@ -39,12 +41,14 @@ export default function Index({
     })
   }
 
+  const visiting = useVisiting()
+
   return (
     <>
       <Head title="Fulfillment - Survive" />
 
       <AdminSidebarLayout eyebrow="Shipping" title={`${waiting} to send`}>
-        {orders.length === 0 ? (
+        {!visiting && orders.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing to send.</p>
           </div>
@@ -62,7 +66,8 @@ export default function Index({
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
+              {visiting && <SkeletonTableRows columns={6} rows={6} />}
+                {(visiting ? [] : orders).map((order) => (
                   <tr key={order.id}>
                     <td>
                       <div style={{ fontWeight: 600 }}>
@@ -100,8 +105,7 @@ export default function Index({
                     </td>
                   </tr>
                 ))}
-                {orders
-                  .filter((order) => order.id === open)
+                {(visiting ? [] : orders).filter((order) => order.id === open)
                   .map((order) => (
                     <tr key={`send-${order.id}`}>
                       <td colSpan={6}>

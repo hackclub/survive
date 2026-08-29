@@ -1,6 +1,8 @@
 import { Head, Link, usePage } from "@inertiajs/react"
 import { AppShell } from "../../components/AppShell"
 import { Empty } from "../../components/Empty"
+import { SkeletonCards } from "../../components/Skeleton"
+import { useVisiting } from "../../lib/useVisiting"
 import { formatMinutes } from "../../lib/format"
 import type { Project, SharedProps } from "../../types"
 
@@ -76,6 +78,7 @@ function Card({ project, tall }: { project: Project; tall?: boolean }) {
 
 export default function Index({ projects, stats }: { projects: Project[]; stats: Stats }) {
   const { auth } = usePage<SharedProps>().props
+  const visiting = useVisiting()
   const [live, ...rest] = projects
   const csrfToken =
     typeof document !== "undefined"
@@ -106,7 +109,9 @@ export default function Index({ projects, stats }: { projects: Project[]; stats:
             : undefined
         }
       >
-        {projects.length === 0 ? (
+        {visiting ? (
+          <SkeletonCards />
+        ) : projects.length === 0 ? (
           <Empty
             action={
               <Link className="btn btn--primary btn--sm" href="/projects/new">

@@ -29,9 +29,8 @@
 
 .admin-sidebar__link {
   padding: var(--sp-2) var(--sp-3);
-  border-radius: var(--r-sm);
+  border-radius: var(--r);
   font-weight: 700;
-  transition: background var(--dur-fast) var(--ease);
 }
 
 .admin-sidebar__link:hover {

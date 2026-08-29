@@ -2,6 +2,10 @@ class DashboardController < ApplicationController
   STAGE_ORDER = %w[returned ari final sent draft paid].freeze
 
   def index
+    render inertia: "Dashboard/Hub"
+  end
+
+  def camp
     projects = current_user.projects
       .includes(:reviews, banner_attachment: :blob)
       .order(updated_at: :desc)

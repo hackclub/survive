@@ -20,40 +20,10 @@
   display: flex;
   flex-direction: column;
   min-height: 11rem;
-  border-radius: var(--r-md);
+  border-radius: var(--r);
   overflow: hidden;
   border: 1px solid var(--line-strong);
   background: var(--bg-raised);
-  transition: transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
-  animation: card-in 0.6s var(--ease) both;
-}
-
-@keyframes card-in {
-  from {
-    opacity: 0;
-    transform: translateY(18px) scale(0.985);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-.camp__grid > .gcard {
-  animation-delay: 0.1s;
-}
-
-.camp__pair > .gcard:nth-child(1) {
-  animation-delay: 0.18s;
-}
-
-.camp__pair > .gcard:nth-child(2) {
-  animation-delay: 0.26s;
-}
-
-.gcard:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-2);
 }
 
 .gcard--tall {
@@ -66,29 +36,18 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform var(--dur-slow) var(--ease);
-}
-
-.gcard:hover .gcard__image {
-  transform: scale(1.035);
 }
 
 .gcard__placeholder {
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, var(--rust-200), var(--rust-50) 46%, var(--lime-50));
+  background: var(--bg-sunken);
 }
 
 .gcard__veil {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(13, 18, 25, 0.94) 0%,
-    rgba(13, 18, 25, 0.8) 26%,
-    rgba(13, 18, 25, 0.34) 58%,
-    rgba(13, 18, 25, 0.06) 84%
-  );
+  background: rgba(13, 18, 25, 0.62);
 }
 
 .gcard__top {
@@ -109,10 +68,8 @@
   font-size: var(--fs-xs);
   font-weight: 700;
   padding: 0.2rem 0.6rem;
-  border-radius: var(--r-pill);
-  background: rgba(13, 18, 25, 0.55);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  border-radius: var(--r);
+  background: rgba(13, 18, 25, 0.78);
   border: 1px solid rgba(232, 230, 223, 0.18);
   color: var(--bone);
 }
@@ -120,14 +77,14 @@
 .gcard__state i {
   width: 6px;
   height: 6px;
-  border-radius: 50%;
+  border-radius: var(--r);
 }
 
 .gcard__body {
   position: relative;
   z-index: 2;
   margin-block-start: auto;
-  padding: var(--sp-6) var(--sp-4) var(--sp-4);
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
   color: var(--bone);
   display: flex;
   flex-direction: column;
@@ -137,8 +94,8 @@
 .gcard__name {
   font-family: var(--font-display);
   font-size: var(--fs-h3);
-  font-weight: 800;
-  letter-spacing: -0.025em;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--bone);
 }
 
@@ -171,35 +128,32 @@
 .gcard__rail b {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--lime-500), var(--ember));
+  background: var(--lime-500);
 }
 
 .gcard__tag {
   font-family: var(--font-mono);
   font-size: var(--fs-label);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   padding: 0.2rem 0.5rem;
-  border-radius: var(--r-xs);
-  background: rgba(13, 18, 25, 0.5);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  border-radius: var(--r);
+  background: rgba(13, 18, 25, 0.78);
   color: rgba(232, 230, 223, 0.8);
 }
 
 .panel {
   background: var(--bg-raised);
   border: 1px solid var(--line);
-  border-radius: var(--r-md);
+  border-radius: var(--r);
   padding: var(--sp-3) var(--sp-4);
 }
 
 .panel--go {
-  background: linear-gradient(150deg, var(--white), var(--lime-50));
+  background: var(--lime-50);
 }
 
 .panel--warn {
-  background: linear-gradient(150deg, var(--white), var(--ember-50));
+  background: var(--ember-50);
 }
 
 .panel--bad {
@@ -216,8 +170,7 @@
 .panel__title {
   font-family: var(--font-display);
   font-size: var(--fs-sm);
-  font-weight: 800;
-  letter-spacing: -0.015em;
+  font-weight: 700;
 }
 
 .panel__head .btn,
@@ -256,9 +209,9 @@
 .payout__amount {
   font-family: var(--font-display);
   font-variant-numeric: tabular-nums;
-  font-size: 2.6rem;
-  font-weight: 800;
-  letter-spacing: -0.035em;
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
@@ -269,7 +222,7 @@
 .panel--payout {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   gap: var(--sp-2);
-  padding-block: var(--sp-5);
+  padding-block: var(--sp-4);
 }

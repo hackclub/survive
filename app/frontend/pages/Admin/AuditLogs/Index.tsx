@@ -1,4 +1,6 @@
 import { Head, router } from "@inertiajs/react"
+import { SkeletonTableRows } from "../../../components/Skeleton"
+import { useVisiting } from "../../../lib/useVisiting"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import type { Pagination } from "../../../types"
 
@@ -30,6 +32,8 @@ export default function Index({
       actor_id: patch.actor_id ?? filters.actor,
     })
   }
+
+  const visiting = useVisiting()
 
   return (
     <>
@@ -63,7 +67,7 @@ export default function Index({
           </select>
         </div>
 
-        {entries.length === 0 ? (
+        {!visiting && entries.length === 0 ? (
           <div className="dashboard__empty">
             <p className="u-lead">Nothing recorded yet.</p>
           </div>
@@ -80,7 +84,8 @@ export default function Index({
                 </tr>
               </thead>
               <tbody>
-                {entries.map((entry) => (
+              {visiting && <SkeletonTableRows columns={5} rows={6} />}
+                {(visiting ? [] : entries).map((entry) => (
                   <tr key={entry.id}>
                     <td className="u-mono u-xs u-faint">{entry.at}</td>
                     <td className="u-soft">{entry.actor ?? "system"}</td>

@@ -66,6 +66,7 @@ Rails.application.routes.draw do
   end
 
   get "dashboard" => "dashboard#index", as: :dashboard
+  get "camp" => "dashboard#camp", as: :camp
   get "account" => "accounts#show", as: :account
   patch "account" => "accounts#update"
   get "shop" => "shop#index", as: :shop

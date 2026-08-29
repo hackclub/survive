@@ -16,33 +16,20 @@
   align-items: center;
   gap: var(--sp-3);
   padding: 0.6rem 0.9rem;
-  border-radius: var(--r-sm);
+  border-radius: var(--r);
   background: var(--slate-800);
   color: var(--bone);
   font-size: var(--fs-sm);
   font-weight: 700;
-  box-shadow: var(--shadow-3);
   max-width: 22rem;
   overflow: hidden;
   pointer-events: auto;
-  animation: toast-in 0.32s var(--ease-spring);
-}
-
-@keyframes toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
 }
 
 .toast__dot {
   width: 7px;
   height: 7px;
-  border-radius: 50%;
+  border-radius: var(--r);
   flex-shrink: 0;
 }
 
@@ -55,7 +42,7 @@
 }
 
 .toast--coins {
-  background: linear-gradient(120deg, var(--rust-700), var(--ember-700));
+  background: var(--rust-700);
   border: 1px solid rgba(242, 163, 63, 0.4);
 }
 
@@ -68,24 +55,6 @@
 
 .toast__close:hover {
   color: var(--bone);
-}
-
-.toast__timer {
-  position: absolute;
-  inset-inline-start: 0;
-  inset-block-end: 0;
-  height: 2px;
-  background: rgba(232, 230, 223, 0.4);
-  animation: toast-timer 6s linear forwards;
-}
-
-@keyframes toast-timer {
-  from {
-    width: 100%;
-  }
-  to {
-    width: 0%;
-  }
 }
 
 @media (max-width: 700px) {

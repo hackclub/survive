@@ -1,10 +1,9 @@
 import full from "../../images/full.webp"
-import raccoon from "../../images/raccoon.webp"
 
 const SURVIVE_LINKS = [
-  { label: "How it works", href: "/#how" },
+  { label: "Steps", href: "/#how" },
   { label: "FAQ", href: "/#faq" },
-  { label: "Ship a project", href: "/dashboard" },
+  { label: "Ship a project", href: "/camp" },
   { label: "Your dashboard", href: "/dashboard" },
 ]
 
@@ -22,18 +21,13 @@ export function Footer() {
     <footer className="footer">
       <div className="footer__scene" aria-hidden="true">
         <img className="footer__art" src={full} alt="" loading="lazy" />
-        <div className="footer__night"></div>
-        <div className="footer__stars"></div>
-        <div className="footer__glow"></div>
-        <img className="footer__raccoon" src={raccoon} alt="" loading="lazy" />
-        <div className="footer__embers" data-embers></div>
       </div>
 
       <div className="wrap footer__inner">
         <div className="footer__cta">
-          <h2>Seems interesting? Start building</h2>
+          <h2>Start building</h2>
           <div className="row footer__ctaRow">
-            <a className="btn btn--primary btn--lg" href="/dashboard">
+            <a className="btn btn--primary btn--lg" href="/camp">
               Ship a project
               <svg className="btn__icon" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path

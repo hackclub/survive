@@ -45,7 +45,7 @@
 
 .review__card {
   padding: var(--sp-4) var(--sp-5);
-  border-radius: var(--r-md);
+  border-radius: var(--r);
   background: var(--bg-raised);
   border: 1px solid var(--line);
 }
@@ -59,7 +59,7 @@
   flex-direction: column;
   gap: var(--sp-4);
   padding: var(--sp-5);
-  border-radius: var(--r-md);
+  border-radius: var(--r);
   border: 1px solid var(--line);
   background: var(--bg-sunken);
 }
@@ -134,12 +134,11 @@
 
 .role-toggle {
   padding: 0.11rem 0.44rem;
-  border-radius: var(--r-xs);
+  border-radius: var(--r);
   font-size: var(--fs-xs);
   font-weight: 600;
   background: rgba(44, 54, 67, 0.065);
   color: var(--ink-faint);
-  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
 }
 
 .role-toggle:hover {
