@@ -27,6 +27,12 @@ const FILTERS = [
   { value: "grant", label: "Grants" },
 ] as const
 
+const PINNED_ITEMS = [
+  "Hardware Funding",
+  "Register Your Interest for The Hackathon!",
+  "Certificate of Completion",
+]
+
 type Filter = (typeof FILTERS)[number]["value"]
 
 export default function Index({
@@ -114,12 +120,13 @@ export default function Index({
           <div className="shop-grid" style={frozen ? { opacity: 0.45 } : undefined}>
             {filteredItems.map((item) => {
               const locked = item.unavailableReason !== null
+              const pinned = PINNED_ITEMS.includes(item.name)
 
               return (
                 <Link
                   key={item.id}
                   href={`/shop/items/${item.id}`}
-                  className={`shop-card${locked ? " shop-card--locked" : ""}`}
+                  className={`shop-card${locked ? " shop-card--locked" : ""}${pinned ? " shop-card--pinned" : ""}`}
                 >
                   {item.imageUrl ? (
                     <img className="shop-card__image" src={item.imageUrl} alt="" />
