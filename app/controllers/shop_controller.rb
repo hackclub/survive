@@ -1,10 +1,4 @@
 class ShopController < ApplicationController
-  PINNED_ITEMS = [
-    "Hardware Funding",
-    "Register Your Interest for The Hackathon!",
-    "Certificate of Completion"
-  ].freeze
-
   def index
     region = ShopItem.region_for(current_user)
     balance = current_user.spendable_coins
@@ -15,11 +9,6 @@ class ShopController < ApplicationController
 
       serialize(item, region, balance, minutes)
     end.compact
-
-    items.sort_by! do |item|
-      pinned_index = PINNED_ITEMS.index(item[:name])
-      [pinned_index.nil? ? 1 : 0, pinned_index || 0]
-    end
 
     render inertia: "Shop/Index", props: {
       items: items,
@@ -62,6 +51,7 @@ class ShopController < ApplicationController
       name: item.name,
       description: item.description,
       kind: item.kind,
+      featured: item.featured,
       imageUrl: item.image_url,
       coinCost: cost,
       stock: item.stock,
