@@ -18,6 +18,7 @@ type Item = {
   minApprovedHours: number | null
   unavailableReason: string | null
   shortBy: number
+  featured: boolean
 }
 
 const FILTERS = [
@@ -27,21 +28,9 @@ const FILTERS = [
   { value: "grant", label: "Grants" },
 ] as const
 
-const PINNED_ITEMS = [
-  "Hardware Funding",
-  "Register Your Interest for The Hackathon!",
-  "Certificate of Completion",
-]
-
 type Filter = (typeof FILTERS)[number]["value"]
 
-export default function Index({
-  items,
-  balance,
-  trueBalance,
-  frozen,
-  approvedMinutes,
-}: {
+export default function Index({ items, balance, trueBalance, frozen, approvedMinutes }: {
   items: Item[]
   balance: number
   trueBalance: number
@@ -54,113 +43,52 @@ export default function Index({
 
   const filteredItems = useMemo(() => {
     const query = search.trim().toLowerCase()
-
     return items.filter((item) => {
       const matchesFilter = filter === "all" || item.kind === filter
-      const matchesSearch =
-        !query ||
-        item.name.toLowerCase().includes(query) ||
-        item.description?.toLowerCase().includes(query)
-
+      const matchesSearch = !query || item.name.toLowerCase().includes(query) || item.description?.toLowerCase().includes(query)
       return matchesFilter && matchesSearch
     })
   }, [items, search, filter])
 
+  const featuredItems = filteredItems.filter((item) => item.featured)
+  const regularItems = filteredItems.filter((item) => !item.featured)
+
+  function Card({ item, featured = false }: { item: Item; featured?: boolean }) {
+    const locked = item.unavailableReason !== null
+    return (
+      <Link key={item.id} href={`/shop/items/${item.id}`} className={`shop-card${locked ? " shop-card--locked" : ""}${featured ? " shop-card--featured" : ""}`}>
+        {item.imageUrl ? <img className="shop-card__image" src={item.imageUrl} alt="" /> : <div className="shop-card__image shop-card__image--placeholder" />}
+        <div className="shop-card__body">
+          <span className="shop-card__name">{item.name}</span>
+          {item.description && <p className="shop-card__description">{item.description}</p>}
+          {item.onePerPerson && <span className="shop-card__note">One per person</span>}
+          {item.stock !== null && <span className="shop-card__note">{item.stock} left</span>}
+          {item.shortBy > 0 && <span className="shop-card__short">{item.shortBy} more wood</span>}
+          {locked && item.shortBy === 0 && <span className="shop-card__short shop-card__short--out">{item.unavailableReason}</span>}
+          <div className="shop-card__price">
+            <span className="coin" aria-hidden="true" />
+            <b>{item.coinCost}</b>
+            <span className="btn btn--primary btn--sm" aria-disabled={locked ? "true" : undefined} style={locked ? { opacity: 0.45 } : undefined}>Order</span>
+          </div>
+        </div>
+      </Link>
+    )
+  }
+
   return (
     <>
       <Head title="Shop - Survive" />
-
-      <AppShell
-        eyebrow="Shop"
-        title={frozen ? "Spending is paused" : `${balance} wood to spend`}
-        tone={frozen ? "returned" : undefined}
-        wide
-        lede={
-          frozen
-            ? `Your account is suspended, so your ${trueBalance} wood cannot be spent right now. Open orders are on hold, not cancelled.`
-            : `${formatMinutes(approvedMinutes)} approved so far.`
-        }
-      >
-        {!visiting && items.length > 0 && (
-          <div className="shop-toolbar">
-            <label className="shop-search">
-              <span className="sr-only">Search the shop</span>
-              <input
-                className="field__input"
-                type="search"
-                placeholder="Search the shop..."
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-              />
-            </label>
-
-            <div className="shop-filters" role="group" aria-label="Filter shop items">
-              {FILTERS.map((option) => (
-                <button
-                  key={option.value}
-                  type="button"
-                  className={`btn btn--sm ${filter === option.value ? "btn--primary" : "btn--ghost"}`}
-                  onClick={() => setFilter(option.value)}
-                  aria-pressed={filter === option.value}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </div>
+      <AppShell eyebrow="Shop" title={frozen ? "Spending is paused" : `${balance} wood to spend`} tone={frozen ? "returned" : undefined} wide lede={frozen ? `Your account is suspended, so your ${trueBalance} wood cannot be spent right now. Open orders are on hold, not cancelled.` : `${formatMinutes(approvedMinutes)} approved so far.`}>
+        {!visiting && items.length > 0 && <div className="shop-toolbar">
+          <label className="shop-search"><span className="sr-only">Search the shop</span><input className="field__input" type="search" placeholder="Search the shop..." value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+          <div className="shop-filters" role="group" aria-label="Filter shop items">
+            {FILTERS.map((option) => <button key={option.value} type="button" className={`btn btn--sm ${filter === option.value ? "btn--primary" : "btn--ghost"}`} onClick={() => setFilter(option.value)} aria-pressed={filter === option.value}>{option.label}</button>)}
           </div>
-        )}
-
-        {visiting ? (
-          <SkeletonShopList rows={items.length || 8} />
-        ) : items.length === 0 ? (
-          <Empty title="The shelves are bare" text="Nothing in the shop yet. Check back." idle />
-        ) : filteredItems.length === 0 ? (
-          <Empty title="Nothing matches" text="Try a different search or filter." idle />
-        ) : (
-          <div className="shop-grid" style={frozen ? { opacity: 0.45 } : undefined}>
-            {filteredItems.map((item) => {
-              const locked = item.unavailableReason !== null
-              const pinned = PINNED_ITEMS.includes(item.name)
-
-              return (
-                <Link
-                  key={item.id}
-                  href={`/shop/items/${item.id}`}
-                  className={`shop-card${locked ? " shop-card--locked" : ""}${pinned ? " shop-card--pinned" : ""}`}
-                >
-                  {item.imageUrl ? (
-                    <img className="shop-card__image" src={item.imageUrl} alt="" />
-                  ) : (
-                    <div className="shop-card__image shop-card__image--placeholder" />
-                  )}
-
-                  <div className="shop-card__body">
-                    <span className="shop-card__name">{item.name}</span>
-                    {item.description && <p className="shop-card__description">{item.description}</p>}
-                    {item.onePerPerson && <span className="shop-card__note">One per person</span>}
-                    {item.stock !== null && <span className="shop-card__note">{item.stock} left</span>}
-                    {item.shortBy > 0 && <span className="shop-card__short">{item.shortBy} more wood</span>}
-                    {locked && item.shortBy === 0 && (
-                      <span className="shop-card__short shop-card__short--out">{item.unavailableReason}</span>
-                    )}
-
-                    <div className="shop-card__price">
-                      <span className="coin" aria-hidden="true" />
-                      <b>{item.coinCost}</b>
-                      <span
-                        className="btn btn--primary btn--sm"
-                        aria-disabled={locked ? "true" : undefined}
-                        style={locked ? { opacity: 0.45 } : undefined}
-                      >
-                        Order
-                      </span>
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        )}
+        </div>}
+        {visiting ? <SkeletonShopList rows={items.length || 8} /> : items.length === 0 ? <Empty title="The shelves are bare" text="Nothing in the shop yet. Check back." idle /> : filteredItems.length === 0 ? <Empty title="Nothing matches" text="Try a different search or filter." idle /> : <div className="shop-content" style={frozen ? { opacity: 0.45 } : undefined}>
+          {featuredItems.length > 0 && <div className="shop-featured"><div className="shop-featured__grid">{featuredItems.map((item) => <Card key={item.id} item={item} featured />)}</div></div>}
+          {regularItems.length > 0 && <div className="shop-grid">{regularItems.map((item) => <Card key={item.id} item={item} />)}</div>}
+        </div>}
       </AppShell>
     </>
   )
