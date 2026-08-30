@@ -7,7 +7,7 @@ type Doc = { id: number; title: string; slug: string; body: string; position: nu
 export default function Show({ docs }: { docs: Doc[] }) {
   return <>
     <Head title="Docs - Survive" />
-    <AppShell eyebrow="Docs" title="How Survive works" narrow lede="Everything you need to know about Survive.">
+    <AppShell eyebrow="Docs" title="How Survive works" wide lede="Everything you need to know about Survive.">
       <div className="docs">
         <aside className="docs__toc panel">
           <div className="panel__head"><h2 className="panel__title">On this page</h2></div>
