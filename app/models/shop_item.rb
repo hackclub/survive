@@ -17,7 +17,7 @@ class ShopItem < ApplicationRecord
   validates :grant_amount_usd, numericality: { greater_than: 0 }, allow_nil: true
 
   scope :enabled, -> { where(enabled: true) }
-  scope :sorted, -> { order(:coin_cost, :name) }
+  scope :sorted, -> { order(featured: :desc, coin_cost: :asc, name: :asc) }
 
   def self.region_for(user)
     user.country.to_s.strip.downcase.presence || DEFAULT_REGION
