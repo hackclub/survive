@@ -12,6 +12,7 @@ type Item = {
   kind: string
   coinCost: number
   enabled: boolean
+  featured: boolean
   stock: number | null
   onePerPerson: boolean
   maxQuantity: number | null
@@ -29,6 +30,7 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
     kind: item?.kind ?? kinds[0],
     coin_cost: item?.coinCost ?? 0,
     enabled: item?.enabled ?? true,
+    featured: item?.featured ?? false,
     max_quantity: item?.maxQuantity ?? "",
     one_per_person: item?.onePerPerson ?? false,
     stock: item?.stock ?? "",
@@ -139,6 +141,11 @@ export default function Form({ item, kinds }: { item: Item | null; kinds: string
                     <input type="checkbox" checked={form.data.enabled}
                       onChange={(e) => form.setData("enabled", e.target.checked)} />
                     Enabled
+                  </label>
+                  <label className="checkbox">
+                    <input type="checkbox" checked={form.data.featured}
+                      onChange={(e) => form.setData("featured", e.target.checked)} />
+                    Featured in shop
                   </label>
                   <label className="checkbox">
                     <input type="checkbox" checked={form.data.one_per_person}
