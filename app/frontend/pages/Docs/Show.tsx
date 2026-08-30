@@ -1,5 +1,6 @@
 import { Head, Link } from "@inertiajs/react"
 import { AppShell } from "../../components/AppShell"
+import { Markdown } from "../../components/Markdown"
 
 type Doc = { id: number; title: string; slug: string; body: string; position: number; published: boolean }
 
@@ -20,7 +21,7 @@ export default function Show({ docs }: { docs: Doc[] }) {
             <section key={doc.id} id={doc.slug} className="panel docs__section">
               <p className="band__eyebrow">{doc.title}</p>
               <h2 className="docs__title">{doc.title}</h2>
-              <div className="docs__body" style={{ whiteSpace: "pre-wrap" }}>{doc.body}</div>
+              <Markdown>{doc.body}</Markdown>
             </section>
           )}
         </article>
