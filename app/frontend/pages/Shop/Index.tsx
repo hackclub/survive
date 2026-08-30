@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react"
 import { Head, Link } from "@inertiajs/react"
 import { AppShell } from "../../components/AppShell"
 import { Empty } from "../../components/Empty"
@@ -19,6 +20,15 @@ type Item = {
   shortBy: number
 }
 
+const FILTERS = [
+  { value: "all", label: "All" },
+  { value: "physical", label: "Physical" },
+  { value: "digital", label: "Digital" },
+  { value: "grant", label: "Grants" },
+] as const
+
+type Filter = (typeof FILTERS)[number]["value"]
+
 export default function Index({
   items,
   balance,
@@ -33,6 +43,22 @@ export default function Index({
   approvedMinutes: number
 }) {
   const visiting = useVisiting()
+  const [search, setSearch] = useState("")
+  const [filter, setFilter] = useState<Filter>("all")
+
+  const filteredItems = useMemo(() => {
+    const query = search.trim().toLowerCase()
+
+    return items.filter((item) => {
+      const matchesFilter = filter === "all" || item.kind === filter
+      const matchesSearch =
+        !query ||
+        item.name.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query)
+
+      return matchesFilter && matchesSearch
+    })
+  }, [items, search, filter])
 
   return (
     <>
@@ -49,13 +75,44 @@ export default function Index({
             : `${formatMinutes(approvedMinutes)} approved so far.`
         }
       >
+        {!visiting && items.length > 0 && (
+          <div className="shop-toolbar">
+            <label className="shop-search">
+              <span className="sr-only">Search the shop</span>
+              <input
+                className="field__input"
+                type="search"
+                placeholder="Search the shop..."
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+              />
+            </label>
+
+            <div className="shop-filters" role="group" aria-label="Filter shop items">
+              {FILTERS.map((option) => (
+                <button
+                  key={option.value}
+                  type="button"
+                  className={`btn btn--sm ${filter === option.value ? "btn--primary" : "btn--ghost"}`}
+                  onClick={() => setFilter(option.value)}
+                  aria-pressed={filter === option.value}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {visiting ? (
           <SkeletonShopList rows={items.length || 8} />
         ) : items.length === 0 ? (
           <Empty title="The shelves are bare" text="Nothing in the shop yet. Check back." idle />
+        ) : filteredItems.length === 0 ? (
+          <Empty title="Nothing matches" text="Try a different search or filter." idle />
         ) : (
           <div className="shop-grid" style={frozen ? { opacity: 0.45 } : undefined}>
-            {items.map((item) => {
+            {filteredItems.map((item) => {
               const locked = item.unavailableReason !== null
 
               return (
@@ -72,25 +129,12 @@ export default function Index({
 
                   <div className="shop-card__body">
                     <span className="shop-card__name">{item.name}</span>
-
-                    {item.description && (
-                      <p className="shop-card__description">{item.description}</p>
-                    )}
-
+                    {item.description && <p className="shop-card__description">{item.description}</p>}
                     {item.onePerPerson && <span className="shop-card__note">One per person</span>}
-
-                    {item.stock !== null && (
-                      <span className="shop-card__note">{item.stock} left</span>
-                    )}
-
-                    {item.shortBy > 0 && (
-                      <span className="shop-card__short">{item.shortBy} more wood</span>
-                    )}
-
+                    {item.stock !== null && <span className="shop-card__note">{item.stock} left</span>}
+                    {item.shortBy > 0 && <span className="shop-card__short">{item.shortBy} more wood</span>}
                     {locked && item.shortBy === 0 && (
-                      <span className="shop-card__short shop-card__short--out">
-                        {item.unavailableReason}
-                      </span>
+                      <span className="shop-card__short shop-card__short--out">{item.unavailableReason}</span>
                     )}
 
                     <div className="shop-card__price">
