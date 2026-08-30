@@ -28,7 +28,11 @@ export default function Form({ doc }: { doc: Doc | null }) {
             <div className="field"><label className="field__label" htmlFor="position">Position</label><input id="position" className="field__input" type="number" value={position} onChange={e => setPosition(Number(e.target.value))} /></div>
             <label className="checkbox"><input type="checkbox" checked={published} onChange={e => setPublished(e.target.checked)} /> Published</label>
           </div>
-          <div className="field"><label className="field__label" htmlFor="body">Content</label><textarea id="body" className="field__input field__input--textarea" rows={18} value={body} onChange={e => setBody(e.target.value)} /></div>
+          <div className="field">
+            <label className="field__label" htmlFor="body">Content (Markdown)</label>
+            <textarea id="body" className="field__input field__input--textarea docs__editor" rows={24} value={body} onChange={e => setBody(e.target.value)} placeholder={'# Heading\n\nWrite your documentation here using Markdown.\n\n- Bullet point\n- Another point\n\n**Bold text** and [links](https://hackclub.com).'} />
+            <p className="field__hint">Markdown is supported. Use <code>#</code> for headings, <code>-</code> for lists, <code>**bold**</code>, <code>*italic*</code>, backticks for code, and <code>[text](url)</code> for links.</p>
+          </div>
           <div className="project-form__actions"><button className="btn btn--primary" type="button" onClick={save}>{doc ? "Save changes" : "Create page"}</button>{doc && <button className="btn btn--ghost" type="button" onClick={() => { if (confirm("Delete this documentation page?")) router.delete(`/admin/docs/${doc.id}`) }}>Delete</button>}</div>
         </div>
       </section>
