@@ -37,6 +37,38 @@
 .shop-card:hover { border-color: var(--line-strong); }
 .shop-card--locked { opacity: 0.62; }
 
+.shop-card--pinned {
+  border-width: 2px;
+  box-shadow: 0 6px 20px rgb(0 0 0 / 8%);
+}
+
+.shop-card--pinned .shop-card__image {
+  aspect-ratio: 4 / 3;
+}
+
+.shop-card--pinned .shop-card__body {
+  padding: var(--sp-5);
+  gap: var(--sp-3);
+}
+
+.shop-card--pinned .shop-card__name {
+  font-size: var(--fs-lg);
+}
+
+.shop-card--pinned .shop-card__description {
+  font-size: var(--fs-sm);
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.shop-card--pinned .shop-card__price {
+  padding-block-start: var(--sp-4);
+}
+
+.shop-card--pinned .shop-card__price b {
+  font-size: var(--fs-lg);
+}
+
 .shop-card__image {
   width: 100%;
   aspect-ratio: 3 / 2;
