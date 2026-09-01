@@ -1,6 +1,6 @@
 .nav {
   position: relative;
-  z-index: 4;
+  z-index: 10;
   display: flex;
   align-items: center;
   gap: var(--sp-3);
@@ -49,9 +49,7 @@
   white-space: nowrap;
 }
 
-.nav__link:hover {
-  color: var(--bone);
-}
+.nav__link:hover { color: var(--bone); }
 
 .nav__link.is-active {
   color: var(--slate-900);
@@ -68,9 +66,7 @@
   background: var(--ember);
 }
 
-.nav__spacer {
-  flex: 1;
-}
+.nav__spacer { flex: 1; }
 
 .nav__actions {
   display: flex;
@@ -91,12 +87,11 @@
   border: 1px solid rgba(232, 230, 223, 0.26);
 }
 
-.nav__ghost:hover {
-  background: rgba(232, 230, 223, 0.18);
-}
+.nav__ghost:hover { background: rgba(232, 230, 223, 0.18); }
 
 .nav__menu {
   position: relative;
+  z-index: 20;
 }
 
 .nav__sheet {
@@ -109,10 +104,11 @@
   background: var(--white);
   color: var(--ink);
   border: 1px solid var(--line);
-  z-index: var(--z-sheet);
+  z-index: 100;
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
+  box-shadow: 0 10px 30px rgba(18, 25, 33, 0.16);
 }
 
 .nav__sheet a,
@@ -128,9 +124,7 @@
 }
 
 .nav__sheet a:hover,
-.nav__sheet button:hover {
-  background: rgba(44, 54, 67, 0.06);
-}
+.nav__sheet button:hover { background: rgba(44, 54, 67, 0.06); }
 
 .nav__sheet-head {
   padding: 0.3rem 0.6rem 0.5rem;
@@ -139,9 +133,7 @@
 }
 
 @media (max-width: 700px) {
-  .nav__seg {
-    display: none;
-  }
+  .nav__seg { display: none; }
 }
 
 .dock {
@@ -155,11 +147,7 @@
   border-top: 1px solid var(--line);
 }
 
-@media (max-width: 700px) {
-  .dock {
-    display: flex;
-  }
-}
+@media (max-width: 700px) { .dock { display: flex; } }
 
 .dock__link {
   position: relative;
@@ -172,9 +160,7 @@
   color: var(--ink-faint);
 }
 
-.dock__link.is-active {
-  color: var(--rust-500);
-}
+.dock__link.is-active { color: var(--rust-500); }
 
 .dock__link.is-active::before {
   content: "";
