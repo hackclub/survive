@@ -1,6 +1,4 @@
 import { Head, Link } from "@inertiajs/react"
-import { Nav } from "./Nav"
-
 import clouds from "../images/clouds.webp"
 import mountains from "../images/mountains.webp"
 import ground from "../images/ground.webp"
@@ -14,8 +12,6 @@ export function Hub() {
       <Head title="Survive" />
 
       <main id="main" className="hub">
-        <Nav over />
-
         <div className="hub__stage">
           <img className="hub__layer hub__layer--clouds" src={clouds} alt="" fetchPriority="high" />
           <img className="hub__layer" src={mountains} alt="" fetchPriority="high" />
