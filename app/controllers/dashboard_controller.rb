@@ -7,7 +7,7 @@ class DashboardController < ApplicationController
 
   def camp
     projects = current_user.projects
-      .includes(:reviews, banner_attachment: :blob)
+      .includes({ reviews: :coin_payout }, banner_attachment: :blob)
       .order(updated_at: :desc)
       .to_a
 
