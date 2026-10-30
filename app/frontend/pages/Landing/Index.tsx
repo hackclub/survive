@@ -39,7 +39,7 @@ export default function Index() {
           <div className="scene__credit">
             <p className="scene__eyebrow">
               <img src={mark} alt="" />
-              Hack Club, sponsored by Mihi
+              Hack Club, sponsored by Johnny
             </p>
           </div>
 

@@ -46,29 +46,30 @@ class ShopItem < ApplicationRecord
     orders.held.sum(:quantity)
   end
 
-  def available_stock
+  def available_stock(reserved_quantity: nil)
     return nil if unlimited_stock?
 
-    [ stock.to_i - reserved_quantity, 0 ].max
+    reserved = reserved_quantity.nil? ? self.reserved_quantity : reserved_quantity
+    [ stock.to_i - reserved, 0 ].max
   end
 
   def short_of?(quantity)
     !unlimited_stock? && quantity > available_stock
   end
 
-  def in_stock?
-    unlimited_stock? || available_stock.positive?
+  def in_stock?(reserved_quantity: nil)
+    unlimited_stock? || available_stock(reserved_quantity: reserved_quantity).positive?
   end
 
   def unlock_minutes
     min_approved_hours.to_i * 60
   end
 
-  def unavailable_reason(user, approved_minutes:, balance:)
+  def unavailable_reason(user, approved_minutes:, balance:, reserved_quantity: nil)
     region = self.class.region_for(user)
 
     return "Not available where you are" unless enabled_for?(region)
-    return "Out of stock" unless in_stock?
+    return "Out of stock" unless in_stock?(reserved_quantity: reserved_quantity)
     return "Unlocks at #{min_approved_hours} approved hours" if min_approved_hours.present? && approved_minutes < unlock_minutes
 
     cost = coin_cost_for(region)

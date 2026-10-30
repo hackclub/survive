@@ -42,7 +42,7 @@ function Card({ project, tall }: { project: Project; tall?: boolean }) {
   return (
     <Link className={`gcard${tall ? " gcard--tall" : ""}`} href={`/projects/${project.id}`}>
       {project.bannerUrl ? (
-        <img className="gcard__image" src={project.bannerUrl} alt="" />
+        <img className="gcard__image" src={project.bannerUrl} alt="" loading="lazy" decoding="async" />
       ) : (
         <span className="gcard__placeholder" />
       )}

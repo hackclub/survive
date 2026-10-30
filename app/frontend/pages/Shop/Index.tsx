@@ -57,7 +57,7 @@ export default function Index({ items, balance, trueBalance, frozen, approvedMin
     const locked = item.unavailableReason !== null
     return (
       <Link key={item.id} href={`/shop/items/${item.id}`} className={`shop-card${locked ? " shop-card--locked" : ""}${featured ? " shop-card--featured" : ""}`}>
-        {item.imageUrl ? <img className="shop-card__image" src={item.imageUrl} alt="" /> : <div className="shop-card__image shop-card__image--placeholder" />}
+        {item.imageUrl ? <img className="shop-card__image" src={item.imageUrl} alt="" loading="lazy" decoding="async" /> : <div className="shop-card__image shop-card__image--placeholder" />}
         <div className="shop-card__body">
           <span className="shop-card__name">{item.name}</span>
           {item.description && <p className="shop-card__description">{item.description}</p>}

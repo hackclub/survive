@@ -4,11 +4,20 @@ class ShopController < ApplicationController
     balance = current_user.spendable_coins
     minutes = current_user.approved_minutes
 
-    items = ShopItem.includes(:shop_item_regions, image_attachment: :blob).sorted.map do |item|
+    shop_items = ShopItem.includes(:shop_item_regions, image_attachment: :blob).sorted.to_a
+    reserved_quantities = Order.held.where(shop_item_id: shop_items.map(&:id)).group(:shop_item_id).sum(:quantity)
+
+    items = shop_items.filter_map do |item|
       next unless item.enabled? || item.region_row(region)&.enabled?
 
-      serialize(item, region, balance, minutes)
-    end.compact
+      serialize(
+        item,
+        region,
+        balance,
+        minutes,
+        reserved_quantity: reserved_quantities.fetch(item.id, 0)
+      )
+    end
 
     render inertia: "Shop/Index", props: {
       items: items,
@@ -43,7 +52,7 @@ class ShopController < ApplicationController
     Order::ADDRESS_FIELDS.filter_map { |field| current_user.public_send(field).presence }
   end
 
-  def serialize(item, region, balance, minutes)
+  def serialize(item, region, balance, minutes, reserved_quantity: nil)
     cost = item.coin_cost_for(region)
 
     {
@@ -57,7 +66,12 @@ class ShopController < ApplicationController
       stock: item.stock,
       onePerPerson: item.one_per_person,
       minApprovedHours: item.min_approved_hours,
-      unavailableReason: item.unavailable_reason(current_user, approved_minutes: minutes, balance: balance),
+      unavailableReason: item.unavailable_reason(
+        current_user,
+        approved_minutes: minutes,
+        balance: balance,
+        reserved_quantity: reserved_quantity
+      ),
       shortBy: [ cost - balance, 0 ].max
     }
   end

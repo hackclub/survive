@@ -43,6 +43,10 @@ class Project < ApplicationRecord
   before_save :set_normalized_repo_url, if: :will_save_change_to_repo_link?
 
   def submit!
+    unless hackatime_projects.exists?
+      raise NotReadyToSubmit, [{ "reasoning" => "Link a Hackatime project before submitting for review." }]
+    end
+
     result = SurviveCheckService.run(project: self)
     raise NotReadyToSubmit, result["blocking"] if result["blocking"].any?
 
