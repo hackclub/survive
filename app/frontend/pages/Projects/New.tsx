@@ -115,16 +115,16 @@ export default function New({ hackatimeProjects }: { hackatimeProjects: Hackatim
 
             <div className="field">
               <label className="field__label">
-                Hackatime project <span className="u-faint">(optional, required to submit for review)</span>
+                Hackatime project <span className="u-faint">(required to submit for review)</span>
               </label>
 
               {!auth.user?.hackatimeConnected ? (
                 <p className="u-sm u-soft">
-                  Connect Hackatime from your{" "}
-                  <a className="u-accent" href="/camp">
-                    dashboard
+                  Connect Hackatime from{" "}
+                  <a className="u-accent" href="/account">
+                    your account
                   </a>{" "}
-                  to link one now, or do it later from the project page.
+                  and link a project before submitting for review.
                 </p>
               ) : form.data.hackatime_project_name ? (
                 <div className="hackatime-link__row">
