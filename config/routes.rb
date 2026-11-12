@@ -57,7 +57,7 @@ Rails.application.routes.draw do
     end
   end
 
-  get "dashboard" => "dashboard#index", as: :dashboard
+  resources :hike_grants, only: %i[index create] do\n    member { post :add_participants }\n  end\n\n  get "dashboard" => "dashboard#index", as: :dashboard
   get "camp" => "dashboard#camp", as: :camp
   get "docs" => "docs#show", as: :docs
   get "account" => "accounts#show", as: :account
