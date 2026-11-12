@@ -27,6 +27,7 @@ class Admin::HikeGrantsController < ApplicationController
     budget_cents = (BigDecimal(attributes.delete(:budget).to_s) * 100).round
     return redirect_to(admin_hike_grants_path, alert: "Enter a valid budget greater than zero.") unless budget_cents.positive?
 
+    grant = nil
     ActiveRecord::Base.transaction do
       grant = HikeGrant.create!(
         name: attributes[:name],
@@ -46,7 +47,6 @@ class Admin::HikeGrantsController < ApplicationController
       end
     end
 
-    grant = HikeGrant.order(:created_at).last
     audit!("hike_grant.created", target: grant, metadata: { budget_cents: budget_cents, participant_count: emails.size })
     redirect_to admin_hike_grants_path, notice: "Hike grant submitted for admin review."
   rescue ActiveRecord::RecordInvalid, ArgumentError => e
