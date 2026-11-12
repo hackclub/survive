@@ -26,6 +26,8 @@ class CoinPayout < ApplicationRecord
     return existing if existing
 
     review = final_review.review
+    raise ArgumentError, "Test submissions never pay wood." if review.test_submission?
+
     minutes = review.net_approved_minutes.to_i
     rate = rate_per_hour
 

@@ -135,7 +135,7 @@ class User < ApplicationRecord
   end
 
   def approved_minutes
-    approved = Review.approved.joins(:project).where(projects: { user_id: id }).sum(:approved_minutes)
+    approved = Review.approved.real.joins(:project).where(projects: { user_id: id }).sum(:approved_minutes)
     deducted = FinalReview.deducted.joins(review: :project).where(projects: { user_id: id }).sum(:deduction_minutes)
 
     [ approved - deducted, 0 ].max

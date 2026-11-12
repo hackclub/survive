@@ -3,6 +3,7 @@ module Airtable
   # Only writable input fields belong here: never formula, "Automation - *" or "Loops - *" fields.
   class Submission
     ARI_APP_URL = "https://ari.hackclub.com".freeze
+    TEST_BANNER = "TEST SUBMISSION, not a real project. Do not submit to Unified YSWS; delete this row after checking.".freeze
 
     def self.fields(review)
       new(review).fields
@@ -24,7 +25,7 @@ module Airtable
         "Last Name" => maker.last_name,
         "Email" => maker.email,
         "Screenshot" => screenshot,
-        "Description" => project.description.to_s.strip,
+        "Description" => description,
         "GitHub Username" => github_username,
         "Address (Line 1)" => maker.address_line1,
         "Address (Line 2)" => maker.address_line2,
@@ -46,6 +47,11 @@ module Airtable
     end
 
     private
+
+    def description
+      text = project.description.to_s.strip
+      review.test_submission? ? "[#{TEST_BANNER}]\n\n#{text}" : text
+    end
 
     def screenshot
       url = PublicUrl.for_attachment(project.banner)
@@ -73,6 +79,7 @@ module Airtable
       return nil if hours.nil?
 
       lines = []
+      lines << TEST_BANNER if review.test_submission?
       lines << "Approved in Ari by #{reviewer} for #{format('%.2f', hours)} hours" \
         "#{" (#{review.round.ordinalize} ship)" if review.round > 1}."
       names = hackatime_names

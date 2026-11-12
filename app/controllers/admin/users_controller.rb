@@ -59,7 +59,7 @@ class Admin::UsersController < ApplicationController
   def approved_minutes_for(ids)
     return {} if ids.empty?
 
-    approved = Review.approved
+    approved = Review.approved.real
       .joins(:project)
       .where(projects: { user_id: ids })
       .group("projects.user_id")

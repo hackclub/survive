@@ -4,6 +4,7 @@ module Ari
     REQUIRED_MAKER = %w[email name slack_id].freeze
     EVIDENCE = %w[commits elapsed].freeze
     TRACK = "software".freeze
+    TEST_NOTE = "Admin test of the Ari to Airtable pipeline, not a real ship. Decide freely; it never pays wood.".freeze
 
     def self.build(review)
       new(review).build
@@ -21,7 +22,7 @@ module Ari
       payload = {
         "external_id" => project.ari_external_id,
         "ingest_version" => review.ingest_version,
-        "title" => project.name,
+        "title" => review.test_submission? ? "[TEST] #{project.name}" : project.name,
         "description" => project.description.to_s.strip,
         "maker" => maker_payload,
         "repo_url" => project.repo_link,
@@ -56,7 +57,9 @@ module Ari
 
     def meta
       page = PublicUrl.project(project)
-      page ? { "Project page" => page } : {}
+      meta = page ? { "Project page" => page } : {}
+      meta["Test submission"] = TEST_NOTE if review.test_submission?
+      meta
     end
 
     def validate!(payload)

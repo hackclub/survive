@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_100000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -129,6 +129,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_090000) do
     t.index ["status"], name: "index_final_reviews_on_status"
   end
 
+  create_table "hackatime_projects", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "project_id"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["project_id"], name: "index_hackatime_projects_on_project_id"
+    t.index ["user_id", "name"], name: "index_hackatime_projects_on_user_id_and_name", unique: true
+    t.index ["user_id"], name: "index_hackatime_projects_on_user_id"
+  end
+
   create_table "hike_grant_participants", force: :cascade do |t|
     t.integer "allocation_cents", null: false
     t.datetime "created_at", null: false
@@ -165,17 +176,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_090000) do
     t.index ["created_by_id"], name: "index_hike_grants_on_created_by_id"
     t.index ["reviewed_by_id"], name: "index_hike_grants_on_reviewed_by_id"
     t.index ["status"], name: "index_hike_grants_on_status"
-  end
-
-  create_table "hackatime_projects", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.string "name", null: false
-    t.bigint "project_id"
-    t.datetime "updated_at", null: false
-    t.bigint "user_id", null: false
-    t.index ["project_id"], name: "index_hackatime_projects_on_project_id"
-    t.index ["user_id", "name"], name: "index_hackatime_projects_on_user_id_and_name", unique: true
-    t.index ["user_id"], name: "index_hackatime_projects_on_user_id"
   end
 
   create_table "orders", force: :cascade do |t|
@@ -264,6 +264,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_090000) do
     t.text "reviewer_notes"
     t.integer "round", null: false
     t.integer "state", default: 0, null: false
+    t.boolean "test_submission", default: false, null: false
     t.datetime "updated_at", null: false
     t.index ["airtable_record_id"], name: "index_reviews_on_airtable_record_id", unique: true
     t.index ["ari_phase"], name: "index_reviews_on_ari_phase"
@@ -492,12 +493,12 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_090000) do
   add_foreign_key "final_reviews", "reviews"
   add_foreign_key "final_reviews", "users", column: "claimed_by_id"
   add_foreign_key "final_reviews", "users", column: "reviewer_id"
+  add_foreign_key "hackatime_projects", "projects"
+  add_foreign_key "hackatime_projects", "users"
   add_foreign_key "hike_grant_participants", "hike_grants"
   add_foreign_key "hike_grant_participants", "users"
   add_foreign_key "hike_grants", "users", column: "created_by_id"
   add_foreign_key "hike_grants", "users", column: "reviewed_by_id"
-  add_foreign_key "hackatime_projects", "projects"
-  add_foreign_key "hackatime_projects", "users"
   add_foreign_key "orders", "projects", column: "fraud_related_project_id"
   add_foreign_key "orders", "shop_items"
   add_foreign_key "orders", "users"

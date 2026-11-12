@@ -42,7 +42,8 @@ class ProjectsController < ApplicationController
       project: @project.as_client_json,
       can: {
         update: policy(@project).update?,
-        submitForReview: policy(@project).submit_for_review?
+        submitForReview: policy(@project).submit_for_review?,
+        submitTest: policy(@project).submit_test?
       },
       checks: checks_for(@project),
       hackatimeProjects: current_user.hackatime_projects.where(project_id: [ nil, @project.id ]).order(:name).map { |hackatime_project|
@@ -65,7 +66,13 @@ class ProjectsController < ApplicationController
       return
     end
 
-    if params[:submit_for_review].present?
+    if params[:submit_as_test].present?
+      authorize @project, :submit_test?
+      review = @project.submit!(as_test: true)
+      audit!("project.test_submitted", target: review, metadata: { project: @project.name,
+        skipped_checks: Array(review.checks&.dig("blocking")).map { |check| check["reasoning"] } })
+      redirect_to project_path(@project), notice: "Sent to Ari as a test. It won't pay wood or count toward hours."
+    elsif params[:submit_for_review].present?
       authorize @project, :submit_for_review?
       @project.submit!
       redirect_to project_path(@project), notice: "Submitted for review!"
