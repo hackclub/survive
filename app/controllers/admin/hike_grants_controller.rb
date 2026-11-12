@@ -26,6 +26,7 @@ class Admin::HikeGrantsController < ApplicationController
 
     budget_cents = (BigDecimal(attributes.delete(:budget).to_s) * 100).round
     return redirect_to(admin_hike_grants_path, alert: "Enter a valid budget greater than zero.") unless budget_cents.positive?
+    return redirect_to(admin_hike_grants_path, alert: "The budget must be at least $0.01 per participant.") if budget_cents < users.size
 
     grant = nil
     ActiveRecord::Base.transaction do
