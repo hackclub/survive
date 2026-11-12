@@ -54,6 +54,45 @@ class Admin::HikeGrantsController < ApplicationController
     redirect_to admin_hike_grants_path, alert: e.message
   end
 
+  def add_participants
+    authorize :hike_grant, :manage?
+    grant = HikeGrant.find(params[:id])
+    return redirect_to(admin_hike_grants_path, alert: "Participants can only be added while a hike grant is awaiting review.") unless grant.pending?
+
+    emails = params[:participant_emails].to_s.split(/[\\s,;]+/).map { |email| email.strip.downcase }.reject(&:blank?).uniq
+    return redirect_to(admin_hike_grants_path, alert: "Enter at least one participant email.") if emails.empty?
+
+    users = User.where("LOWER(email) IN (?)", emails).index_by { |user| user.email.downcase }
+    missing = emails - users.keys
+    return redirect_to(admin_hike_grants_path, alert: "These emails are not registered Survive users: #{missing.join(", ")}") if missing.any?
+
+    added_count = 0
+    ActiveRecord::Base.transaction do
+      grant.lock!
+      raise ArgumentError, "Participants can only be added while a hike grant is awaiting review." unless grant.pending?
+
+      existing_ids = grant.participants.pluck(:user_id)
+      new_users = users.values.reject { |user| existing_ids.include?(user.id) }
+      return redirect_to(admin_hike_grants_path, alert: "Those users are already on this hike grant.") if new_users.empty?
+
+      participant_count = existing_ids.size + new_users.size
+      raise ArgumentError, "The budget must be at least $0.01 per participant." if grant.budget_cents < participant_count
+
+      new_users.each { |user| grant.participants.create!(user: user, allocation_cents: 1) }
+      participants = grant.participants.order(:id).to_a
+      base, remainder = grant.budget_cents.divmod(participants.size)
+      participants.each_with_index do |participant, index|
+        participant.update!(allocation_cents: base + (index < remainder ? 1 : 0))
+      end
+      added_count = new_users.size
+    end
+
+    audit!("hike_grant.participants_added", target: grant, metadata: { participant_count: added_count, total_participants: grant.participants.count })
+    redirect_to admin_hike_grants_path, notice: "Added #{added_count} participant#{'s' unless added_count == 1}. All allocations have been recalculated evenly."
+  rescue ArgumentError, ActiveRecord::RecordInvalid => e
+    redirect_to admin_hike_grants_path, alert: e.message
+  end
+
   def decide
     authorize :hike_grant, :manage?
     grant = HikeGrant.find(params[:id])
