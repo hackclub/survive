@@ -16,7 +16,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: "overview#index"
-    resources :hike_grants, only: :index
+    resources :hike_grants, only: %i[index create] do\n      member do\n        post :decide\n        post "participants/:participant_id/issue" => "hike_grants#issue_participant", as: :issue_participant\n      end\n    end
     resources :audit_logs, only: :index
     resources :shop_items
     resources :docs, only: %i[index new create edit update destroy]
