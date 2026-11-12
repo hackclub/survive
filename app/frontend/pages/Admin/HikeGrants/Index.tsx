@@ -1,4 +1,5 @@
 import { Head } from "@inertiajs/react"
+import type { ReactNode } from "react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 
 function Section({
@@ -8,7 +9,7 @@ function Section({
 }: {
   number: string
   title: string
-  children: React.ReactNode
+  children: ReactNode
 }) {
   return (
     <section className="card" style={{ padding: "var(--sp-4)", marginBottom: "var(--sp-3)" }}>
