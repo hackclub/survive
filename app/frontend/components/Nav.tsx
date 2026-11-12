@@ -7,6 +7,7 @@ import type { SharedProps } from "../types"
 const LINKS = [
   { label: "Dashboard", href: "/dashboard" },
   { label: "Camp", href: "/camp" },
+  { label: "Hikes", href: "/hike_grants" },
   { label: "Shop", href: "/shop" },
   { label: "Orders", href: "/orders" },
 ]
