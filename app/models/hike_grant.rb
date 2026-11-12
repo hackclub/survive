@@ -4,6 +4,7 @@ class HikeGrant < ApplicationRecord
   has_many :participants, class_name: "HikeGrantParticipant", dependent: :destroy
 
   enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3, paid: 4, completed: 5 }
+  enum :visibility, { public: 0, private: 1 }
 
   validates :name, :trail, :region, :meeting_point, :starts_at, presence: true
   validates :budget_cents, numericality: { only_integer: true, greater_than: 0 }
