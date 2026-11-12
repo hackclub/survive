@@ -1,7 +1,6 @@
 import { useEffect } from "react"
 import { Head, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
-import { Hub } from "../../components/Hub"
 import { Trail } from "./Trail"
 import { Faq } from "./Faq"
 import { Footer } from "./Footer"
@@ -18,12 +17,10 @@ import tent from "../../images/tent.webp"
 import campfire from "../../images/campfire.webp"
 
 export default function Index() {
-  const { auth, signInPath } = usePage<SharedProps>().props
+  const { signInPath } = usePage<SharedProps>().props
   const [stack, ready] = useImagesReady<HTMLDivElement>()
 
   useEffect(() => initMotion(), [])
-
-  if (auth.user) return <Hub />
 
   return (
     <>

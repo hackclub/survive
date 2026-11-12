@@ -94,16 +94,27 @@
   inset-block-start: calc(100% + 0.5rem);
   inset-inline-start: 50%;
   translate: -50%;
-  padding: 0.4rem 1rem;
+  display: grid;
+  justify-items: center;
+  gap: 0.1rem;
+  padding: 0.4rem 0.95rem;
   border-radius: var(--r);
-  background: var(--slate-900);
+  background: rgba(16, 22, 30, 0.82);
   border: 1px solid var(--line-invert);
+  backdrop-filter: blur(6px);
   color: var(--bone);
   font-size: var(--fs-sm);
   font-weight: 700;
+  line-height: 1.2;
   white-space: nowrap;
-  opacity: 0;
-  transition: opacity 120ms ease-out;
+  box-shadow: 0 8px 24px -12px rgba(0, 0, 0, 0.8);
+  transition: background-color 120ms ease-out, translate 120ms ease-out;
+}
+
+.hub__label small {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: rgba(232, 230, 223, 0.7);
 }
 
 .hub__spot--tent .hub__label {
@@ -113,17 +124,189 @@
 
 .hub__spot:hover .hub__label,
 .hub__spot:focus-visible .hub__label {
-  opacity: 1;
+  background: var(--rust-500);
+  translate: -50% -2px;
+}
+
+.hub__spot:hover .hub__label small,
+.hub__spot:focus-visible .hub__label small {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* Heads-up layer over the scene: top bar plus a small "your camp" card. */
+.hud-bar {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-3);
+  padding: var(--sp-4) var(--gutter);
+  background: linear-gradient(to bottom, rgba(16, 22, 30, 0.7), transparent);
+  color: var(--bone);
+}
+
+.hud-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-weight: 800;
+  font-size: 1.05rem;
+}
+
+.hud-brand img {
+  width: 30px;
+  height: auto;
+}
+
+.hud-bar__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.hud-bar__link {
+  position: relative;
+  padding: 0.4rem 0.7rem;
+  border-radius: var(--r);
+  font-size: var(--fs-sm);
+  font-weight: 600;
+  color: rgba(232, 230, 223, 0.85);
+}
+
+.hud-bar__link:hover,
+.hud-bar__link:focus-visible {
+  background: rgba(16, 22, 30, 0.6);
+  color: var(--bone);
+}
+
+.hud-card {
+  position: absolute;
+  inset-block-end: var(--sp-6);
+  inset-inline-start: var(--gutter);
+  z-index: 3;
+  width: min(23rem, calc(100% - 2 * var(--gutter)));
+  padding: var(--sp-5);
+  border-radius: calc(var(--r) * 2);
+  background: rgba(16, 22, 30, 0.8);
+  border: 1px solid var(--line-invert);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 48px -18px rgba(0, 0, 0, 0.85);
+  color: var(--bone);
+}
+
+.hud-card__hello {
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.hud-card__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-4);
+}
+
+.hud-card__stats div {
+  display: flex;
+  flex-direction: column-reverse;
+  gap: 0.1rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: var(--r);
+  background: rgba(232, 230, 223, 0.06);
+}
+
+.hud-card__stats dd {
+  font-size: 1.15rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+}
+
+.hud-card__stats dt {
+  font-size: var(--fs-label);
+  font-weight: 600;
+  color: rgba(232, 230, 223, 0.65);
+}
+
+.hud-card__next {
+  display: block;
+  margin-block-start: var(--sp-4);
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: rgba(232, 230, 223, 0.82);
+}
+
+a.hud-card__next:hover {
+  color: var(--bone);
+}
+
+.hud-card__next--alert {
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--r);
+  border-inline-start: 3px solid var(--ember);
+  background: rgba(242, 163, 63, 0.1);
+}
+
+.hud-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-block-start: var(--sp-5);
 }
 
 @media (max-width: 700px) {
+  /* Lift the scene so the tent and fire sit above the camp card. */
   .hub__stage {
-    translate: -42% -50%;
+    translate: -42% -76%;
   }
 
   .hub__label {
     font-size: var(--fs-xs);
     padding: 0.3rem 0.7rem;
+  }
+
+  .hud-bar__link {
+    display: none;
+  }
+
+  /* Below the fire there is no room above the camp card, so the sign sits beside it. */
+  .hub__spot--fire .hub__label,
+  .hub__spot--fire:hover .hub__label,
+  .hub__spot--fire:focus-visible .hub__label {
+    inset-block-start: 50%;
+    inset-inline-start: auto;
+    inset-inline-end: calc(100% + 0.4rem);
+    translate: 0 -50%;
+  }
+
+  .hud-card {
+    inset-inline: var(--sp-3);
+    inset-block-end: var(--sp-3);
+    width: auto;
+    padding: var(--sp-4);
+  }
+
+  .hud-card__hello {
+    font-size: 1.1rem;
+  }
+
+  .hud-card__stats {
+    display: none;
+  }
+
+  .hud-card__next {
+    margin-block-start: var(--sp-2);
+  }
+
+  .hud-card__actions {
+    margin-block-start: var(--sp-3);
+  }
+
+  .hud-card__actions .btn {
+    flex: 1;
   }
 }
 

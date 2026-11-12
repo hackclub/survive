@@ -2,12 +2,12 @@ class DashboardController < ApplicationController
   STAGE_ORDER = %w[returned ari final sent draft paid].freeze
 
   def index
-    render inertia: "Dashboard/Hub"
+    render inertia: "Dashboard/Hub", props: { camp: CampSummary.for(current_user) }
   end
 
   def camp
     projects = current_user.projects
-      .includes({ reviews: :coin_payout }, banner_attachment: :blob)
+      .includes({ reviews: :coin_payout }, banner_attachment: { blob: { variant_records: { image_attachment: :blob } } })
       .order(updated_at: :desc)
       .to_a
 

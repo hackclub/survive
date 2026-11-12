@@ -16,7 +16,10 @@ class Project < ApplicationRecord
   has_many :hackatime_projects, dependent: :nullify
   has_many :project_events, dependent: :destroy
   has_many :reviews, -> { order(:round) }, inverse_of: :project, dependent: :destroy
-  has_one_attached :banner
+  has_one_attached :banner do |attachable|
+    # Banners can be 5 MB originals. Pages show this resized copy, made in a background job on upload.
+    attachable.variant :card, resize_to_limit: [ 1200, 900 ], format: :webp, saver: { quality: 80 }, preprocessed: true
+  end
 
   BANNER_CONTENT_TYPES = %w[image/png image/jpeg image/webp image/gif].freeze
   BANNER_MAX_SIZE = 5.megabytes
@@ -122,9 +125,7 @@ class Project < ApplicationRecord
   end
 
   def banner_url
-    return nil unless banner.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(banner, only_path: true)
+    ImageUrl.for(banner, :card)
   end
 
   def as_client_json
