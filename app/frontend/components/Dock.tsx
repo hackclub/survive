@@ -39,6 +39,7 @@ export function Dock() {
           key={item.href}
           className={`dock__link${isActive(path, item.href) ? " is-active" : ""}`}
           href={item.href}
+          prefetch
         >
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d={item.path} />
