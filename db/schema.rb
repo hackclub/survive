@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_11_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -127,6 +127,44 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_090000) do
     t.index ["review_id"], name: "index_final_reviews_on_review_id", unique: true
     t.index ["reviewer_id"], name: "index_final_reviews_on_reviewer_id"
     t.index ["status"], name: "index_final_reviews_on_status"
+  end
+
+  create_table "hike_grant_participants", force: :cascade do |t|
+    t.integer "allocation_cents", null: false
+    t.datetime "created_at", null: false
+    t.string "hcb_grant_id"
+    t.string "hcb_grant_url"
+    t.bigint "hike_grant_id", null: false
+    t.datetime "issued_at"
+    t.text "notes"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["hike_grant_id", "user_id"], name: "index_hike_grant_participants_on_grant_and_user", unique: true
+    t.index ["hike_grant_id"], name: "index_hike_grant_participants_on_hike_grant_id"
+    t.index ["user_id"], name: "index_hike_grant_participants_on_user_id"
+  end
+
+  create_table "hike_grants", force: :cascade do |t|
+    t.integer "budget_cents", null: false
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.bigint "created_by_id", null: false
+    t.text "decision_reason"
+    t.string "meeting_point", null: false
+    t.string "name", null: false
+    t.text "notes"
+    t.datetime "paid_at"
+    t.string "region", null: false
+    t.datetime "reviewed_at"
+    t.bigint "reviewed_by_id"
+    t.datetime "starts_at", null: false
+    t.integer "status", default: 0, null: false
+    t.string "trail", null: false
+    t.datetime "updated_at", null: false
+    t.index ["created_by_id"], name: "index_hike_grants_on_created_by_id"
+    t.index ["reviewed_by_id"], name: "index_hike_grants_on_reviewed_by_id"
+    t.index ["status"], name: "index_hike_grants_on_status"
   end
 
   create_table "hackatime_projects", force: :cascade do |t|
@@ -454,6 +492,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_11_090000) do
   add_foreign_key "final_reviews", "reviews"
   add_foreign_key "final_reviews", "users", column: "claimed_by_id"
   add_foreign_key "final_reviews", "users", column: "reviewer_id"
+  add_foreign_key "hike_grant_participants", "hike_grants"
+  add_foreign_key "hike_grant_participants", "users"
+  add_foreign_key "hike_grants", "users", column: "created_by_id"
+  add_foreign_key "hike_grants", "users", column: "reviewed_by_id"
   add_foreign_key "hackatime_projects", "projects"
   add_foreign_key "hackatime_projects", "users"
   add_foreign_key "orders", "projects", column: "fraud_related_project_id"
