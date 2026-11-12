@@ -1,116 +1,235 @@
-import { Head } from "@inertiajs/react"
-import type { ReactNode } from "react"
+import { useState } from "react"
+import { Head, router } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
+import { Status } from "../../../components/Status"
 
-function Section({
-  number,
-  title,
-  children,
-}: {
-  number: string
-  title: string
-  children: ReactNode
+type Participant = {
+  id: number
+  userId: number
+  name: string
+  email: string
+  allocationCents: number
+  status: string
+  hcbGrantId: string | null
+  hcbGrantUrl: string | null
+  issuedAt: string | null
+}
+
+type Grant = {
+  id: number
+  name: string
+  trail: string
+  region: string
+  meetingPoint: string
+  startsAt: string
+  budgetCents: number
+  allocatedCents: number
+  status: string
+  notes: string | null
+  decisionReason: string | null
+  createdBy: string
+  reviewedBy: string | null
+  participants: Participant[]
+}
+
+const money = (cents: number) => new Intl.NumberFormat("en-AU", {
+  style: "currency",
+  currency: "AUD",
+}).format(cents / 100)
+
+const tone = (status: string): "neutral" | "ok" | "warn" | "bad" => {
+  if (status === "approved" || status === "paid" || status === "completed" || status === "issued") return "ok"
+  if (status === "rejected" || status === "cancelled") return "bad"
+  if (status === "pending" || status === "allocated") return "warn"
+  return "neutral"
+}
+
+export default function Index({ grants, stats }: {
+  grants: Grant[]
+  stats: { total: number; pending: number; approved: number; allocatedCents: number }
 }) {
-  return (
-    <section className="card" style={{ padding: "var(--sp-4)", marginBottom: "var(--sp-3)" }}>
-      <p className="u-label u-faint">{number}</p>
-      <h2 className="u-h3" style={{ margin: "var(--sp-1) 0 var(--sp-2)" }}>{title}</h2>
-      <div className="u-soft">{children}</div>
-    </section>
-  )
-}
+  const [showForm, setShowForm] = useState(false)
+  const [name, setName] = useState("")
+  const [trail, setTrail] = useState("")
+  const [region, setRegion] = useState("")
+  const [meetingPoint, setMeetingPoint] = useState("")
+  const [startsAt, setStartsAt] = useState("")
+  const [budget, setBudget] = useState("")
+  const [participantEmails, setParticipantEmails] = useState("")
+  const [rejecting, setRejecting] = useState<number | null>(null)
+  const [reason, setReason] = useState("")
+  const [issuing, setIssuing] = useState<number | null>(null)
+  const [hcbId, setHcbId] = useState("")
+  const [hcbUrl, setHcbUrl] = useState("")
 
-function Item({ children }: { children: React.ReactNode }) {
-  return <li style={{ marginBottom: "var(--sp-2)" }}>{children}</li>
-}
+  function createGrant(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    router.post("/admin/hike_grants", {
+      hike_grant: { name, trail, region, meeting_point: meetingPoint, starts_at: startsAt, budget },
+      participant_emails: participantEmails,
+    }, {
+      onSuccess: () => {
+        setShowForm(false)
+        setName("")
+        setTrail("")
+        setRegion("")
+        setMeetingPoint("")
+        setStartsAt("")
+        setBudget("")
+        setParticipantEmails("")
+      },
+    })
+  }
 
-export default function HikeGrants() {
+  function decide(id: number, decision: "approve" | "reject") {
+    router.post(`/admin/hike_grants/${id}/decide`, { decision, reason }, {
+      onSuccess: () => {
+        setRejecting(null)
+        setReason("")
+      },
+    })
+  }
+
+  function recordIssue(grantId: number, participantId: number) {
+    router.post(`/admin/hike_grants/${grantId}/participants/${participantId}/issue`, {
+      hcb_grant_id: hcbId,
+      hcb_grant_url: hcbUrl,
+    }, {
+      onSuccess: () => {
+        setIssuing(null)
+        setHcbId("")
+        setHcbUrl("")
+      },
+    })
+  }
+
   return (
     <>
       <Head title="Hike Grants - Admin - Survive" />
-      <AdminSidebarLayout eyebrow="Admin · Ideas" title="🥾 Hike Grants">
-        <div style={{ maxWidth: 900 }}>
-          <div className="card" style={{ padding: "var(--sp-4)", marginBottom: "var(--sp-4)" }}>
-            <p className="u-label u-faint">Concept proposal · Not yet launched</p>
-            <p className="u-lead" style={{ marginTop: "var(--sp-2)" }}>
-              Help Hack Clubbers get outside together. Participants opt in, find other people in
-              their region, organise a group hike and request one shared grant to make it happen.
-            </p>
-            <p className="u-sm u-faint" style={{ marginTop: "var(--sp-3)" }}>
-              This is an internal planning page. No participant sign-ups, grant applications,
-              payouts or location data are collected by this page.
-            </p>
-          </div>
-
+      <AdminSidebarLayout eyebrow="Admin · Funding" title="🥾 Hike Grants">
+        <div style={{ maxWidth: 1100 }}>
           <div className="mystats__grid" style={{ marginBottom: "var(--sp-4)" }}>
-            <div className="mystats__tile"><span className="mystats__number">1</span><span className="u-xs u-faint">Grant per hike</span></div>
-            <div className="mystats__tile"><span className="mystats__number">5 / hr</span><span className="u-xs u-faint">Proposed funding rate · clarify</span></div>
-            <div className="mystats__tile"><span className="mystats__number">HCB</span><span className="u-xs u-faint">Card grant payouts</span></div>
+            <div className="mystats__tile"><span className="mystats__number">{stats.total}</span><span className="u-xs u-faint">Total hikes</span></div>
+            <div className="mystats__tile"><span className="mystats__number">{stats.pending}</span><span className="u-xs u-faint">Awaiting review</span></div>
+            <div className="mystats__tile"><span className="mystats__number">{stats.approved}</span><span className="u-xs u-faint">Approved</span></div>
+            <div className="mystats__tile"><span className="mystats__number">{money(stats.allocatedCents)}</span><span className="u-xs u-faint">Allocated to hikers</span></div>
           </div>
 
-          <Section number="01 · DISCOVER" title="Opt-in regional matching">
-            <ul>
-              <Item>Participants explicitly opt in to appear on a “Hikers near you” page.</Item>
-              <Item>Show city or broad region only. Never show exact addresses or live locations.</Item>
-              <Item>Let people discover potential hiking groups without exposing personal location details.</Item>
-            </ul>
-          </Section>
+          <div className="card" style={{ padding: "var(--sp-4)", marginBottom: "var(--sp-4)" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}>
+              <div>
+                <p className="u-label u-faint">Internal admin tool</p>
+                <p className="u-sm u-soft">Create a hike grant, split its budget between registered participants, review it, then record each individual HCB card grant.</p>
+              </div>
+              <button className="btn btn--primary" type="button" onClick={() => setShowForm(!showForm)}>
+                {showForm ? "Close form" : "＋ New hike grant"}
+              </button>
+            </div>
 
-          <Section number="02 · ORGANISE" title="Create a hike and bring a group together">
-            <ul>
-              <Item>A participant starts a hike with a trail, public meeting point and date.</Item>
-              <Item>Other opted-in participants can view the plan and request to join.</Item>
-              <Item>Each hike gets a group conversation space so attendees can coordinate plans, transport and what to bring.</Item>
-              <Item>Use clear participant limits, organiser details and safety expectations before a hike is confirmed.</Item>
-            </ul>
-          </Section>
+            {showForm && (
+              <form onSubmit={createGrant} style={{ marginTop: "var(--sp-4)", display: "grid", gap: "var(--sp-3)" }}>
+                <div className="form-grid">
+                  <label className="field"><span className="field__label">Hike name</span><input className="field__input" required value={name} onChange={e => setName(e.target.value)} placeholder="Blue Mountains day hike" /></label>
+                  <label className="field"><span className="field__label">Trail</span><input className="field__input" required value={trail} onChange={e => setTrail(e.target.value)} placeholder="Grand Canyon Track" /></label>
+                  <label className="field"><span className="field__label">Region</span><input className="field__input" required value={region} onChange={e => setRegion(e.target.value)} placeholder="Sydney, NSW" /></label>
+                  <label className="field"><span className="field__label">Public meeting point</span><input className="field__input" required value={meetingPoint} onChange={e => setMeetingPoint(e.target.value)} placeholder="Central Station, main concourse" /></label>
+                  <label className="field"><span className="field__label">Date and time</span><input className="field__input" type="datetime-local" required value={startsAt} onChange={e => setStartsAt(e.target.value)} /></label>
+                  <label className="field"><span className="field__label">Total budget (AUD)</span><input className="field__input" type="number" min="0.01" step="0.01" required value={budget} onChange={e => setBudget(e.target.value)} placeholder="200.00" /></label>
+                </div>
+                <label className="field">
+                  <span className="field__label">Participant emails</span>
+                  <textarea className="field__input" rows={3} required value={participantEmails} onChange={e => setParticipantEmails(e.target.value)} placeholder="one@hackclub.com, two@hackclub.com" />
+                  <span className="u-xs u-faint">Only existing Survive accounts are accepted. Separate emails with commas or new lines. The budget is split evenly, including leftover cents.</span>
+                </label>
+                <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--sp-2)" }}>
+                  <button className="btn btn--quiet" type="button" onClick={() => setShowForm(false)}>Cancel</button>
+                  <button className="btn btn--primary" type="submit">Create and submit for review</button>
+                </div>
+              </form>
+            )}
+          </div>
 
-          <Section number="03 · FUND" title="One grant request per hike">
-            <ul>
-              <Item>One application covers the whole group, rather than separate requests from every hiker.</Item>
-              <Item>Break the budget into travel, picnic food and required gear.</Item>
-              <Item>Set a per-person cap and calculate the total request from the confirmed group size.</Item>
-              <Item>All requests receive human review before any money is committed.</Item>
-              <Item>Approved funds are distributed as HCB card grants, with clear spending and receipt requirements.</Item>
-            </ul>
-          </Section>
+          {grants.length === 0 ? (
+            <div className="dashboard__empty"><p className="u-lead">No hike grants yet.</p><p className="u-sm u-faint">Create the first one to start managing group funding.</p></div>
+          ) : (
+            <div style={{ display: "grid", gap: "var(--sp-3)" }}>
+              {grants.map(grant => (
+                <section className="card" key={grant.id} style={{ padding: "var(--sp-4)" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "var(--sp-3)", flexWrap: "wrap" }}>
+                    <div>
+                      <div style={{ display: "flex", alignItems: "center", gap: "var(--sp-2)", flexWrap: "wrap" }}>
+                        <h2 className="u-h3">{grant.name}</h2>
+                        <Status tone={tone(grant.status)}>{grant.status}</Status>
+                      </div>
+                      <p className="u-sm u-soft" style={{ marginTop: "var(--sp-1)" }}>{grant.trail} · {grant.region} · {grant.startsAt}</p>
+                      <p className="u-xs u-faint">Meet at {grant.meetingPoint} · Created by {grant.createdBy}{grant.reviewedBy ? ` · Reviewed by ${grant.reviewedBy}` : ""}</p>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <p className="u-h3">{money(grant.budgetCents)}</p>
+                      <p className="u-xs u-faint">{grant.participants.length} hikers · {money(grant.allocatedCents)} allocated</p>
+                    </div>
+                  </div>
 
-          <Section number="04 · AFTER THE HIKE" title="Close-out and continued eligibility">
-            <ul>
-              <Item>The organiser submits a group photo and a short write-up after the hike.</Item>
-              <Item>Record whether the grant was used as approved and whether any funds need to be reconciled.</Item>
-              <Item>Submitting the close-out keeps the group eligible for future Hike Grants.</Item>
-            </ul>
-          </Section>
+                  {grant.decisionReason && <p className="u-sm" style={{ marginTop: "var(--sp-2)" }}>Reason: {grant.decisionReason}</p>}
 
-          <Section number="05 · EXPLORE" title="World map of planned hikes">
-            <ul>
-              <Item>Show planned hikes on a world map using approximate public trail or meeting-point locations.</Item>
-              <Item>Map pins open a hike summary with date, region, trail and available places.</Item>
-              <Item>Do not map participant homes, exact personal locations or private travel details.</Item>
-            </ul>
-            <p className="u-sm u-faint">Map is a proposed feature; no live hikes are displayed yet.</p>
-          </Section>
+                  <div style={{ marginTop: "var(--sp-3)", overflowX: "auto" }}>
+                    <table className="data-table">
+                      <thead><tr><th>Participant</th><th>Individual share</th><th>Status</th><th>HCB reference</th><th></th></tr></thead>
+                      <tbody>
+                        {grant.participants.map(participant => (
+                          <tr key={participant.id}>
+                            <td><strong>{participant.name}</strong><div className="u-xs u-faint">{participant.email}</div></td>
+                            <td className="u-mono">{money(participant.allocationCents)}</td>
+                            <td><Status tone={tone(participant.status)}>{participant.status}</Status></td>
+                            <td className="u-xs u-faint">{participant.hcbGrantUrl ? <a href={participant.hcbGrantUrl} target="_blank" rel="noreferrer">{participant.hcbGrantId || "Open HCB grant"}</a> : participant.hcbGrantId || "—"}</td>
+                            <td>
+                              {(grant.status === "approved" || grant.status === "paid") && participant.status !== "issued" && (
+                                <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setIssuing(participant.id); setHcbId(""); setHcbUrl("") }}>Record HCB grant</button>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                        {issuing && grant.participants.some(p => p.id === issuing) && (
+                          <tr><td colSpan={5}>
+                            <div style={{ display: "grid", gap: "var(--sp-2)" }}>
+                              <p className="u-sm">After creating this participant's card grant in HCB, record its reference here.</p>
+                              <input className="field__input" value={hcbId} onChange={e => setHcbId(e.target.value)} placeholder="HCB card grant ID / reference" />
+                              <input className="field__input" value={hcbUrl} onChange={e => setHcbUrl(e.target.value)} placeholder="HCB grant URL (optional)" />
+                              <div style={{ display: "flex", gap: "var(--sp-2)" }}>
+                                <button className="btn btn--primary btn--sm" type="button" disabled={!hcbId.trim()} onClick={() => recordIssue(grant.id, issuing)}>Save issued grant</button>
+                                <button className="btn btn--quiet btn--sm" type="button" onClick={() => setIssuing(null)}>Cancel</button>
+                              </div>
+                            </div>
+                          </td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
 
-          <Section number="06 · FUNDING MODEL" title="Entry rate and hourly funding">
-            <ul>
-              <Item>Explore a consistent entry rate so every hiker contributes the same amount, with the rate visible before joining.</Item>
-              <Item>The proposal also mentions “5/hour of funding”. Confirm the currency, whether this means per hiker-hour or per hike-hour, and how it interacts with the entry rate.</Item>
-              <Item>Publish the per-person cap and total available funding before applications open.</Item>
-            </ul>
-          </Section>
-
-          <section className="card" style={{ padding: "var(--sp-4)", marginBottom: "var(--sp-3)" }}>
-            <p className="u-label u-faint">Before launch · Admin decisions</p>
-            <ul style={{ marginTop: "var(--sp-2)" }}>
-              <Item>Confirm what “5/hour” means and set the currency and calculation.</Item>
-              <Item>Decide the shared entry rate, per-person grant cap and overall grant budget.</Item>
-              <Item>Define eligibility, minimum/maximum group size and organiser responsibilities.</Item>
-              <Item>Agree on safeguarding, consent, emergency contacts, weather cancellation and transport rules.</Item>
-              <Item>Confirm HCB card grant logistics, receipts, unused funds and approval ownership.</Item>
-              <Item>Choose how the map, opt-in directory and group chat will be built and moderated.</Item>
-            </ul>
-          </section>
+                  {grant.status === "pending" && (
+                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--sp-2)", marginTop: "var(--sp-3)" }}>
+                      {rejecting === grant.id ? (
+                        <div style={{ display: "flex", gap: "var(--sp-2)", flex: 1 }}>
+                          <input className="field__input" value={reason} onChange={e => setReason(e.target.value)} placeholder="Reason for rejection" />
+                          <button className="btn btn--danger btn--sm" type="button" disabled={!reason.trim()} onClick={() => decide(grant.id, "reject")}>Confirm reject</button>
+                          <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setRejecting(null); setReason("") }}>Cancel</button>
+                        </div>
+                      ) : (
+                        <>
+                          <button className="btn btn--quiet btn--sm" type="button" onClick={() => setRejecting(grant.id)}>Reject</button>
+                          <button className="btn btn--primary btn--sm" type="button" onClick={() => decide(grant.id, "approve")}>Approve allocations</button>
+                        </>
+                      )}
+                    </div>
+                  )}
+                  {grant.status === "approved" && (
+                    <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>Approved. Create one separate HCB card grant for each participant using the individual amounts above, then record each reference. The dashboard does not issue money automatically.</p>
+                  )}
+                  {grant.status === "paid" && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>Every participant's HCB grant has been recorded.</p>}
+                </section>
+              ))}
+            </div>
+          )}
         </div>
       </AdminSidebarLayout>
     </>
