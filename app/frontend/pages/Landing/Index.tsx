@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { Head, usePage } from "@inertiajs/react"
-import { Nav } from "../../components/Nav"\nimport { ImageCarousel } from "../../components/ImageCarousel"
+import { Nav } from "../../components/Nav"
+import { ImageCarousel } from "../../components/ImageCarousel"
 import { Trail } from "./Trail"
 import { Faq } from "./Faq"
 import { Footer } from "./Footer"
@@ -79,7 +80,8 @@ export default function Index() {
           </div>
         </header>
 
-        {galleryImages.length > 0 && <div className="wrap" style={{ paddingTop: "var(--sp-6)" }}><ImageCarousel images={galleryImages} label="Survive community gallery" /></div>}\n        <Trail />
+        {galleryImages.length > 0 && <div className="wrap" style={{ paddingTop: "var(--sp-6)" }}><ImageCarousel images={galleryImages} label="Survive community gallery" /></div>}
+        <Trail />
         <Faq />
       </main>
 
