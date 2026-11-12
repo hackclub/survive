@@ -2,8 +2,14 @@ class HikeGrantsController < ApplicationController
   before_action :set_owned_grant, only: :add_participants
 
   def index
-    grants = HikeGrant.where(created_by: current_user).includes(participants: :user).recent
-    render inertia: "HikeGrants/Index", props: { grants: grants.map { |grant| serialize(grant) } }
+    public_hikes = HikeGrant.where(status: %i[approved paid], starts_at: Time.current..)
+      .includes(:created_by, :participants).recent
+    my_hikes = HikeGrant.where(created_by: current_user).includes(participants: :user).recent
+
+    render inertia: "HikeGrants/Index", props: {
+      publicHikes: public_hikes.map { |grant| serialize_public(grant) },
+      grants: my_hikes.map { |grant| serialize_private(grant) }
+    }
   end
 
   def create
@@ -76,7 +82,13 @@ class HikeGrantsController < ApplicationController
     end
   end
 
-  def serialize(grant)
+  def serialize_public(grant)
+    { id: grant.id, name: grant.name, trail: grant.trail, region: grant.region,
+      meetingPoint: grant.meeting_point, startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
+      organiser: grant.created_by.display_name, participantCount: grant.participants.size }
+  end
+
+  def serialize_private(grant)
     { id: grant.id, name: grant.name, trail: grant.trail, region: grant.region,
       meetingPoint: grant.meeting_point, startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
       budgetCents: grant.budget_cents, status: grant.status, decisionReason: grant.decision_reason,
