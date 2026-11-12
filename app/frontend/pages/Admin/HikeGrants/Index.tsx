@@ -9,6 +9,7 @@ type Participant = {
   name: string
   email: string
   allocationCents: number
+  woodCost: number
   status: string
   hcbGrantId: string | null
   hcbGrantUrl: string | null
@@ -23,6 +24,8 @@ type Grant = {
   meetingPoint: string
   startsAt: string
   budgetCents: number
+  woodTotal: number
+  items: { id: number; label: string; amountCents: number; reason: string }[]
   allocatedCents: number
   status: string
   notes: string | null
@@ -32,9 +35,9 @@ type Grant = {
   participants: Participant[]
 }
 
-const money = (cents: number) => new Intl.NumberFormat("en-AU", {
+const money = (cents: number) => new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "AUD",
+  currency: "USD",
 }).format(cents / 100)
 
 const tone = (status: string): "neutral" | "ok" | "warn" | "bad" => {
@@ -134,7 +137,7 @@ export default function Index({ grants, stats }: {
                   <label className="field"><span className="field__label">Region</span><input className="field__input" required value={region} onChange={e => setRegion(e.target.value)} placeholder="Sydney, NSW" /></label>
                   <label className="field"><span className="field__label">Public meeting point</span><input className="field__input" required value={meetingPoint} onChange={e => setMeetingPoint(e.target.value)} placeholder="Central Station, main concourse" /></label>
                   <label className="field"><span className="field__label">Date and time</span><input className="field__input" type="datetime-local" required value={startsAt} onChange={e => setStartsAt(e.target.value)} /></label>
-                  <label className="field"><span className="field__label">Total budget (AUD)</span><input className="field__input" type="number" min="0.01" step="0.01" required value={budget} onChange={e => setBudget(e.target.value)} placeholder="200.00" /></label>
+                  <label className="field"><span className="field__label">Total budget (USD)</span><input className="field__input" type="number" min="0.01" step="0.01" required value={budget} onChange={e => setBudget(e.target.value)} placeholder="200.00" /></label>
                 </div>
                 <label className="field">
                   <span className="field__label">Participant emails</span>
@@ -166,20 +169,38 @@ export default function Index({ grants, stats }: {
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <p className="u-h3">{money(grant.budgetCents)}</p>
-                      <p className="u-xs u-faint">{grant.participants.length} hikers · {money(grant.allocatedCents)} allocated</p>
+                      <p className="u-xs u-faint">{grant.participants.length} {grant.participants.length === 1 ? "hiker" : "hikers"} · {money(grant.allocatedCents)} allocated{grant.woodTotal > 0 ? ` · ${grant.woodTotal} wood` : ""}</p>
                     </div>
                   </div>
 
                   {grant.decisionReason && <p className="u-sm" style={{ marginTop: "var(--sp-2)" }}>Reason: {grant.decisionReason}</p>}
 
+                  {grant.items.length > 0 && (
+                    <div style={{ marginTop: "var(--sp-3)", overflowX: "auto" }}>
+                      <table className="data-table">
+                        <thead><tr><th>Cost</th><th>Amount</th><th>Why they need it</th></tr></thead>
+                        <tbody>
+                          {grant.items.map(item => (
+                            <tr key={item.id}>
+                              <td><strong>{item.label}</strong></td>
+                              <td className="u-mono">{money(item.amountCents)}</td>
+                              <td className="u-sm">{item.reason}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+
                   <div style={{ marginTop: "var(--sp-3)", overflowX: "auto" }}>
                     <table className="data-table">
-                      <thead><tr><th>Participant</th><th>Individual share</th><th>Status</th><th>HCB reference</th><th></th></tr></thead>
+                      <thead><tr><th>Participant</th><th>Individual share</th><th>Wood</th><th>Status</th><th>HCB reference</th><th></th></tr></thead>
                       <tbody>
                         {grant.participants.map(participant => (
                           <tr key={participant.id}>
                             <td><strong>{participant.name}</strong><div className="u-xs u-faint">{participant.email}</div></td>
                             <td className="u-mono">{money(participant.allocationCents)}</td>
+                            <td className="u-mono">{participant.woodCost}</td>
                             <td><Status tone={tone(participant.status)}>{participant.status}</Status></td>
                             <td className="u-xs u-faint">{participant.hcbGrantUrl ? <a href={participant.hcbGrantUrl} target="_blank" rel="noreferrer">{participant.hcbGrantId || "Open HCB grant"}</a> : participant.hcbGrantId || "—"}</td>
                             <td>
@@ -190,7 +211,7 @@ export default function Index({ grants, stats }: {
                           </tr>
                         ))}
                         {issuing && grant.participants.some(p => p.id === issuing) && (
-                          <tr><td colSpan={5}>
+                          <tr><td colSpan={6}>
                             <div style={{ display: "grid", gap: "var(--sp-2)" }}>
                               <p className="u-sm">After creating this participant's card grant in HCB, record its reference here.</p>
                               <input className="field__input" value={hcbId} onChange={e => setHcbId(e.target.value)} placeholder="HCB card grant ID / reference" />

@@ -2,6 +2,20 @@ class HikeGrant < ApplicationRecord
   belongs_to :created_by, class_name: "User"
   belongs_to :reviewed_by, class_name: "User", optional: true
   has_many :participants, class_name: "HikeGrantParticipant", dependent: :destroy
+  has_many :items, class_name: "HikeGrantItem", dependent: :destroy
+
+  # Hikers pay their share in wood. Projects earn 5 wood an hour, and 5 wood is $5.
+  DEFAULT_WOOD_PER_USD = 1
+  # Pending hikes hold wood; approved ones have spent it. Rejected hikes hold nothing.
+  WOOD_STATUSES = %i[pending approved paid completed].freeze
+
+  def self.wood_per_usd
+    ENV.fetch("HIKE_WOOD_PER_USD", DEFAULT_WOOD_PER_USD).to_f
+  end
+
+  def self.wood_for(cents)
+    (cents * wood_per_usd / 100.0).ceil
+  end
 
   enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3, paid: 4, completed: 5 }
   # Prefixed because a bare `public`/`private` would define HikeGrant.public and HikeGrant.private,

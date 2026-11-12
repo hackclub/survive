@@ -28,6 +28,7 @@ class ApplicationController < ActionController::Base
             adjusted: u.coins_adjusted,
             held: u.coins_held,
             heldOrders: u.orders.held.count,
+            heldHikes: u.hike_wood_held,
             spendable: u.spendable_coins
           }
         }

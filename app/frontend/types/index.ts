@@ -20,6 +20,7 @@ export type AuthUser = {
     adjusted: number
     held: number
     heldOrders: number
+    heldHikes: number
     spendable: number
   }
 }
