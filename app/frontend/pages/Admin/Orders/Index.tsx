@@ -114,7 +114,7 @@ export default function Index({
                     </td>
                     <td className="u-soft">{order.makerName}</td>
                     <td className="data-table__num u-mono">{order.coins}</td>
-                    <td className="data-table__num u-mono">{order.makerBalance ?? "—"}</td>
+                    <td className="data-table__num u-mono">{order.makerBalance ?? "-"}</td>
                     <td>
                       {order.makerBanned ? (
                         <Tag tone="bad">banned</Tag>
@@ -124,7 +124,7 @@ export default function Index({
                         <Tag tone="ok">clean</Tag>
                       )}
                     </td>
-                    <td className="u-mono u-xs u-faint">{order.region ?? "—"}</td>
+                    <td className="u-mono u-xs u-faint">{order.region ?? "-"}</td>
                     <td>
                       <Status tone={TONE[order.state] ?? "neutral"}>{order.state.replace("_", " ")}</Status>
                       {order.rejectionReason && (

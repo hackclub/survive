@@ -85,7 +85,7 @@ export default function Index({
                     <div className="u-xs u-faint">{row.email}</div>
                   </td>
                   <td className="data-table__num u-mono">{row.earned}</td>
-                  <td className="data-table__num u-mono">{row.adjusted === 0 ? "—" : row.adjusted}</td>
+                  <td className="data-table__num u-mono">{row.adjusted === 0 ? "-" : row.adjusted}</td>
                   <td className="data-table__num u-mono" style={{ fontWeight: 700 }}>
                     {row.balance}
                   </td>

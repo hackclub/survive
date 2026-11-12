@@ -90,10 +90,10 @@ export default function Index({
                     <td className="u-mono u-xs u-faint">{entry.at}</td>
                     <td className="u-soft">{entry.actor ?? "system"}</td>
                     <td className="u-mono u-xs">{entry.action}</td>
-                    <td className="u-mono u-xs u-faint">{entry.target ?? "—"}</td>
+                    <td className="u-mono u-xs u-faint">{entry.target ?? "-"}</td>
                     <td className="u-xs u-soft audit-meta">
                       {Object.keys(entry.metadata).length === 0
-                        ? "—"
+                        ? "-"
                         : Object.entries(entry.metadata)
                             .map(([key, value]) => `${key}: ${JSON.stringify(value)}`)
                             .join(", ")}
