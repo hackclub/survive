@@ -6,6 +6,7 @@ import { Trail } from "./Trail"
 import { Faq } from "./Faq"
 import { Footer } from "./Footer"
 import { initMotion } from "../../lib/motion"
+import { useImagesReady } from "../../lib/useImagesReady"
 import type { SharedProps } from "../../types"
 
 import mark from "../../images/mark.webp"
@@ -18,6 +19,7 @@ import campfire from "../../images/campfire.webp"
 
 export default function Index() {
   const { auth, signInPath } = usePage<SharedProps>().props
+  const [stack, ready] = useImagesReady<HTMLDivElement>()
 
   useEffect(() => initMotion(), [])
 
@@ -36,14 +38,7 @@ export default function Index() {
         <header className="scene">
           <Nav over />
 
-          <div className="scene__credit">
-            <p className="scene__eyebrow">
-              <img src={mark} alt="" />
-              Hack Club, sponsored by Johnny
-            </p>
-          </div>
-
-          <div className="scene__stack" aria-hidden="true">
+          <div ref={stack} className="scene__stack" data-ready={ready || undefined} aria-hidden="true">
             <div className="layer layer--clouds">
               <img src={clouds} alt="" fetchPriority="high" />
             </div>
@@ -54,7 +49,7 @@ export default function Index() {
               <img src={ground} alt="" fetchPriority="high" />
             </div>
             <div className="layer layer--vegetation">
-              <img src={vegetation} alt="" />
+              <img src={vegetation} alt="" fetchPriority="high" />
             </div>
             <div className="scene__dusk"></div>
             <div className="layer layer--tent">
@@ -66,6 +61,11 @@ export default function Index() {
           </div>
 
           <div className="scene__content">
+            <p className="scene__eyebrow">
+              <img src={mark} alt="" />
+              Hack Club, sponsored by Johnny
+            </p>
+
             <h1 className="scene__title">
               Survive
             </h1>
