@@ -17,7 +17,9 @@ import vegetation from "../../images/vegetation.webp"
 import tent from "../../images/tent.webp"
 import campfire from "../../images/campfire.webp"
 
-export default function Index() {
+type GallerySlide = { id: number; imageUrl: string; caption: string | null }
+
+export default function Index({ galleryImages = [] }: { galleryImages?: GallerySlide[] }) {
   const { signInPath } = usePage<SharedProps>().props
   const [stack, ready] = useImagesReady<HTMLDivElement>()
 
