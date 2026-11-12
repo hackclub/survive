@@ -1,5 +1,5 @@
-import { Hub } from "../../components/Hub"
+import { Hub, type HubCamp } from "../../components/Hub"
 
-export default function DashboardHub() {
-  return <Hub />
+export default function DashboardHub({ camp }: { camp: HubCamp }) {
+  return <Hub camp={camp} />
 }
