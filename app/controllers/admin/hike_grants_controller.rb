@@ -2,7 +2,7 @@ class Admin::HikeGrantsController < ApplicationController
   def index
     authorize :hike_grant
 
-    grants = HikeGrant.includes(:created_by, :reviewed_by, participants: :user).recent
+    grants = HikeGrant.includes(:created_by, :reviewed_by, :items, participants: :user).recent
     render inertia: "Admin/HikeGrants/Index", props: {
       grants: grants.map { |grant| serialize(grant) },
       stats: {
@@ -107,6 +107,8 @@ class Admin::HikeGrantsController < ApplicationController
       meetingPoint: grant.meeting_point,
       startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
       budgetCents: grant.budget_cents,
+      woodTotal: grant.participants.sum(&:wood_cost),
+      items: grant.items.map { |item| { id: item.id, label: item.label, amountCents: item.amount_cents, reason: item.reason } },
       allocatedCents: grant.allocated_cents,
       status: grant.status,
       notes: grant.notes,
@@ -120,6 +122,7 @@ class Admin::HikeGrantsController < ApplicationController
           name: participant.user.display_name,
           email: participant.user.email,
           allocationCents: participant.allocation_cents,
+          woodCost: participant.wood_cost,
           status: participant.status,
           hcbGrantId: participant.hcb_grant_id,
           hcbGrantUrl: participant.hcb_grant_url,

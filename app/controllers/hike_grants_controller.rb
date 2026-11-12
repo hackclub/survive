@@ -6,60 +6,41 @@ class HikeGrantsController < ApplicationController
       .includes(:created_by, :participants).recent
     my_hikes = HikeGrant.joins("LEFT JOIN hike_grant_participants ON hike_grant_participants.hike_grant_id = hike_grants.id")
       .where("hike_grants.created_by_id = :user_id OR (hike_grants.visibility = :private AND hike_grant_participants.user_id = :user_id)", user_id: current_user.id, private: HikeGrant.visibilities[:private])
-      .includes(participants: :user).distinct.recent
+      .includes(:items, participants: :user).distinct.recent
 
     render inertia: "HikeGrants/Index", props: {
       publicHikes: public_hikes.map { |grant| serialize_public(grant) },
-      grants: my_hikes.map { |grant| serialize_private(grant) }
+      grants: my_hikes.map { |grant| serialize_private(grant) },
+      costKinds: HikeGrantItem::KINDS.map { |kind, info| { kind: kind, label: info[:label], hint: info[:hint] } },
+      woodPerUsd: HikeGrant.wood_per_usd,
+      spendable: current_user.spendable_coins
     }
   end
 
   def create
-    attrs = params.require(:hike_grant).permit(:name, :trail, :region, :meeting_point, :starts_at, :budget, :visibility)
-    emails = parse_emails
-    return redirect_to(hike_grants_path, alert: "Add at least one person's email.") if emails.empty?
-    users = find_users(emails)
-    missing = emails - users.keys
-    return redirect_to(hike_grants_path, alert: "These emails don't have a Survive account: #{missing.join(", ")}") if missing.any?
-    cents = (BigDecimal(attrs.delete(:budget).to_s) * 100).round
-    return redirect_to(hike_grants_path, alert: "Enter how much you need.") unless cents.positive?
-    return redirect_to(hike_grants_path, alert: "That's less than a cent each. Raise the amount or add fewer people.") if cents < users.size
-
-    grant = nil
-    ActiveRecord::Base.transaction do
-      grant = HikeGrant.create!(name: attrs[:name], trail: attrs[:trail], region: attrs[:region],
-        meeting_point: attrs[:meeting_point], starts_at: Time.zone.parse(attrs[:starts_at]),
-        budget_cents: cents, visibility: attrs[:visibility].presence_in(%w[public private]) || "public", status: :pending, created_by: current_user)
-      rebalance!(grant, users.values)
-    end
-    audit!("hike_grant.created", target: grant, metadata: { budget_cents: cents, participant_count: users.size })
-    redirect_to hike_grants_path, notice: "Sent. We'll review your hike soon."
-  rescue ActiveRecord::RecordInvalid, ArgumentError => e
+    attrs = params.require(:hike_grant).permit(:name, :trail, :region, :meeting_point, :starts_at, :visibility)
+    grant = HikeGrantSubmission.create!(
+      organiser: current_user,
+      attributes: {
+        name: attrs[:name], trail: attrs[:trail], region: attrs[:region], meeting_point: attrs[:meeting_point],
+        starts_at: Time.zone.parse(attrs[:starts_at].to_s),
+        visibility: attrs[:visibility].presence_in(%w[public private]) || "public"
+      },
+      items: params.permit(items: %i[kind amount reason]).fetch(:items, []),
+      emails: parse_emails
+    )
+    audit!("hike_grant.created", target: grant, metadata: { budget_cents: grant.budget_cents,
+      participant_count: grant.participants.size, wood_each: grant.participants.maximum(:wood_cost) })
+    redirect_to hike_grants_path, notice: "Sent. We've held each person's share of wood and will review your hike soon."
+  rescue HikeGrantSubmission::Refused, ActiveRecord::RecordInvalid => e
     redirect_to hike_grants_path, alert: e.message
   end
 
   def add_participants
-    emails = parse_emails
-    return redirect_to(hike_grants_path, alert: "Add at least one person's email.") if emails.empty?
-    users = find_users(emails)
-    missing = emails - users.keys
-    return redirect_to(hike_grants_path, alert: "These emails don't have a Survive account: #{missing.join(", ")}") if missing.any?
-
-    added = []
-    ActiveRecord::Base.transaction do
-      @grant.lock!
-      raise ArgumentError, "You can only add people before your hike is reviewed." unless @grant.pending?
-      existing_ids = @grant.participants.pluck(:user_id)
-      duplicates = users.values.select { |u| existing_ids.include?(u.id) }
-      raise ArgumentError, "Already on this hike: #{duplicates.map(&:email).join(", ")}" if duplicates.any?
-      all_users = @grant.participants.includes(:user).map(&:user) + users.values
-      raise ArgumentError, "That's less than a cent each. Raise the amount or add fewer people." if @grant.budget_cents < all_users.size
-      rebalance!(@grant, all_users)
-      added = users.values
-    end
+    added = HikeGrantSubmission.add_participants!(@grant, parse_emails)
     audit!("hike_grant.participants_added", target: @grant, metadata: { user_ids: added.map(&:id) })
-    redirect_to hike_grants_path, notice: "Added #{added.size} #{'hiker'.pluralize(added.size)} and re-split the money."
-  rescue ActiveRecord::RecordInvalid, ArgumentError => e
+    redirect_to hike_grants_path, notice: "Added #{added.size} #{'hiker'.pluralize(added.size)} and re-split the cost."
+  rescue HikeGrantSubmission::Refused, ActiveRecord::RecordInvalid => e
     redirect_to hike_grants_path, alert: e.message
   end
 
@@ -70,18 +51,11 @@ class HikeGrantsController < ApplicationController
   end
 
   def parse_emails
-    params[:participant_emails].to_s.split(/[\\s,;]+/).map { |e| e.strip.downcase }.reject(&:blank?).uniq
+    params[:participant_emails].to_s.split(/[\s,;]+/).map { |e| e.strip.downcase }.reject(&:blank?).uniq
   end
 
-  def find_users(emails)
-    User.where("LOWER(email) IN (?)", emails).index_by { |u| u.email.downcase }
-  end
-
-  def rebalance!(grant, users)
-    base, remainder = grant.budget_cents.divmod(users.size)
-    users.each_with_index do |user, i|
-      grant.participants.find_or_initialize_by(user: user).update!(allocation_cents: base + (i < remainder ? 1 : 0))
-    end
+  def serialize_items(grant)
+    grant.items.map { |item| { id: item.id, label: item.label, amountCents: item.amount_cents, reason: item.reason } }
   end
 
   def serialize_public(grant)
@@ -93,7 +67,7 @@ class HikeGrantsController < ApplicationController
   def serialize_private(grant)
     { id: grant.id, name: grant.name, trail: grant.trail, region: grant.region,
       meetingPoint: grant.meeting_point, startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
-      budgetCents: grant.budget_cents, status: grant.status, visibility: grant.visibility, isOrganiser: grant.created_by_id == current_user.id, decisionReason: grant.decision_reason,
-      participants: grant.participants.map { |p| { id: p.id, name: p.user.display_name, email: p.user.email, allocationCents: p.allocation_cents } } }
+      budgetCents: grant.budget_cents, items: serialize_items(grant), status: grant.status, visibility: grant.visibility, isOrganiser: grant.created_by_id == current_user.id, decisionReason: grant.decision_reason,
+      participants: grant.participants.map { |p| { id: p.id, name: p.user.display_name, email: p.user.email, allocationCents: p.allocation_cents, woodCost: p.wood_cost } } }
   end
 end

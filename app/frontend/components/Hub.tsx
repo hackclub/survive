@@ -109,6 +109,7 @@ export function Hub({ camp }: { camp: HubCamp }) {
                 adjusted={user.coins.adjusted}
                 held={user.coins.held}
                 heldOrders={user.coins.heldOrders}
+                heldHikes={user.coins.heldHikes}
               />
               <Link className="hud-bar__link" href="/hike_grants" prefetch>Hikes</Link>
               <Link className="hud-bar__link" href="/orders" prefetch>

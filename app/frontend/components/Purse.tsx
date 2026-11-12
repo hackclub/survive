@@ -6,9 +6,11 @@ type Props = {
   adjusted: number
   held: number
   heldOrders: number
+  heldHikes?: number
 }
 
-export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) {
+export function Purse({ spendable, earned, adjusted, held, heldOrders, heldHikes = 0 }: Props) {
+  const heldByOrders = held - heldHikes
   const [open, setOpen] = useState(false)
   const [landing, setLanding] = useState(false)
   const box = useRef<HTMLDivElement>(null)
@@ -72,12 +74,18 @@ export function Purse({ spendable, earned, adjusted, held, heldOrders }: Props) 
               </span>
             </div>
           )}
-          {held > 0 && (
+          {heldByOrders > 0 && (
             <div className="purse__row">
               <span className="u-soft">
                 Held by {heldOrders} {heldOrders === 1 ? "order" : "orders"}
               </span>
-              <span>&minus;{held}</span>
+              <span>&minus;{heldByOrders}</span>
+            </div>
+          )}
+          {heldHikes > 0 && (
+            <div className="purse__row">
+              <span className="u-soft">Hikes</span>
+              <span>&minus;{heldHikes}</span>
             </div>
           )}
           <div className="purse__row purse__row--total">

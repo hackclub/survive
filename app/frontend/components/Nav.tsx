@@ -105,6 +105,7 @@ export function Nav({ over, admin }: { over?: boolean; admin?: boolean } = {}) {
               adjusted={user.coins.adjusted}
               held={user.coins.held}
               heldOrders={user.coins.heldOrders}
+                heldHikes={user.coins.heldHikes}
             />
 
             <div className="nav__menu" ref={menu}>

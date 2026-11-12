@@ -131,7 +131,11 @@ class User < ApplicationRecord
   end
 
   def coins_held
-    orders.held.sum("frozen_coin_cost * quantity")
+    orders.held.sum("frozen_coin_cost * quantity") + hike_wood_held
+  end
+
+  def hike_wood_held
+    HikeGrantParticipant.holding_wood.where(user_id: id).sum(:wood_cost)
   end
 
   def approved_minutes
