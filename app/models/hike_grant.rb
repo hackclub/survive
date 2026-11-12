@@ -4,7 +4,10 @@ class HikeGrant < ApplicationRecord
   has_many :participants, class_name: "HikeGrantParticipant", dependent: :destroy
 
   enum :status, { draft: 0, pending: 1, approved: 2, rejected: 3, paid: 4, completed: 5 }
-  enum :visibility, { public: 0, private: 1 }
+  # Prefixed because a bare `public`/`private` would define HikeGrant.public and HikeGrant.private,
+  # which clash with Ruby's own methods and stop the app from booting. Helpers are
+  # visibility_public? / HikeGrant.visibility_public and so on.
+  enum :visibility, { public: 0, private: 1 }, prefix: true
 
   validates :name, :trail, :region, :meeting_point, :starts_at, presence: true
   validates :budget_cents, numericality: { only_integer: true, greater_than: 0 }

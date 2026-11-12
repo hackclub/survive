@@ -40,4 +40,20 @@ class HikeGrantTest < ActiveSupport::TestCase
     refute HikeGrantPolicy.new(regular_user, :hike_grant).index?
     refute HikeGrantPolicy.new(regular_user, :hike_grant).manage?
   end
+
+  test "visibility uses prefixed helpers and keeps the stored values" do
+    admin = build_maker(roles: [ "admin" ])
+    attrs = { trail: "Track", region: "Sydney, NSW", meeting_point: "Central", starts_at: 1.week.from_now,
+      budget_cents: 1_000, status: :pending, created_by: admin }
+    open_hike = HikeGrant.create!(attrs.merge(name: "Open", visibility: :public))
+    closed_hike = HikeGrant.create!(attrs.merge(name: "Closed", visibility: "private"))
+
+    assert open_hike.visibility_public?
+    assert closed_hike.visibility_private?
+    assert_equal "public", open_hike.visibility
+    assert_equal({ "public" => 0, "private" => 1 }, HikeGrant.visibilities)
+    assert_equal [ open_hike ], HikeGrant.visibility_public.to_a
+    assert_equal [ open_hike ], HikeGrant.where(visibility: :public).to_a, "the controller's query still works"
+    assert_equal Module.instance_method(:public).owner, HikeGrant.method(:public).owner, "Ruby's own public is untouched"
+  end
 end
