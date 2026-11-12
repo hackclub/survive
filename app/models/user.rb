@@ -137,7 +137,7 @@ class User < ApplicationRecord
   end
 
   def hike_wood_held
-    HikeGrantParticipant.holding_wood.where(user_id: id).sum(:wood_cost)
+    HikeGrantContribution.holding_wood.where(user_id: id).sum(:wood)
   end
 
   def approved_minutes

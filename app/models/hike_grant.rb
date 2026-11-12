@@ -3,8 +3,10 @@ class HikeGrant < ApplicationRecord
   belongs_to :reviewed_by, class_name: "User", optional: true
   has_many :participants, class_name: "HikeGrantParticipant", dependent: :destroy
   has_many :items, class_name: "HikeGrantItem", dependent: :destroy
+  has_many :contributions, class_name: "HikeGrantContribution", dependent: :destroy
 
-  # Hikers pay their share in wood. Projects earn 5 wood an hour, and 5 wood is $5.
+  # A hike only happens once its wood is paid in full. Anyone can chip in. The rate is
+  # deliberately never shown on the site.
   DEFAULT_WOOD_PER_USD = 1
   # Pending hikes hold wood; approved ones have spent it. Rejected hikes hold nothing.
   WOOD_STATUSES = %i[pending approved paid completed].freeze
@@ -29,6 +31,18 @@ class HikeGrant < ApplicationRecord
 
   scope :recent, -> { order(starts_at: :desc, created_at: :desc) }
 
+  def wood_raised
+    contributions.loaded? ? contributions.sum(&:wood) : contributions.sum(:wood)
+  end
+
+  def wood_remaining
+    [ wood_needed - wood_raised, 0 ].max
+  end
+
+  def funded?
+    wood_remaining.zero?
+  end
+
   def allocated_cents
     participants.sum(:allocation_cents)
   end
@@ -41,6 +55,7 @@ class HikeGrant < ApplicationRecord
     raise ArgumentError, "Only pending grants can be approved." unless pending?
     raise ArgumentError, "Add at least one participant before approving." if participants.empty?
     raise ArgumentError, "Participant allocations exceed the approved budget." if allocated_cents > budget_cents
+    raise ArgumentError, "This hike still needs #{wood_remaining} wood before it can be approved." unless funded?
 
     update!(status: :approved, reviewed_by: actor, reviewed_at: Time.current, decision_reason: nil)
   end

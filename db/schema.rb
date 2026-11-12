@@ -151,6 +151,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_210000) do
     t.index ["user_id"], name: "index_hackatime_projects_on_user_id"
   end
 
+  create_table "hike_grant_contributions", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "hike_grant_id", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.integer "wood", null: false
+    t.index ["hike_grant_id"], name: "index_hike_grant_contributions_on_hike_grant_id"
+    t.index ["user_id"], name: "index_hike_grant_contributions_on_user_id"
+    t.check_constraint "wood > 0", name: "hike_grant_contributions_wood_positive"
+  end
+
   create_table "hike_grant_items", force: :cascade do |t|
     t.integer "amount_cents", null: false
     t.datetime "created_at", null: false
@@ -196,6 +207,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_210000) do
     t.string "trail", null: false
     t.datetime "updated_at", null: false
     t.integer "visibility", default: 0, null: false
+    t.integer "wood_needed", default: 0, null: false
     t.index ["created_by_id"], name: "index_hike_grants_on_created_by_id"
     t.index ["reviewed_by_id"], name: "index_hike_grants_on_reviewed_by_id"
     t.index ["status"], name: "index_hike_grants_on_status"
@@ -528,6 +540,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_210000) do
   add_foreign_key "hackatime_daily_totals", "users"
   add_foreign_key "hackatime_projects", "projects"
   add_foreign_key "hackatime_projects", "users"
+  add_foreign_key "hike_grant_contributions", "hike_grants"
+  add_foreign_key "hike_grant_contributions", "users"
   add_foreign_key "hike_grant_items", "hike_grants"
   add_foreign_key "hike_grant_participants", "hike_grants"
   add_foreign_key "hike_grant_participants", "users"
