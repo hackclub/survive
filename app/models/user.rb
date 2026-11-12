@@ -11,6 +11,8 @@ class User < ApplicationRecord
   has_many :coin_payouts, dependent: :destroy
   has_many :coin_adjustments, dependent: :destroy
   has_many :orders, dependent: :destroy
+  has_many :user_activity_days, dependent: :delete_all
+  has_many :hackatime_daily_totals, dependent: :delete_all
   belongs_to :banned_by, class_name: "User", optional: true
 
   after_commit -> { Rails.cache.delete("user/#{id}") }

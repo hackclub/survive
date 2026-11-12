@@ -10,6 +10,11 @@
 #     schedule: at 5am every day
 
 production:
+  hackatime_snapshot:
+    class: HackatimeSnapshotJob
+    queue: default
+    schedule: every 2 hours
+
   ari_status_refresh:
     class: AriStatusRefreshJob
     queue: default

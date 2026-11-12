@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       end
     end
     resources :audit_logs, only: :index
+    get "stats" => "stats#index", as: :stats
     resources :shop_items
     resources :docs, only: %i[index new create edit update destroy]
     resources :orders, only: :index do

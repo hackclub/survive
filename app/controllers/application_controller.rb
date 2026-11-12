@@ -7,6 +7,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  after_action :record_activity
 
   inertia_share auth: -> {
     {
@@ -40,6 +41,13 @@ class ApplicationController < ActionController::Base
   inertia_share flash: -> { flash.to_hash }
 
   private
+
+  # Counts signed-in visits for daily active users. Never lets a tracking hiccup break a page.
+  def record_activity
+    UserActivityDay.record!(current_user) if current_user && request.get?
+  rescue StandardError => e
+    Rails.logger.warn("record_activity #{e.class}")
+  end
 
   def audit!(action, target: nil, metadata: {})
     return if current_user.nil?
