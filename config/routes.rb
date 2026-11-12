@@ -58,7 +58,11 @@ Rails.application.routes.draw do
   end
 
   resources :hike_grants, only: %i[index create] do
-    member { post :add_participants }
+    member do
+      post :add_participants
+      post :contribute
+      delete "contribute" => "hike_grants#withdraw", as: :withdraw
+    end
   end
 
   get "dashboard" => "dashboard#index", as: :dashboard
