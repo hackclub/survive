@@ -4,7 +4,7 @@ class ShopController < ApplicationController
     balance = current_user.spendable_coins
     minutes = current_user.approved_minutes
 
-    shop_items = ShopItem.includes(:shop_item_regions, image_attachment: :blob).sorted.to_a
+    shop_items = ShopItem.includes(:shop_item_regions, image_attachment: { blob: { variant_records: { image_attachment: :blob } } }).sorted.to_a
     reserved_quantities = Order.held.where(shop_item_id: shop_items.map(&:id)).group(:shop_item_id).sum(:quantity)
 
     items = shop_items.filter_map do |item|

@@ -1,7 +1,9 @@
 class ShopItem < ApplicationRecord
   DEFAULT_REGION = "default".freeze
 
-  has_one_attached :image
+  has_one_attached :image do |attachable|
+    attachable.variant :card, resize_to_limit: [ 1200, 900 ], format: :webp, saver: { quality: 80 }, preprocessed: true
+  end
   has_many :shop_item_regions, dependent: :destroy
   has_many :orders, dependent: :nullify
 
@@ -79,8 +81,6 @@ class ShopItem < ApplicationRecord
   end
 
   def image_url
-    return nil unless image.attached?
-
-    Rails.application.routes.url_helpers.rails_blob_path(image, only_path: true)
+    ImageUrl.for(image, :card)
   end
 end

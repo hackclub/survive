@@ -121,14 +121,7 @@ class Project < ApplicationRecord
   end
 
   def banner_url
-    return nil unless banner.attached?
-
-    card = banner.variant(:card)
-    # Once the resized copy exists on a public bucket, link straight to it so the browser
-    # never has to go through Rails. Until then Rails makes it on first request and redirects.
-    return card.url if card.key.present? && banner.blob.service.public?
-
-    Rails.application.routes.url_helpers.rails_representation_path(card, only_path: true)
+    ImageUrl.for(banner, :card)
   end
 
   def as_client_json

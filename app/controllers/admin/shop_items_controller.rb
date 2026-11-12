@@ -4,7 +4,7 @@ class Admin::ShopItemsController < ApplicationController
   def index
     authorize ShopItem
 
-    items = ShopItem.includes(:shop_item_regions, image_attachment: :blob).sorted
+    items = ShopItem.includes(:shop_item_regions, image_attachment: { blob: { variant_records: { image_attachment: :blob } } }).sorted
 
     render inertia: "Admin/ShopItems/Index", props: {
       items: items.map { |item| row(item) },
