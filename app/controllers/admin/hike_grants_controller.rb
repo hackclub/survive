@@ -59,7 +59,7 @@ class Admin::HikeGrantsController < ApplicationController
     grant = HikeGrant.find(params[:id])
     return redirect_to(admin_hike_grants_path, alert: "Participants can only be added while a hike grant is awaiting review.") unless grant.pending?
 
-    emails = params[:participant_emails].to_s.split(/[\\s,;]+/).map { |email| email.strip.downcase }.reject(&:blank?).uniq
+    emails = params[:participant_emails].to_s.split(/[\s,;]+/).map { |email| email.strip.downcase }.reject(&:blank?).uniq
     return redirect_to(admin_hike_grants_path, alert: "Enter at least one participant email.") if emails.empty?
 
     users = User.where("LOWER(email) IN (?)", emails).index_by { |user| user.email.downcase }
@@ -73,7 +73,7 @@ class Admin::HikeGrantsController < ApplicationController
 
       existing_ids = grant.participants.pluck(:user_id)
       new_users = users.values.reject { |user| existing_ids.include?(user.id) }
-      return redirect_to(admin_hike_grants_path, alert: "Those users are already on this hike grant.") if new_users.empty?
+      raise ArgumentError, "Those users are already on this hike grant." if new_users.empty?
 
       participant_count = existing_ids.size + new_users.size
       raise ArgumentError, "The budget must be at least $0.01 per participant." if grant.budget_cents < participant_count
