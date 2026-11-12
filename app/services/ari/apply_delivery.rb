@@ -78,7 +78,10 @@ module Ari
         review.project.public_send("#{PROJECT_ACTIONS.fetch(state)}_event!", feedback)
       end
 
-      review.open_final_review! if state == :approved
+      return unless state == :approved
+
+      review.open_final_review!
+      AirtableSyncJob.perform_later(review.id)
     end
 
     def minutes(body)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_24_090002) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_11_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -93,6 +93,20 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_090002) do
     t.index ["project_id"], name: "index_coin_payouts_on_project_id"
     t.index ["review_id"], name: "index_coin_payouts_on_review_id", unique: true
     t.index ["user_id"], name: "index_coin_payouts_on_user_id"
+  end
+
+  create_table "docs", force: :cascade do |t|
+    t.text "body", default: "", null: false
+    t.datetime "created_at", null: false
+    t.integer "position", default: 0, null: false
+    t.boolean "published", default: true, null: false
+    t.string "slug", null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.bigint "updated_by_id"
+    t.index ["published", "position"], name: "index_docs_on_published_and_position"
+    t.index ["slug"], name: "index_docs_on_slug", unique: true
+    t.index ["updated_by_id"], name: "index_docs_on_updated_by_id"
   end
 
   create_table "final_reviews", force: :cascade do |t|
@@ -188,6 +202,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_090002) do
   end
 
   create_table "reviews", force: :cascade do |t|
+    t.text "airtable_error"
+    t.string "airtable_record_id"
+    t.datetime "airtable_synced_at"
     t.integer "approved_minutes"
     t.string "ari_decision"
     t.string "ari_phase"
@@ -210,6 +227,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_090002) do
     t.integer "round", null: false
     t.integer "state", default: 0, null: false
     t.datetime "updated_at", null: false
+    t.index ["airtable_record_id"], name: "index_reviews_on_airtable_record_id", unique: true
     t.index ["ari_phase"], name: "index_reviews_on_ari_phase"
     t.index ["ari_ship_id"], name: "index_reviews_on_ari_ship_id", unique: true
     t.index ["project_id", "round"], name: "index_reviews_on_project_id_and_round", unique: true
@@ -232,6 +250,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_090002) do
     t.datetime "created_at", null: false
     t.text "description"
     t.boolean "enabled", default: true, null: false
+    t.boolean "featured", default: false, null: false
     t.decimal "grant_amount_usd", precision: 10, scale: 2
     t.decimal "internal_price_usd", precision: 10, scale: 2
     t.integer "kind", default: 0, null: false
@@ -242,6 +261,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_090002) do
     t.integer "stock"
     t.datetime "updated_at", null: false
     t.index ["enabled"], name: "index_shop_items_on_enabled"
+    t.index ["featured"], name: "index_shop_items_on_featured"
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
@@ -430,6 +450,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_24_090002) do
   add_foreign_key "coin_payouts", "projects"
   add_foreign_key "coin_payouts", "reviews"
   add_foreign_key "coin_payouts", "users"
+  add_foreign_key "docs", "users", column: "updated_by_id"
   add_foreign_key "final_reviews", "reviews"
   add_foreign_key "final_reviews", "users", column: "claimed_by_id"
   add_foreign_key "final_reviews", "users", column: "reviewer_id"
