@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: "overview#index"
+    resources :hike_grants, only: :index
     resources :audit_logs, only: :index
     resources :shop_items
     resources :docs, only: %i[index new create edit update destroy]
