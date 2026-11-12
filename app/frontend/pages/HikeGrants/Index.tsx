@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Head, Link, router } from "@inertiajs/react"
 import { Status } from "../../components/Status"
 import { ImageCarousel } from "../../components/ImageCarousel"
+import { AppShell } from "../../components/AppShell"
 
 type Participant = { id: number; name: string; email: string; allocationCents: number }
 type Wood = { woodNeeded: number; woodRaised: number; myWood: number }
@@ -66,11 +67,12 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
 
   return <>
     <Head title="Hikes - Survive" />
-    <main id="main" style={{ maxWidth: 1000, margin: "0 auto", padding: "var(--sp-5) var(--sp-4)" }}>
-      <header style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", alignItems: "center", flexWrap: "wrap" }}>
-        <div><p className="u-label u-faint">Survive</p><h1 className="u-h1">Hikes</h1><p className="u-sm u-soft">Join a hike, plan one, or chip in wood to help someone else's happen.</p></div>
-        <Link className="btn btn--quiet" href="/dashboard">← Dashboard</Link>
-      </header>
+    <AppShell
+      title="Hikes"
+      lede="Join a hike, plan one, or chip in wood to help someone else's happen."
+      narrow
+      actions={<Link className="btn btn--quiet btn--sm" href="/dashboard">← Dashboard</Link>}
+    >
 
       {galleryImages.length > 0 && <div style={{ marginTop: "var(--sp-4)" }}><ImageCarousel images={galleryImages} label="Hikes gallery" /></div>}
 
@@ -152,6 +154,6 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
           </article>)}
         </div>}
       </section>}
-    </main>
+    </AppShell>
   </>
 }
