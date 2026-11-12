@@ -12,6 +12,7 @@ class HikeGrantsController < ApplicationController
       .includes(:items, contributions: :user, participants: :user).distinct.recent
 
     render inertia: "HikeGrants/Index", props: {
+      galleryImages: GalleryImage.where(placement: %w[hikes both]).with_attached_image.ordered.map { |image| { id: image.id, imageUrl: image.image_url, caption: image.caption } },
       publicHikes: public_hikes.map { |grant| serialize_public(grant) },
       needsWood: needs_wood.map { |grant| serialize_needs_wood(grant) },
       grants: my_hikes.map { |grant| serialize_private(grant) },

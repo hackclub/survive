@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { Head, usePage } from "@inertiajs/react"
 import { Nav } from "../../components/Nav"
+import { ImageCarousel } from "../../components/ImageCarousel"
 import { Trail } from "./Trail"
 import { Faq } from "./Faq"
 import { Footer } from "./Footer"
@@ -16,7 +17,9 @@ import vegetation from "../../images/vegetation.webp"
 import tent from "../../images/tent.webp"
 import campfire from "../../images/campfire.webp"
 
-export default function Index() {
+type GallerySlide = { id: number; imageUrl: string; caption: string | null }
+
+export default function Index({ galleryImages = [] }: { galleryImages?: GallerySlide[] }) {
   const { signInPath } = usePage<SharedProps>().props
   const [stack, ready] = useImagesReady<HTMLDivElement>()
 
@@ -79,6 +82,7 @@ export default function Index() {
           </div>
         </header>
 
+        {galleryImages.length > 0 && <div className="wrap" style={{ paddingTop: "var(--sp-6)" }}><ImageCarousel images={galleryImages} label="Survive community gallery" /></div>}
         <Trail />
         <Faq />
       </main>

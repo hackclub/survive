@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { Head, Link, router } from "@inertiajs/react"
 import { Status } from "../../components/Status"
+import { ImageCarousel } from "../../components/ImageCarousel"
 
 type Participant = { id: number; name: string; email: string; allocationCents: number }
 type Wood = { woodNeeded: number; woodRaised: number; myWood: number }
@@ -9,6 +10,7 @@ type CostKind = { kind: string; label: string; hint: string }
 type DraftItem = { kind: string; amount: string; reason: string }
 type Grant = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; budgetCents: number; status: string; visibility: "public" | "private"; isOrganiser: boolean; decisionReason: string | null; items: Item[]; participants: Participant[]; contributors: { name: string; wood: number }[] } & Wood
 type NeedsWood = { id: number; name: string; trail: string; region: string; startsAt: string; organiser: string; isOrganiser: boolean; items: { id: number; label: string; reason: string }[] } & Wood
+type GallerySlide = { id: number; imageUrl: string; caption: string | null }
 type PublicHike = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; organiser: string; participantCount: number }
 const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n / 100)
 const tone = (s: string): "neutral" | "ok" | "warn" | "bad" => ["approved", "paid", "completed"].includes(s) ? "ok" : s === "rejected" ? "bad" : s === "pending" ? "warn" : "neutral"
@@ -43,7 +45,7 @@ function ChipIn({ id, hike, spendable }: { id: number; hike: Wood; spendable: nu
   </div>
 }
 
-export default function Index({ grants, publicHikes, needsWood, costKinds, woodRate, spendable }: { grants: Grant[]; publicHikes: PublicHike[]; needsWood: NeedsWood[]; costKinds: CostKind[]; woodRate: number; spendable: number }) {
+export default function Index({ grants, publicHikes, needsWood, costKinds, woodRate, spendable, galleryImages = [] }: { galleryImages?: GallerySlide[]; grants: Grant[]; publicHikes: PublicHike[]; needsWood: NeedsWood[]; costKinds: CostKind[]; woodRate: number; spendable: number }) {
   const [tab, setTab] = useState<"explore" | "mine">("explore")
   const [fields, setFields] = useState({ name: "", trail: "", region: "", meeting_point: "", starts_at: "", visibility: "public", participant_emails: "" })
   const [items, setItems] = useState<DraftItem[]>([])
@@ -69,6 +71,8 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
         <div><p className="u-label u-faint">Survive</p><h1 className="u-h1">Hikes</h1><p className="u-sm u-soft">Join a hike, plan one, or chip in wood to help someone else's happen.</p></div>
         <Link className="btn btn--quiet" href="/dashboard">← Dashboard</Link>
       </header>
+
+      {galleryImages.length > 0 && <div style={{ marginTop: "var(--sp-4)" }}><ImageCarousel images={galleryImages} label="Hikes gallery" /></div>}
 
       <div role="tablist" aria-label="Hikes" style={{ display: "flex", gap: "var(--sp-2)", borderBottom: "1px solid var(--border)", marginTop: "var(--sp-4)" }}>
         <button type="button" role="tab" aria-selected={tab === "explore"} className={tab === "explore" ? "btn btn--primary" : "btn btn--quiet"} onClick={() => setTab("explore")}>Upcoming</button>

@@ -16,6 +16,7 @@ Rails.application.routes.draw do
 
   namespace :admin do
     root to: "overview#index"
+    resources :gallery_images, only: %i[index create destroy]
     resources :hike_grants, only: %i[index create] do
       member do
         post :decide
