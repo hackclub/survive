@@ -15,7 +15,7 @@ export function Hub() {
       <Head title="Survive" />
 
       <main id="main" className="hub">
-        <div ref={stage} className="hub__stage" data-ready={ready || undefined}>
+        <div ref={stage} className="hub__stage" data-ready={ready || undefined}>\n          <Link href="/hike_grants" style={{ position: "absolute", zIndex: 5, top: 20, right: 20, padding: "10px 14px", borderRadius: 12, background: "rgba(255,255,255,.9)", color: "#24352d", fontWeight: 700, textDecoration: "none" }}>🥾 Organise a hike</Link>
           <img className="hub__layer hub__layer--clouds" src={clouds} alt="" fetchPriority="high" />
           <img className="hub__layer" src={mountains} alt="" fetchPriority="high" />
           <img className="hub__layer" src={ground} alt="" fetchPriority="high" />
