@@ -6,7 +6,7 @@ class HikeGrantParticipant < ApplicationRecord
 
   validates :allocation_cents, numericality: { only_integer: true, greater_than: 0 }
   validates :user_id, uniqueness: { scope: :hike_grant_id }
-  validates :hcb_grant_url, format: { with: %r{\\Ahttps://[^\\s]+\\z}i }, allow_blank: true
+  validates :hcb_grant_url, format: { with: %r{\Ahttps://[^\s]+\z}i }, allow_blank: true
 
   def mark_issued!(reference: nil)
     raise ArgumentError, "The hike grant must be approved first." unless hike_grant.approved? || hike_grant.paid?
