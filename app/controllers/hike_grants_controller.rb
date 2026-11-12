@@ -17,13 +17,13 @@ class HikeGrantsController < ApplicationController
   def create
     attrs = params.require(:hike_grant).permit(:name, :trail, :region, :meeting_point, :starts_at, :budget, :visibility)
     emails = parse_emails
-    return redirect_to(hike_grants_path, alert: "Add at least one participant email.") if emails.empty?
+    return redirect_to(hike_grants_path, alert: "Add at least one person's email.") if emails.empty?
     users = find_users(emails)
     missing = emails - users.keys
-    return redirect_to(hike_grants_path, alert: "These emails are not registered Survive users: #{missing.join(", ")}") if missing.any?
+    return redirect_to(hike_grants_path, alert: "These emails don't have a Survive account: #{missing.join(", ")}") if missing.any?
     cents = (BigDecimal(attrs.delete(:budget).to_s) * 100).round
-    return redirect_to(hike_grants_path, alert: "Enter a valid budget greater than zero.") unless cents.positive?
-    return redirect_to(hike_grants_path, alert: "The budget must be at least $0.01 per participant.") if cents < users.size
+    return redirect_to(hike_grants_path, alert: "Enter how much you need.") unless cents.positive?
+    return redirect_to(hike_grants_path, alert: "That's less than a cent each. Raise the amount or add fewer people.") if cents < users.size
 
     grant = nil
     ActiveRecord::Base.transaction do
@@ -33,32 +33,32 @@ class HikeGrantsController < ApplicationController
       rebalance!(grant, users.values)
     end
     audit!("hike_grant.created", target: grant, metadata: { budget_cents: cents, participant_count: users.size })
-    redirect_to hike_grants_path, notice: "Your hike has been submitted for review."
+    redirect_to hike_grants_path, notice: "Sent. We'll review your hike soon."
   rescue ActiveRecord::RecordInvalid, ArgumentError => e
     redirect_to hike_grants_path, alert: e.message
   end
 
   def add_participants
     emails = parse_emails
-    return redirect_to(hike_grants_path, alert: "Add at least one participant email.") if emails.empty?
+    return redirect_to(hike_grants_path, alert: "Add at least one person's email.") if emails.empty?
     users = find_users(emails)
     missing = emails - users.keys
-    return redirect_to(hike_grants_path, alert: "These emails are not registered Survive users: #{missing.join(", ")}") if missing.any?
+    return redirect_to(hike_grants_path, alert: "These emails don't have a Survive account: #{missing.join(", ")}") if missing.any?
 
     added = []
     ActiveRecord::Base.transaction do
       @grant.lock!
-      raise ArgumentError, "You can only add people while your hike is awaiting review." unless @grant.pending?
+      raise ArgumentError, "You can only add people before your hike is reviewed." unless @grant.pending?
       existing_ids = @grant.participants.pluck(:user_id)
       duplicates = users.values.select { |u| existing_ids.include?(u.id) }
       raise ArgumentError, "Already on this hike: #{duplicates.map(&:email).join(", ")}" if duplicates.any?
       all_users = @grant.participants.includes(:user).map(&:user) + users.values
-      raise ArgumentError, "The budget must be at least $0.01 per participant." if @grant.budget_cents < all_users.size
+      raise ArgumentError, "That's less than a cent each. Raise the amount or add fewer people." if @grant.budget_cents < all_users.size
       rebalance!(@grant, all_users)
       added = users.values
     end
     audit!("hike_grant.participants_added", target: @grant, metadata: { user_ids: added.map(&:id) })
-    redirect_to hike_grants_path, notice: "Added #{added.size} #{'hiker'.pluralize(added.size)}. Shares have been recalculated."
+    redirect_to hike_grants_path, notice: "Added #{added.size} #{'hiker'.pluralize(added.size)} and re-split the money."
   rescue ActiveRecord::RecordInvalid, ArgumentError => e
     redirect_to hike_grants_path, alert: e.message
   end
