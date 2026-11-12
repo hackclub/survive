@@ -17,6 +17,7 @@ class Review < ApplicationRecord
   validates :ingest_version, numericality: { only_integer: true, greater_than: 0 }
   validates :approved_minutes, numericality: { only_integer: true, greater_than_or_equal_to: 0 }, allow_nil: true
 
+  scope :real, -> { where(test_submission: false) }
   scope :open_rounds, -> { where(state: %i[pending in_review]) }
   scope :awaiting_ari, -> { open_rounds.where.not(ingested_at: nil) }
   scope :ingest_failed, -> { where(ingested_at: nil).where.not(ingest_error: nil) }
@@ -44,6 +45,7 @@ class Review < ApplicationRecord
   end
 
   def open_final_review!
+    return nil if test_submission?
     return final_review if final_review.present?
 
     outcome = FinalReviews::Signals.call(self)

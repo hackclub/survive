@@ -33,7 +33,7 @@ export default function Show({
   hackatimeProjects,
 }: {
   project: Project
-  can: { update: boolean; submitForReview: boolean }
+  can: { update: boolean; submitForReview: boolean; submitTest: boolean }
   checks: ChecksResult | null
   hackatimeProjects: HackatimeProject[]
 }) {
@@ -56,6 +56,20 @@ export default function Show({
 
   function submitForReview() {
     form.transform((data) => ({ ...data, submit_for_review: true }))
+    form.patch(`/projects/${project.id}`, {
+      onFinish: () => form.transform((data) => data),
+    })
+  }
+
+  function submitAsTest() {
+    const ok = window.confirm(
+      "Send this project to Ari as a TEST, skipping the blocking checks?\n\n" +
+        "It shows up in Ari as [TEST] and, once approved, in Airtable marked as a test. " +
+        "It never pays wood or counts toward approved hours. Delete the Airtable row afterwards."
+    )
+    if (!ok) return
+
+    form.transform((data) => ({ ...data, submit_as_test: true }))
     form.patch(`/projects/${project.id}`, {
       onFinish: () => form.transform((data) => data),
     })
@@ -336,6 +350,17 @@ export default function Show({
                 Submit for review
               </button>
             </div>
+            {can.submitTest && (
+              <div className="checklist__gate">
+                <p className="u-sm u-soft">
+                  Superadmin only: send this to Ari as a flagged test to check the Ari to Airtable sync.
+                  It skips the blocking checks and never pays wood.
+                </p>
+                <button className="btn btn--quiet" type="button" disabled={form.processing} onClick={submitAsTest}>
+                  Send as test submission
+                </button>
+              </div>
+            )}
           </div>
         )}
       </AppShell>
