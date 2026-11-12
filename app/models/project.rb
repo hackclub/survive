@@ -45,17 +45,21 @@ class Project < ApplicationRecord
 
   before_save :set_normalized_repo_url, if: :will_save_change_to_repo_link?
 
-  def submit!
+  # as_test: a superadmin sending their own project through Ari and Airtable to test the
+  # pipeline. The checks still run and are stored, but blocking ones don't stop it, and the
+  # review is flagged so it never pays wood or counts toward approved hours.
+  def submit!(as_test: false)
     unless hackatime_projects.exists?
       raise NotReadyToSubmit, [{ "reasoning" => "Link a Hackatime project before submitting for review." }]
     end
 
     result = SurviveCheckService.run(project: self)
-    raise NotReadyToSubmit, result["blocking"] if result["blocking"].any?
+    raise NotReadyToSubmit, result["blocking"] if result["blocking"].any? && !as_test
 
     review = transaction do
       project_events.create!(actor: user, action: :submitted)
       opened = record_checks(result)
+      opened.update!(test_submission: true) if as_test
       sync_status_from_reviews!
       opened
     end

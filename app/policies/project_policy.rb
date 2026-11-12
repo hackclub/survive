@@ -20,6 +20,11 @@ class ProjectPolicy < ApplicationPolicy
     owner? && editable?
   end
 
+  # Superadmins can push their own project past the blocking checks to test Ari and Airtable.
+  def submit_test?
+    owner? && editable? && user.superadmin?
+  end
+
   def review?
     user&.reviewer? && record.pending?
   end
