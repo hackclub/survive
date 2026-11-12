@@ -9,7 +9,13 @@ type Item = { label: string; href: string; role: Role }
 type Section = { label: string; items: Item[] }
 
 const SECTIONS: Section[] = [
-  { label: "Overview", items: [{ label: "Dashboard", href: "/admin", role: "admin" }] },
+  {
+    label: "Overview",
+    items: [
+      { label: "Dashboard", href: "/admin", role: "admin" },
+      { label: "Stats", href: "/admin/stats", role: "admin" },
+    ],
+  },
   { label: "Ari", items: [{ label: "Submissions", href: "/admin/reviews", role: "admin" }] },
   {
     label: "Payouts",

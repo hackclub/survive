@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_210000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -127,6 +127,17 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_160000) do
     t.index ["review_id"], name: "index_final_reviews_on_review_id", unique: true
     t.index ["reviewer_id"], name: "index_final_reviews_on_reviewer_id"
     t.index ["status"], name: "index_final_reviews_on_status"
+  end
+
+  create_table "hackatime_daily_totals", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "day", null: false
+    t.bigint "linked_seconds", default: 0, null: false
+    t.bigint "total_seconds", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["day"], name: "index_hackatime_daily_totals_on_day"
+    t.index ["user_id", "day"], name: "index_hackatime_daily_totals_on_user_id_and_day", unique: true
   end
 
   create_table "hackatime_projects", force: :cascade do |t|
@@ -458,6 +469,14 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_160000) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "user_activity_days", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.date "day", null: false
+    t.bigint "user_id", null: false
+    t.index ["day"], name: "index_user_activity_days_on_day"
+    t.index ["user_id", "day"], name: "index_user_activity_days_on_user_id_and_day", unique: true
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "address_line1"
     t.string "address_line2"
@@ -506,6 +525,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_160000) do
   add_foreign_key "final_reviews", "reviews"
   add_foreign_key "final_reviews", "users", column: "claimed_by_id"
   add_foreign_key "final_reviews", "users", column: "reviewer_id"
+  add_foreign_key "hackatime_daily_totals", "users"
   add_foreign_key "hackatime_projects", "projects"
   add_foreign_key "hackatime_projects", "users"
   add_foreign_key "hike_grant_items", "hike_grants"
@@ -531,5 +551,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_160000) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "user_activity_days", "users"
   add_foreign_key "users", "users", column: "banned_by_id"
 end
