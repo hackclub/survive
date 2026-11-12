@@ -56,6 +56,7 @@ export default function Index({ grants, stats }: {
   const [startsAt, setStartsAt] = useState("")
   const [budget, setBudget] = useState("")
   const [participantEmails, setParticipantEmails] = useState("")
+  const [additionalEmails, setAdditionalEmails] = useState<Record<number, string>>({})
   const [rejecting, setRejecting] = useState<number | null>(null)
   const [reason, setReason] = useState("")
   const [issuing, setIssuing] = useState<number | null>(null)
@@ -78,6 +79,14 @@ export default function Index({ grants, stats }: {
         setBudget("")
         setParticipantEmails("")
       },
+    })
+  }
+
+  function addParticipants(id: number) {
+    router.post(`/admin/hike_grants/${id}/add_participants`, {
+      participant_emails: additionalEmails[id] || "",
+    }, {
+      onSuccess: () => setAdditionalEmails(current => ({ ...current, [id]: "" })),
     })
   }
 
@@ -205,6 +214,27 @@ export default function Index({ grants, stats }: {
                       </tbody>
                     </table>
                   </div>
+
+                  {grant.status === "pending" && (
+                    <div style={{ display: "flex", gap: "var(--sp-2)", alignItems: "flex-end", flexWrap: "wrap", marginTop: "var(--sp-3)" }}>
+                      <label className="field" style={{ flex: "1 1 280px" }}>
+                        <span className="field__label">Add people to this submitted hike</span>
+                        <input
+                          className="field__input"
+                          value={additionalEmails[grant.id] || ""}
+                          onChange={e => setAdditionalEmails(current => ({ ...current, [grant.id]: e.target.value }))}
+                          placeholder="newperson@hackclub.com, another@hackclub.com"
+                        />
+                        <span className="u-xs u-faint">Registered Survive emails only. The total budget will be split evenly again.</span>
+                      </label>
+                      <button
+                        className="btn btn--quiet btn--sm"
+                        type="button"
+                        disabled={!(additionalEmails[grant.id] || "").trim()}
+                        onClick={() => addParticipants(grant.id)}
+                      >Add participants</button>
+                    </div>
+                  )}
 
                   {grant.status === "pending" && (
                     <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--sp-2)", marginTop: "var(--sp-3)" }}>
