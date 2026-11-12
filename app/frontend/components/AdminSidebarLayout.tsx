@@ -35,7 +35,7 @@ const SECTIONS: Section[] = [
     items: [
       { label: "Users", href: "/admin/users", role: "admin" },
       { label: "Audit log", href: "/admin/audit_logs", role: "admin" },
-      { label: "Hike Grants", href: "/admin/hike_grants", role: "admin" },\n      { label: "Gallery images", href: "/admin/gallery_images", role: "admin" },
+      { label: "Hike Grants", href: "/admin/hike_grants", role: "admin" },\n      { label: "Gallery images", href: "/admin/gallery_images", role: "admin" },\n      { label: "Gallery images", href: "/admin/gallery_images", role: "admin" },
     ],
   },
 ]
