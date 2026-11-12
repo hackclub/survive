@@ -15,7 +15,6 @@ const ELSEWHERE_LINKS = [
 ]
 
 export function Footer() {
-  const year = new Date().getFullYear()
 
   return (
     <footer className="footer">
@@ -84,9 +83,6 @@ export function Footer() {
 
       <div className="footer__bottom">
         <div className="wrap footer__bottomRow">
-          <span>
-            &copy; {year} Hack Club &middot; 501(c)(3) nonprofit
-          </span>
           <span>Built offline, mostly</span>
         </div>
       </div>
