@@ -4,29 +4,29 @@ const STEPS = [
   {
     id: "sign-in",
     title: "Sign in",
-    body: "One click with your Hack Club account. If you don't have one yet, making it takes about a minute.",
+    body: "Use your Hack Club account. If you don't have one, it only takes a minute to make.",
   },
   {
     id: "build",
-    title: "Build the thing",
-    body: "Build your cool project, either offline or outdoors themed.",
+    title: "Build something",
+    body: "Make a project that either works without internet or has something to do with the outdoors.",
   },
   {
     id: "track",
     title: (
       <>
-        Track it with{" "}
-        <a href="https://hackatime.hackclub.com" target="_blank" rel="noreferrer">
+        Track your time with{" "}
+        <a href="https://hackatime.hackclub.com/" target="_blank" rel="noreferrer">
           Hackatime
         </a>
       </>
     ),
-    body: "Log your hours as you build, so the time you put in is counted.",
+    body: "Leave Hackatime running while you code. Only the hours it logs count toward your wood.",
   },
   {
     id: "ship",
     title: "Ship it",
-    body: "Paste the repo link, describe your project, and send it for review!",
+    body: "Drop in your repo link, tell us what you made, and send it off for review.",
   },
 ]
 
