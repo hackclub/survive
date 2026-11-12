@@ -1,6 +1,6 @@
-# Creating a hike and adding people to it. The budget is the sum of the listed costs, split
-# evenly, and each hiker's share is held from their wood in the same transaction that checks
-# they can afford it.
+# Creating a hike, adding people to it, and paying for it. The budget is the sum of the listed
+# costs, and the hike needs that much wood before it can be approved. The organiser can put
+# some in when they send it, and anyone who can see the hike can chip in after that.
 module HikeGrantSubmission
   module_function
 
@@ -8,16 +8,18 @@ module HikeGrantSubmission
 
   MAX_ITEMS = 20
 
-  def create!(organiser:, attributes:, items:, emails:)
+  def create!(organiser:, attributes:, items:, emails:, wood: 0)
     users = users_for!(emails)
     item_rows = build_items(items)
     budget_cents = item_rows.sum { |item| item[:amount_cents] }
-    raise Refused, "That's less than a cent each. Add to the costs or invite fewer people." if budget_cents < users.size
+    raise Refused, "Add to the costs or invite fewer people." if budget_cents < users.size
 
     ActiveRecord::Base.transaction do
-      grant = HikeGrant.create!(attributes.merge(budget_cents: budget_cents, status: :pending, created_by: organiser))
+      grant = HikeGrant.create!(attributes.merge(budget_cents: budget_cents, wood_needed: HikeGrant.wood_for(budget_cents),
+        status: :pending, created_by: organiser))
       item_rows.each { |row| grant.items.create!(row) }
-      rebalance!(grant, users)
+      split!(grant, users)
+      contribute!(grant, organiser, wood) if wood.to_i.positive?
       grant
     end
   end
@@ -34,10 +36,43 @@ module HikeGrantSubmission
       raise Refused, "Already on this hike: #{duplicates.map(&:email).join(", ")}" if duplicates.any?
 
       everyone = existing + new_users
-      raise Refused, "That's less than a cent each. Add to the costs or invite fewer people." if grant.budget_cents < everyone.size
+      raise Refused, "Add to the costs or invite fewer people." if grant.budget_cents < everyone.size
 
-      rebalance!(grant, everyone)
+      split!(grant, everyone)
       new_users
+    end
+  end
+
+  # Puts some of the user's wood toward the hike. The user and hike rows are locked so the
+  # same wood can't go to two places at once, and a hike can't be overpaid.
+  def contribute!(grant, user, wood)
+    wood = Integer(wood.to_s, 10) rescue 0
+    raise Refused, "Enter how much wood to put in." unless wood.positive?
+
+    ActiveRecord::Base.transaction do
+      grant.lock!
+      User.where(id: user.id).lock.load
+      raise Refused, "This hike isn't taking wood any more." unless grant.pending?
+
+      remaining = grant.wood_remaining
+      raise Refused, "This hike already has all the wood it needs." if remaining.zero?
+      raise Refused, "This hike only needs #{remaining} more wood." if wood > remaining
+      raise Refused, "You only have #{user.reload.spendable_coins} wood to spend." if user.reload.spendable_coins < wood
+
+      grant.contributions.create!(user: user, wood: wood)
+    end
+  end
+
+  # Gives back everything the user put in, while the hike is still waiting for review.
+  def withdraw!(grant, user)
+    ActiveRecord::Base.transaction do
+      grant.lock!
+      raise Refused, "Wood can only be taken back before the hike is reviewed." unless grant.pending?
+
+      mine = grant.contributions.where(user: user)
+      raise Refused, "You haven't put any wood into this hike." unless mine.exists?
+
+      mine.sum(:wood).tap { mine.delete_all }
     end
   end
 
@@ -76,26 +111,13 @@ module HikeGrantSubmission
     emails.map { |email| users.fetch(email) }
   end
 
-  # Splits the budget evenly and holds each person's share in wood. Rows are locked so two
-  # hikes (or a hike and a shop order) can't spend the same wood at once.
-  def rebalance!(grant, users)
-    User.where(id: users.map(&:id)).order(:id).lock.load
+  # Splits the budget evenly so each hiker's HCB grant is known. Wood is paid separately.
+  def split!(grant, users)
     base, remainder = grant.budget_cents.divmod(users.size)
 
-    short = []
     users.each_with_index do |user, index|
-      cents = base + (index < remainder ? 1 : 0)
       participant = grant.participants.find_or_initialize_by(user: user)
-      wood = HikeGrant.wood_for(cents)
-      already_held = participant.persisted? ? participant.wood_cost : 0
-      short << user if user.reload.spendable_coins + already_held < wood
-
-      participant.update!(allocation_cents: cents, wood_cost: wood)
+      participant.update!(allocation_cents: base + (index < remainder ? 1 : 0))
     end
-
-    return if short.empty?
-
-    raise Refused, "Not enough wood for their share: #{short.map(&:email).join(", ")}. " \
-      "Each person needs #{HikeGrant.wood_for(base + (remainder.positive? ? 1 : 0))} wood."
   end
 end

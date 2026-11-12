@@ -9,7 +9,6 @@ type Participant = {
   name: string
   email: string
   allocationCents: number
-  woodCost: number
   status: string
   hcbGrantId: string | null
   hcbGrantUrl: string | null
@@ -24,7 +23,9 @@ type Grant = {
   meetingPoint: string
   startsAt: string
   budgetCents: number
-  woodTotal: number
+  woodNeeded: number
+  woodRaised: number
+  contributors: { name: string; email: string; wood: number }[]
   items: { id: number; label: string; amountCents: number; reason: string }[]
   allocatedCents: number
   status: string
@@ -169,7 +170,8 @@ export default function Index({ grants, stats }: {
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <p className="u-h3">{money(grant.budgetCents)}</p>
-                      <p className="u-xs u-faint">{grant.participants.length} {grant.participants.length === 1 ? "hiker" : "hikers"} · {money(grant.allocatedCents)} allocated{grant.woodTotal > 0 ? ` · ${grant.woodTotal} wood` : ""}</p>
+                      <p className="u-xs u-faint">{grant.participants.length} {grant.participants.length === 1 ? "hiker" : "hikers"} · {money(grant.allocatedCents)} allocated</p>
+                      <p className="u-xs" style={{ fontWeight: 700 }}>{grant.woodRaised} / {grant.woodNeeded} wood paid</p>
                     </div>
                   </div>
 
@@ -192,15 +194,20 @@ export default function Index({ grants, stats }: {
                     </div>
                   )}
 
+                  {grant.contributors.length > 0 && (
+                    <p className="u-xs u-soft" style={{ marginTop: "var(--sp-3)" }}>
+                      Wood from: {grant.contributors.map(c => `${c.name} (${c.email}) ${c.wood}`).join(", ")}
+                    </p>
+                  )}
+
                   <div style={{ marginTop: "var(--sp-3)", overflowX: "auto" }}>
                     <table className="data-table">
-                      <thead><tr><th>Participant</th><th>Individual share</th><th>Wood</th><th>Status</th><th>HCB reference</th><th></th></tr></thead>
+                      <thead><tr><th>Participant</th><th>Individual share</th><th>Status</th><th>HCB reference</th><th></th></tr></thead>
                       <tbody>
                         {grant.participants.map(participant => (
                           <tr key={participant.id}>
                             <td><strong>{participant.name}</strong><div className="u-xs u-faint">{participant.email}</div></td>
                             <td className="u-mono">{money(participant.allocationCents)}</td>
-                            <td className="u-mono">{participant.woodCost}</td>
                             <td><Status tone={tone(participant.status)}>{participant.status}</Status></td>
                             <td className="u-xs u-faint">{participant.hcbGrantUrl ? <a href={participant.hcbGrantUrl} target="_blank" rel="noreferrer">{participant.hcbGrantId || "Open HCB grant"}</a> : participant.hcbGrantId || "-"}</td>
                             <td>
@@ -211,7 +218,7 @@ export default function Index({ grants, stats }: {
                           </tr>
                         ))}
                         {issuing && grant.participants.some(p => p.id === issuing) && (
-                          <tr><td colSpan={6}>
+                          <tr><td colSpan={5}>
                             <div style={{ display: "grid", gap: "var(--sp-2)" }}>
                               <p className="u-sm">After creating this participant's card grant in HCB, record its reference here.</p>
                               <input className="field__input" value={hcbId} onChange={e => setHcbId(e.target.value)} placeholder="HCB card grant ID / reference" />
@@ -238,7 +245,8 @@ export default function Index({ grants, stats }: {
                       ) : (
                         <>
                           <button className="btn btn--quiet btn--sm" type="button" onClick={() => setRejecting(grant.id)}>Reject</button>
-                          <button className="btn btn--primary btn--sm" type="button" onClick={() => decide(grant.id, "approve")}>Approve allocations</button>
+                          {grant.woodRaised < grant.woodNeeded && <span className="u-xs u-faint" style={{ alignSelf: "center" }}>Needs {grant.woodNeeded - grant.woodRaised} more wood before it can be approved</span>}
+                          <button className="btn btn--primary btn--sm" type="button" disabled={grant.woodRaised < grant.woodNeeded} onClick={() => decide(grant.id, "approve")}>Approve allocations</button>
                         </>
                       )}
                     </div>
