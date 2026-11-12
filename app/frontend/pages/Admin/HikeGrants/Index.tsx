@@ -202,7 +202,7 @@ export default function Index({ grants, stats }: {
                             <td className="u-mono">{money(participant.allocationCents)}</td>
                             <td className="u-mono">{participant.woodCost}</td>
                             <td><Status tone={tone(participant.status)}>{participant.status}</Status></td>
-                            <td className="u-xs u-faint">{participant.hcbGrantUrl ? <a href={participant.hcbGrantUrl} target="_blank" rel="noreferrer">{participant.hcbGrantId || "Open HCB grant"}</a> : participant.hcbGrantId || "—"}</td>
+                            <td className="u-xs u-faint">{participant.hcbGrantUrl ? <a href={participant.hcbGrantUrl} target="_blank" rel="noreferrer">{participant.hcbGrantId || "Open HCB grant"}</a> : participant.hcbGrantId || "-"}</td>
                             <td>
                               {(grant.status === "approved" || grant.status === "paid") && participant.status !== "issued" && (
                                 <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setIssuing(participant.id); setHcbId(""); setHcbUrl("") }}>Record HCB grant</button>

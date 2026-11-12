@@ -96,7 +96,7 @@ export default function Index({
                     </td>
                     <td className="u-soft">{row.makerName}</td>
                     <td className="data-table__num u-mono">
-                      {row.approvedMinutes === null ? "—" : formatMinutes(row.approvedMinutes)}
+                      {row.approvedMinutes === null ? "-" : formatMinutes(row.approvedMinutes)}
                     </td>
                     <td className="data-table__num u-mono">{formatMinutes(row.netMinutes)}</td>
                     <td>
