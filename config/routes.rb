@@ -19,6 +19,7 @@ Rails.application.routes.draw do
     resources :hike_grants, only: %i[index create] do
       member do
         post :decide
+        post :add_participants
         post "participants/:participant_id/issue" => "hike_grants#issue_participant", as: :issue_participant
       end
     end
