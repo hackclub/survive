@@ -106,7 +106,7 @@ export default function Index({ grants, stats }: {
   return (
     <>
       <Head title="Hike Grants - Admin - Survive" />
-      <AdminSidebarLayout eyebrow="Admin · Funding" title="🥾 Hike Grants">
+      <AdminSidebarLayout eyebrow="Admin · Funding" title="Hike Grants">
         <div style={{ maxWidth: 1100 }}>
           <div className="mystats__grid" style={{ marginBottom: "var(--sp-4)" }}>
             <div className="mystats__tile"><span className="mystats__number">{stats.total}</span><span className="u-xs u-faint">Total hikes</span></div>
