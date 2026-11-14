@@ -80,7 +80,7 @@ class Admin::FinalReviewsController < ApplicationController
 
     SlackDmJob.perform_later(
       maker.id,
-      "final-review-#{outcome}:#{record.id}",
+      "final-review-#{outcome}:#{record.id}:#{record.updated_at.to_i}",
       "#{message} #{SlackDmService.project_url(record.review.project)}"
     )
   end
