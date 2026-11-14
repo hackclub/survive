@@ -26,7 +26,6 @@ class HikeGrant < ApplicationRecord
   enum :visibility, { public: 0, private: 1 }, prefix: true
 
   validates :name, :trail, :region, :meeting_point, :starts_at, presence: true
-  validates :latitude, :longitude, presence: true, if: :visibility_public?
   validates :latitude, numericality: { in: -90..90 }, allow_nil: true
   validates :longitude, numericality: { in: -180..180 }, allow_nil: true
   validates :budget_cents, numericality: { only_integer: true, greater_than: 0 }
@@ -47,7 +46,7 @@ class HikeGrant < ApplicationRecord
   end
 
   def allocated_cents
-    participants.sum(:allocation_cents)
+    participants.going.sum(:allocation_cents)
   end
 
   def remaining_cents
@@ -71,9 +70,10 @@ class HikeGrant < ApplicationRecord
   def refresh_payment_status!
     return unless approved? || paid?
     return unless funded?
-    return if participants.empty?
+    active_participants = participants.going
+    return if active_participants.empty?
 
-    update!(status: :paid, paid_at: Time.current) if participants.all?(&:issued?)
+    update!(status: :paid, paid_at: Time.current) if active_participants.all?(&:issued?)
   end
 
   private
