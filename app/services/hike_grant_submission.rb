@@ -1,6 +1,5 @@
-# Creating a hike, adding people to it, and paying for it. The budget is the sum of the listed
-# costs, and the hike needs that much wood before it can be approved. The organiser can put
-# some in when they send it, and anyone who can see the hike can chip in after that.
+# Creating a hike, adding people to it, and paying for it. Admins review hikes before funding is issued.
+# The organiser can put wood in when they send it, and anyone who can see a pending public hike can chip in.
 module HikeGrantSubmission
   module_function
 
@@ -21,6 +20,24 @@ module HikeGrantSubmission
       split!(grant, users)
       contribute!(grant, organiser, wood) if wood.to_i.positive?
       grant
+    end
+  end
+
+  # Join an approved public hike while its participant grants have not been issued.
+  # The total budget stays fixed and is re-split across all participants.
+  def join!(grant, user)
+    ActiveRecord::Base.transaction do
+      grant.lock!
+      raise Refused, "Only approved public hikes can be joined." unless grant.visibility_public? && grant.approved?
+      raise Refused, "This hike's funding has already started, so joining is closed." if grant.participants.issued.exists?
+      raise Refused, "You're already on this hike." if grant.participants.exists?(user_id: user.id)
+
+      users = grant.participants.includes(:user).map(&:user) + [ user ]
+      raise Refused, "This hike has no remaining participant allocation." if grant.budget_cents < users.size
+
+      grant.participants.delete_all
+      split!(grant, users)
+      grant.participants.find_by!(user: user)
     end
   end
 

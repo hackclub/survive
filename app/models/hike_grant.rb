@@ -55,7 +55,6 @@ class HikeGrant < ApplicationRecord
     raise ArgumentError, "Only pending grants can be approved." unless pending?
     raise ArgumentError, "Add at least one participant before approving." if participants.empty?
     raise ArgumentError, "Participant allocations exceed the approved budget." if allocated_cents > budget_cents
-    raise ArgumentError, "This hike still needs #{wood_remaining} wood before it can be approved." unless funded?
 
     update!(status: :approved, reviewed_by: actor, reviewed_at: Time.current, decision_reason: nil)
   end

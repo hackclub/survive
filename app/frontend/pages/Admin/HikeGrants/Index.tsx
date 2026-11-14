@@ -212,7 +212,7 @@ export default function Index({ grants, stats }: {
                             <td className="u-xs u-faint">{participant.hcbGrantUrl ? <a href={participant.hcbGrantUrl} target="_blank" rel="noreferrer">{participant.hcbGrantId || "Open HCB grant"}</a> : participant.hcbGrantId || "-"}</td>
                             <td>
                               {(grant.status === "approved" || grant.status === "paid") && participant.status !== "issued" && (
-                                <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setIssuing(participant.id); setHcbId(""); setHcbUrl("") }}>Record HCB grant</button>
+                                <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setIssuing(participant.id); setHcbId(""); setHcbUrl("") }}>Record sent HCB grant</button>
                               )}
                             </td>
                           </tr>
@@ -245,14 +245,13 @@ export default function Index({ grants, stats }: {
                       ) : (
                         <>
                           <button className="btn btn--quiet btn--sm" type="button" onClick={() => setRejecting(grant.id)}>Reject</button>
-                          {grant.woodRaised < grant.woodNeeded && <span className="u-xs u-faint" style={{ alignSelf: "center" }}>Needs {grant.woodNeeded - grant.woodRaised} more wood before it can be approved</span>}
-                          <button className="btn btn--primary btn--sm" type="button" disabled={grant.woodRaised < grant.woodNeeded} onClick={() => decide(grant.id, "approve")}>Approve allocations</button>
+                          <button className="btn btn--primary btn--sm" type="button" onClick={() => decide(grant.id, "approve")}>Approve hike</button>
                         </>
                       )}
                     </div>
                   )}
                   {grant.status === "approved" && (
-                    <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>Approved. Create one separate HCB card grant for each participant using the individual amounts above, then record each reference. The dashboard does not issue money automatically.</p>
+                    <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>Approved. Funding can now be sent. Create one HCB card grant for each participant using the individual amounts above, then record each reference here. HCB grants are created manually in HCB; this dashboard records them but does not send money automatically.</p>
                   )}
                   {grant.status === "paid" && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>Every participant's HCB grant has been recorded.</p>}
                 </section>
