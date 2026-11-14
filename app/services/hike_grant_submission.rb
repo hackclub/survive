@@ -27,9 +27,15 @@ module HikeGrantSubmission
       grant.lock!
       raise Refused, "Only approved public hikes can be joined." unless grant.visibility_public? && grant.approved?
       raise Refused, "This hike's funding has already started, so joining is closed." if grant.participants.issued.exists?
-      raise Refused, "You've already requested or joined this hike." if grant.participants.exists?(user_id: user.id)
+      participant = grant.participants.find_by(user: user)
+      raise Refused, "You've already requested or joined this hike." if participant&.membership_pending? || participant&.membership_approved?
 
-      grant.participants.create!(user: user, allocation_cents: 0, wood_cost: 0, membership_status: :pending)
+      if participant
+        participant.update!(allocation_cents: 0, wood_cost: 0, membership_status: :pending, status: :allocated)
+      else
+        participant = grant.participants.create!(user: user, allocation_cents: 0, wood_cost: 0, membership_status: :pending)
+      end
+      participant
     end
   end
 
@@ -46,7 +52,7 @@ module HikeGrantSubmission
         everyone = grant.participants.going.includes(:user).map(&:user) + [ participant.user ]
         raise Refused, "There isn't enough budget to add another hiker." if grant.budget_cents < everyone.size
 
-        participant.update!(membership_status: :approved)
+        participant.update!(membership_status: :approved, allocation_cents: 1)
         split!(grant, everyone)
       else
         participant.update!(membership_status: :declined)
