@@ -74,7 +74,8 @@ class ProjectsController < ApplicationController
       redirect_to project_path(@project), notice: "Sent to Ari as a test. It won't pay wood or count toward hours."
     elsif params[:submit_for_review].present?
       authorize @project, :submit_for_review?
-      @project.submit!
+      review = @project.submit!
+      SlackReviewSubmittedJob.perform_later(review.id)
       redirect_to project_path(@project), notice: "Submitted for review!"
     else
       redirect_to camp_path, notice: "Project saved."
