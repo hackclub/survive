@@ -7,7 +7,7 @@ declare global {
   }
 }
 
-type HikePin = { id: number; name: string; trail: string; region: string; startsAt: string; latitude: number | null; longitude: number | null }
+type HikePin = { id: number; name: string; trail: string; region: string; startsAt: string; latitude: number | null; longitude: number | null; status?: string }
 const EMPTY_HIKES: HikePin[] = []
 
 function loadLeaflet() {
@@ -79,7 +79,7 @@ export function HikeMap({ hikes = EMPTY_HIKES, editable = false, selected, onSel
         const bounds: any[] = []
         pins.forEach(hike => {
           const point: [number, number] = [hike.latitude!, hike.longitude!]
-          L.marker(point).addTo(map).bindPopup(`<strong>${escapePopup(hike.name)}</strong><br>${escapePopup(hike.trail)} · ${escapePopup(hike.region)}<br>${escapePopup(hike.startsAt)}`)
+          L.marker(point).addTo(map).bindPopup(`<strong>${escapePopup(hike.name)}</strong><br>${escapePopup(hike.trail)} · ${escapePopup(hike.region)}<br>${escapePopup(hike.startsAt)}${hike.status === "pending" ? "<br>Awaiting admin approval" : ""}`)
           bounds.push(point)
         })
         if (bounds.length > 1) map.fitBounds(L.latLngBounds(bounds), { padding: [28, 28], maxZoom: 12 })
