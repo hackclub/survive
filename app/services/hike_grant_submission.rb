@@ -1,6 +1,5 @@
-# Creating a hike, adding people to it, and paying for it. The budget is the sum of the listed
-# costs, and the hike needs that much wood before it can be approved. The organiser can put
-# some in when they send it, and anyone who can see the hike can chip in after that.
+# Creating a hike, adding people to it, and paying for it. Admins review hikes before funding is issued.
+# The organiser can put wood in when they send it, and anyone who can see a pending public hike can chip in.
 module HikeGrantSubmission
   module_function
 
@@ -36,6 +35,7 @@ module HikeGrantSubmission
       users = grant.participants.includes(:user).map(&:user) + [ user ]
       raise Refused, "This hike has no remaining participant allocation." if grant.budget_cents < users.size
 
+      grant.participants.delete_all
       split!(grant, users)
       grant.participants.find_by!(user: user)
     end
