@@ -120,7 +120,7 @@ class HikeGrantsController < ApplicationController
   def serialize_public(grant)
     { id: grant.id, name: grant.name, trail: grant.trail, region: grant.region,
       meetingPoint: grant.meeting_point, startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
-      organiser: grant.created_by.display_name, participantCount: grant.participants.size,
+      organiser: grant.created_by.display_name, participantCount: grant.participants.size, status: grant.status,
       joined: current_user ? grant.participants.exists?(user_id: current_user.id) : false,
       joinable: grant.approved? && !grant.participants.issued.exists? }.merge(wood_props(grant))
   end
