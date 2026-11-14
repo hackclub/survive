@@ -26,7 +26,7 @@ class HikeGrant < ApplicationRecord
   enum :visibility, { public: 0, private: 1 }, prefix: true
 
   validates :name, :trail, :region, :meeting_point, :starts_at, presence: true
-  validates :latitude, :longitude, presence: true, if: :visibility_public?
+  validates :latitude, :longitude, presence: true, if: -> { visibility_public? && (new_record? || will_save_change_to_visibility?) }
   validates :latitude, numericality: { greater_than_or_equal_to: -90, less_than_or_equal_to: 90 }, allow_nil: true
   validates :longitude, numericality: { greater_than_or_equal_to: -180, less_than_or_equal_to: 180 }, allow_nil: true
   validates :budget_cents, numericality: { only_integer: true, greater_than: 0 }
