@@ -5,7 +5,7 @@ class SlackInactiveProjectsJob < ApplicationJob
 
   def perform
     Project.includes(:user).where(status: %i[draft returned]).find_each do |project|
-      last_activity = [ project.updated_at, project.project_events.maximum(:created_at) ].compact.max
+      last_activity = [ project.updated_at, project.project_events.unscope(:order).maximum(:created_at) ].compact.max
       next if last_activity > INACTIVE_AFTER.ago
 
       week = Date.current.strftime("%G-%V")
