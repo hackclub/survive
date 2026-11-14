@@ -1,5 +1,5 @@
 class HikeGrantsController < ApplicationController
-  before_action :set_owned_grant, only: :add_participants
+  before_action :set_owned_grant, only: %i[add_participants update_location]
   before_action :set_visible_grant, only: %i[contribute withdraw leave]
   before_action :set_public_grant, only: :join
   before_action :set_owned_grant_for_membership, only: %i[approve_join decline_join]
@@ -54,6 +54,15 @@ class HikeGrantsController < ApplicationController
     redirect_to hike_grants_path, notice: created_notice(grant)
   rescue HikeGrantSubmission::Refused, ActiveRecord::RecordInvalid => e
     redirect_to hike_grants_path, alert: e.message
+  end
+
+  def update_location
+    coordinates = params.permit(:latitude, :longitude)
+    @grant.update!(latitude: coordinates[:latitude], longitude: coordinates[:longitude])
+    audit!("hike_grant.location_pinned", target: @grant, metadata: { latitude: @grant.latitude, longitude: @grant.longitude })
+    redirect_to hike_grants_path, notice: "Map pin saved for #{@grant.name}."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to hike_grants_path, alert: e.record.errors.full_messages.to_sentence
   end
 
   def join
