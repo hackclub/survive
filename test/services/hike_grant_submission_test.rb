@@ -11,7 +11,7 @@ class HikeGrantSubmissionTest < ActiveSupport::TestCase
 
   def attrs
     { name: "Ridge walk", trail: "Ridge Track", region: "Somewhere", meeting_point: "Station",
-      starts_at: 1.week.from_now, visibility: "public" }
+      starts_at: 1.week.from_now, visibility: "public", latitude: -33.8, longitude: 151.2 }
   end
 
   def submit(items: [ FUEL ], emails: [ @organiser.email, @friend.email ], wood: 0)
