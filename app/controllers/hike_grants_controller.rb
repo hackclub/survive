@@ -14,8 +14,10 @@ class HikeGrantsController < ApplicationController
     needs_wood = current_user ? HikeGrant.visibility_public.where(status: :pending, starts_at: Time.current..)
       .includes(:created_by, :items, :contributions).order(:starts_at) : HikeGrant.none
     my_hikes = if current_user
+      active_memberships = HikeGrantParticipant.membership_statuses.values_at("pending", "approved")
       HikeGrant.joins("LEFT JOIN hike_grant_participants ON hike_grant_participants.hike_grant_id = hike_grants.id")
-        .where("hike_grants.created_by_id = :user_id OR hike_grant_participants.user_id = :user_id", user_id: current_user.id)
+        .where("hike_grants.created_by_id = :user_id OR (hike_grant_participants.user_id = :user_id AND hike_grant_participants.membership_status IN (:memberships))",
+          user_id: current_user.id, memberships: active_memberships)
         .includes(:items, contributions: :user, participants: :user).distinct.recent
     else
       HikeGrant.none
@@ -127,9 +129,10 @@ class HikeGrantsController < ApplicationController
   end
 
   def set_visible_grant
+    active_memberships = HikeGrantParticipant.membership_statuses.values_at("pending", "approved")
     @grant = HikeGrant.left_joins(:participants)
-      .where("hike_grants.visibility = :public OR hike_grants.created_by_id = :user_id OR hike_grant_participants.user_id = :user_id",
-        public: HikeGrant.visibilities[:public], user_id: current_user.id)
+      .where("hike_grants.visibility = :public OR hike_grants.created_by_id = :user_id OR (hike_grant_participants.user_id = :user_id AND hike_grant_participants.membership_status IN (:memberships))",
+        public: HikeGrant.visibilities[:public], user_id: current_user.id, memberships: active_memberships)
       .distinct.find(params[:id])
   end
 
