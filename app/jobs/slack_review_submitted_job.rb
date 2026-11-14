@@ -16,7 +16,7 @@ class SlackReviewSubmittedJob < ApplicationJob
       "Your project “#{project.name}” has been submitted for review. You can follow its progress here: #{SlackDmService.project_url(project)}"
     )
 
-    reviewers = User.where("roles && ARRAY['reviewer', 'admin', 'superadmin']::varchar[]")
+    reviewers = User.where("roles && ARRAY['reviewer', 'admin', 'superadmin']::varchar[]").where.not(slack_id: [ nil, "" ])
     reviewers.find_each do |reviewer|
       SlackDmJob.perform_later(
         reviewer.id,
