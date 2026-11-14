@@ -1,7 +1,7 @@
 class SlackDmService
   class DeliveryError < StandardError; end
 
-  API_URL = "https://slack.com/api".freeze
+  API_URL = "https://slack.com".freeze
 
   def self.deliver(user:, event_key:, text:)
     return :disabled if ENV["SLACK_BOT_TOKEN"].blank?
@@ -44,7 +44,7 @@ class SlackDmService
   end
 
   def self.post(endpoint, payload)
-    response = connection.post("/#{endpoint}") do |request|
+    response = connection.post("/api/#{endpoint}") do |request|
       request.headers["Authorization"] = "Bearer #{ENV.fetch('SLACK_BOT_TOKEN')}"
       request.headers["Content-Type"] = "application/json; charset=utf-8"
       request.body = payload.to_json
