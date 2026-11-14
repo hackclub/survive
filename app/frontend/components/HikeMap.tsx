@@ -56,7 +56,7 @@ export function HikeMap({ hikes = [], editable = false, selected, onSelect, heig
         : hikes.find(h => h.latitude != null && h.longitude != null)
           ? [hikes.find(h => h.latitude != null && h.longitude != null)!.latitude!, hikes.find(h => h.latitude != null && h.longitude != null)!.longitude!]
           : [-33.8, 151.2]
-      map = L.map(element.current).setView(center, editable ? 10 : 5)
+      map = L.map(element.current).setView(center, editable ? 10 : (hikes.some(h => h.latitude != null && h.longitude != null) ? 11 : 5))
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
