@@ -58,6 +58,8 @@ class HikeGrantsController < ApplicationController
 
   def update_location
     coordinates = params.permit(:latitude, :longitude)
+    return redirect_to(hike_grants_path, alert: "Choose a map location first.") if coordinates[:latitude].blank? || coordinates[:longitude].blank?
+
     @grant.update!(latitude: coordinates[:latitude], longitude: coordinates[:longitude])
     audit!("hike_grant.location_pinned", target: @grant, metadata: { latitude: @grant.latitude, longitude: @grant.longitude })
     redirect_to hike_grants_path, notice: "Map pin saved for #{@grant.name}."
