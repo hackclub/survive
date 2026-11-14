@@ -2,6 +2,7 @@ import { useState } from "react"
 import { Head, router } from "@inertiajs/react"
 import { AdminSidebarLayout } from "../../../components/AdminSidebarLayout"
 import { Status } from "../../../components/Status"
+import { HikeMap } from "../../../components/HikeMap"
 
 type Participant = {
   id: number
@@ -58,6 +59,8 @@ export default function Index({ grants, stats }: {
   const [region, setRegion] = useState("")
   const [meetingPoint, setMeetingPoint] = useState("")
   const [startsAt, setStartsAt] = useState("")
+  const [latitude, setLatitude] = useState<number | null>(null)
+  const [longitude, setLongitude] = useState<number | null>(null)
   const [budget, setBudget] = useState("")
   const [participantEmails, setParticipantEmails] = useState("")
   const [rejecting, setRejecting] = useState<number | null>(null)
@@ -69,7 +72,7 @@ export default function Index({ grants, stats }: {
   function createGrant(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     router.post("/admin/hike_grants", {
-      hike_grant: { name, trail, region, meeting_point: meetingPoint, starts_at: startsAt, budget },
+      hike_grant: { name, trail, region, meeting_point: meetingPoint, starts_at: startsAt, budget, latitude, longitude },
       participant_emails: participantEmails,
     }, {
       onSuccess: () => {
@@ -140,6 +143,12 @@ export default function Index({ grants, stats }: {
                   <label className="field"><span className="field__label">Date and time</span><input className="field__input" type="datetime-local" required value={startsAt} onChange={e => setStartsAt(e.target.value)} /></label>
                   <label className="field"><span className="field__label">Total budget (USD)</span><input className="field__input" type="number" min="0.01" step="0.01" required value={budget} onChange={e => setBudget(e.target.value)} placeholder="200.00" /></label>
                 </div>
+                <div className="field" style={{ display: "grid", gap: "var(--sp-2)" }}>
+                  <span className="field__label">Pin the public hike location</span>
+                  <span className="u-xs u-faint">Click the map to place a marker for the upcoming hikes map.</span>
+                  <HikeMap editable height={280} selected={latitude != null && longitude != null ? { latitude, longitude } : null} onSelect={(lat, lng) => { setLatitude(lat); setLongitude(lng) }} />
+                  <span className="u-xs u-faint">{latitude != null && longitude != null ? `Pinned: ${latitude}, ${longitude}` : "Choose a map location to continue."}</span>
+                </div>
                 <label className="field">
                   <span className="field__label">Participant emails</span>
                   <textarea className="field__input" rows={3} required value={participantEmails} onChange={e => setParticipantEmails(e.target.value)} placeholder="one@hackclub.com, two@hackclub.com" />
@@ -147,7 +156,7 @@ export default function Index({ grants, stats }: {
                 </label>
                 <div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--sp-2)" }}>
                   <button className="btn btn--quiet" type="button" onClick={() => setShowForm(false)}>Cancel</button>
-                  <button className="btn btn--primary" type="submit">Create and submit for review</button>
+                  <button className="btn btn--primary" type="submit" disabled={latitude == null || longitude == null}>Create and submit for review</button>
                 </div>
               </form>
             )}
