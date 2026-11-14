@@ -1,0 +1,74 @@
+.hikes-page {
+  display: grid;
+  gap: clamp(24px, 3vw, 36px);
+  padding-bottom: var(--sp-8);
+}
+
+.hikes-page > .gallery {
+  max-width: none;
+  margin-top: 0 !important;
+}
+
+.hikes-page__tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--surface, rgba(255, 255, 255, 0.55));
+}
+
+.hikes-page__tabs [role="tab"] {
+  border-radius: 999px;
+}
+
+.hikes-page__section {
+  min-width: 0;
+}
+
+.hikes-page__section > h2 {
+  margin-bottom: 6px;
+}
+
+.hikes-page__cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+  align-items: start;
+}
+
+.hikes-page__card {
+  height: 100%;
+  align-content: start;
+  transition: border-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.hikes-page__card:hover {
+  border-color: color-mix(in srgb, var(--accent, #c65d37) 35%, var(--border));
+  box-shadow: 0 12px 28px rgba(14, 19, 27, 0.07);
+  transform: translateY(-2px);
+}
+
+.hikes-page .dashboard__empty {
+  margin-top: var(--sp-3);
+}
+
+@media (max-width: 640px) {
+  .hikes-page__tabs {
+    width: 100%;
+  }
+  .hikes-page__tabs [role="tab"] {
+    flex: 1;
+  }
+  .hikes-page__card:hover {
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hikes-page__card { transition: none; }
+}
