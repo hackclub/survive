@@ -8,6 +8,7 @@ declare global {
 }
 
 type HikePin = { id: number; name: string; trail: string; region: string; startsAt: string; latitude: number | null; longitude: number | null }
+const EMPTY_HIKES: HikePin[] = []
 
 function loadLeaflet() {
   if (window.L) return Promise.resolve()
@@ -31,7 +32,7 @@ function loadLeaflet() {
   return window.__surviveLeaflet
 }
 
-export function HikeMap({ hikes = [], editable = false, selected, onSelect, height = 390 }: {
+export function HikeMap({ hikes = EMPTY_HIKES, editable = false, selected, onSelect, height = 390 }: {
   hikes?: HikePin[]
   editable?: boolean
   selected?: { latitude: number; longitude: number } | null
