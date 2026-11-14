@@ -100,6 +100,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
         <h2 className="u-h2">Upcoming hikes map</h2>
         <p className="u-sm u-soft">Every public upcoming hike with a pinned location appears here. Select a marker to see the hike.</p>
         <HikeMap hikes={publicHikes} height={420} />
+        {publicHikes.some(h => h.latitude == null || h.longitude == null) && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-2)" }}>A few older public hikes don't have map pins yet, so they appear in the list below but not on the map.</p>}
         <h2 className="u-h2" style={{ marginTop: "var(--sp-5)" }}>Upcoming hikes</h2>
         <p className="u-sm u-soft">Approved public hikes are happening. Request to join; the organiser will approve your place. Private hikes never appear here.</p>
         {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div className="hikes-page__cards">
