@@ -51,6 +51,7 @@ class HikeGrant < ApplicationRecord
     budget_cents - allocated_cents
   end
 
+  # Approval confirms the hike can go ahead; it does not mean its costs are funded.
   def approve!(actor)
     raise ArgumentError, "Only pending grants can be approved." unless pending?
     raise ArgumentError, "Add at least one participant before approving." if participants.empty?
