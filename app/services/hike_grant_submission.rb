@@ -24,6 +24,23 @@ module HikeGrantSubmission
     end
   end
 
+  # Join an approved public hike while its participant grants have not been issued.
+  # The total budget stays fixed and is re-split across all participants.
+  def join!(grant, user)
+    ActiveRecord::Base.transaction do
+      grant.lock!
+      raise Refused, "Only approved public hikes can be joined." unless grant.visibility_public? && grant.approved?
+      raise Refused, "This hike's funding has already started, so joining is closed." if grant.participants.issued.exists?
+      raise Refused, "You're already on this hike." if grant.participants.exists?(user_id: user.id)
+
+      users = grant.participants.includes(:user).map(&:user) + [ user ]
+      raise Refused, "This hike has no remaining participant allocation." if grant.budget_cents < users.size
+
+      split!(grant, users)
+      grant.participants.find_by!(user: user)
+    end
+  end
+
   def add_participants!(grant, emails)
     new_users = users_for!(emails)
 
