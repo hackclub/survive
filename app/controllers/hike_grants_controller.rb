@@ -114,7 +114,7 @@ class HikeGrantsController < ApplicationController
   def wood_props(grant)
     raised = grant.wood_raised
     { woodNeeded: grant.wood_needed, woodRaised: raised,
-      myWood: grant.contributions.select { |c| c.user_id == current_user.id }.sum(&:wood) }
+      myWood: current_user ? grant.contributions.select { |c| c.user_id == current_user.id }.sum(&:wood) : 0 }
   end
 
   def serialize_public(grant)
