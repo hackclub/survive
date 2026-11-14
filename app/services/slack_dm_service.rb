@@ -35,6 +35,10 @@ class SlackDmService
     "#{app_url}/admin/final_reviews?filter=pending"
   end
 
+  def self.admin_fulfillment_url
+    "#{app_url}/admin/fulfillment"
+  end
+
   def self.app_url
     (ENV["APP_HOST"].presence || "https://survive.hackclub.com").delete_suffix("/")
   end
