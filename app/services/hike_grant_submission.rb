@@ -139,8 +139,9 @@ module HikeGrantSubmission
     return if users.empty?
     base, remainder = grant.budget_cents.divmod(users.size)
     users.each_with_index do |user, index|
-      participant = grant.participants.find_by!(user: user)
-      participant.update!(allocation_cents: base + (index < remainder ? 1 : 0))
+      participant = grant.participants.find_or_initialize_by(user: user)
+      participant.membership_status = :approved
+      participant.update!(allocation_cents: base + (index < remainder ? 1 : 0), wood_cost: 0)
     end
   end
 end
