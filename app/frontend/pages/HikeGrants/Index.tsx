@@ -3,6 +3,8 @@ import { Head, Link, router } from "@inertiajs/react"
 import { Status } from "../../components/Status"
 import { ImageCarousel } from "../../components/ImageCarousel"
 import { AppShell } from "../../components/AppShell"
+import { usePage } from "@inertiajs/react"
+import type { SharedProps } from "../../types"
 
 type Participant = { id: number; name: string; email: string; allocationCents: number }
 type Wood = { woodNeeded: number; woodRaised: number; myWood: number }
@@ -12,7 +14,7 @@ type DraftItem = { kind: string; amount: string; reason: string }
 type Grant = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; budgetCents: number; status: string; visibility: "public" | "private"; isOrganiser: boolean; decisionReason: string | null; items: Item[]; participants: Participant[]; contributors: { name: string; wood: number }[] } & Wood
 type NeedsWood = { id: number; name: string; trail: string; region: string; startsAt: string; organiser: string; isOrganiser: boolean; items: { id: number; label: string; reason: string }[] } & Wood
 type GallerySlide = { id: number; imageUrl: string; caption: string | null }
-type PublicHike = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; organiser: string; participantCount: number }
+type PublicHike = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; organiser: string; participantCount: number; joined: boolean; joinable: boolean }
 const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n / 100)
 const tone = (s: string): "neutral" | "ok" | "warn" | "bad" => ["approved", "paid", "completed"].includes(s) ? "ok" : s === "rejected" ? "bad" : s === "pending" ? "warn" : "neutral"
 
@@ -47,6 +49,7 @@ function ChipIn({ id, hike, spendable }: { id: number; hike: Wood; spendable: nu
 }
 
 export default function Index({ grants, publicHikes, needsWood, costKinds, woodRate, spendable, galleryImages = [] }: { galleryImages?: GallerySlide[]; grants: Grant[]; publicHikes: PublicHike[]; needsWood: NeedsWood[]; costKinds: CostKind[]; woodRate: number; spendable: number }) {
+  const { auth, signInPath } = usePage<SharedProps>().props
   const [tab, setTab] = useState<"explore" | "mine">("explore")
   const [fields, setFields] = useState({ name: "", trail: "", region: "", meeting_point: "", starts_at: "", visibility: "public", participant_emails: "" })
   const [items, setItems] = useState<DraftItem[]>([])
@@ -78,7 +81,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
 
       <div role="tablist" aria-label="Hikes" style={{ display: "flex", gap: "var(--sp-2)", borderBottom: "1px solid var(--border)", marginTop: "var(--sp-4)" }}>
         <button type="button" role="tab" aria-selected={tab === "explore"} className={tab === "explore" ? "btn btn--primary" : "btn btn--quiet"} onClick={() => setTab("explore")}>Upcoming</button>
-        <button type="button" role="tab" aria-selected={tab === "mine"} className={tab === "mine" ? "btn btn--primary" : "btn btn--quiet"} onClick={() => setTab("mine")}>Your hikes</button>
+        {auth.user && <button type="button" role="tab" aria-selected={tab === "mine"} className={tab === "mine" ? "btn btn--primary" : "btn btn--quiet"} onClick={() => setTab("mine")}>Your hikes</button>}
       </div>
 
       {tab === "explore" ? <section style={{ marginTop: "var(--sp-4)" }}>
@@ -94,10 +97,10 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
           </div>
         </div>}
         <h2 className="u-h2">Upcoming hikes</h2>
-        <p className="u-sm u-soft">Approved and paid for. Who's going and who paid stays between the organiser and us.</p>
-        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">Nothing planned yet. Want to plan the first one?</p><button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button></div> : <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
+        <p className="u-sm u-soft">Admin-approved public hikes. Sign in to join one.</p>
+        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
           {publicHikes.map(h => <article className="card" key={h.id} style={{ padding: "var(--sp-4)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Meet at {h.meetingPoint}</p><p className="u-xs u-faint">Organised by {h.organiser}</p></div><div style={{ textAlign: "right" }}><Status tone="ok">Approved</Status><p className="u-xs u-faint" style={{ marginTop: 8 }}>{h.participantCount} {h.participantCount === 1 ? "hiker" : "hikers"}</p></div></div>
+            <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Meet at {h.meetingPoint}</p><p className="u-xs u-faint">Organised by {h.organiser}</p></div><div style={{ textAlign: "right" }}><Status tone="ok">Approved</Status><p className="u-xs u-faint" style={{ marginTop: 8 }}>{h.participantCount} {h.participantCount === 1 ? "hiker" : "hikers"}</p>{h.joined ? <Status tone="ok">You are going</Status> : h.joinable ? auth.user ? <button className="btn btn--primary btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => router.post("/hike_grants/" + h.id + "/join", {}, { preserveScroll: true })}>Join hike</button> : <a className="btn btn--primary btn--sm" style={{ display: "inline-block", marginTop: 8 }} href={signInPath}>Sign in to join</a> : <Status tone="neutral">Joining closed</Status>}</div></div>
           </article>)}
         </div>}
       </section> : <section style={{ marginTop: "var(--sp-4)" }}>
@@ -153,7 +156,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
             {g.isOrganiser && g.status !== "pending" && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>You can't change who's going once it's been reviewed.</p>}
           </article>)}
         </div>}
-      </section>}
+      </section> : <section style={{ marginTop: "var(--sp-4)" }}><div className="dashboard__empty"><p className="u-sm u-faint">Sign in to plan a hike, manage your hikes, or contribute wood.</p><a className="btn btn--primary" href={signInPath}>Sign in</a></div></section>}
     </AppShell>
   </>
 }
