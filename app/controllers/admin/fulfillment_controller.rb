@@ -20,6 +20,13 @@ class Admin::FulfillmentController < ApplicationController
     end
 
     order.fulfill!(current_user, reference: params[:reference])
+    reference = order.grant? ? order.hcb_grant_link : order.tracking_number
+    details = reference.present? ? " Reference: #{reference}" : ""
+    SlackDmJob.perform_later(
+      order.user_id,
+      "order-fulfilled:#{order.id}",
+      "Your Survive reward “#{order.frozen_item_name}” has been fulfilled!#{details} Check your orders: #{SlackDmService.app_url}/orders"
+    )
     audit!("order.fulfilled", target: order, metadata: { user_id: order.user_id, item: order.frozen_item_name })
     redirect_to admin_fulfillment_index_path, notice: "Marked #{order.frozen_item_name} as sent."
   rescue Order::NotAllowed => e
