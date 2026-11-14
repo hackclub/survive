@@ -211,7 +211,7 @@ export default function Index({ grants, stats }: {
                             <td><Status tone={tone(participant.status)}>{participant.status}</Status></td>
                             <td className="u-xs u-faint">{participant.hcbGrantUrl ? <a href={participant.hcbGrantUrl} target="_blank" rel="noreferrer">{participant.hcbGrantId || "Open HCB grant"}</a> : participant.hcbGrantId || "-"}</td>
                             <td>
-                              {(grant.status === "approved" || grant.status === "paid") && participant.status !== "issued" && (
+                              {(grant.status === "approved" || grant.status === "paid") && grant.woodRaised >= grant.woodNeeded && participant.status !== "issued" && (
                                 <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setIssuing(participant.id); setHcbId(""); setHcbUrl("") }}>Record sent HCB grant</button>
                               )}
                             </td>
@@ -251,7 +251,11 @@ export default function Index({ grants, stats }: {
                     </div>
                   )}
                   {grant.status === "approved" && (
-                    <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>Approved. Funding can now be sent. Create one HCB card grant for each participant using the individual amounts above, then record each reference here. HCB grants are created manually in HCB; this dashboard records them but does not send money automatically.</p>
+                    <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>
+                      {grant.woodRaised < grant.woodNeeded
+                        ? `Approved — the hike is confirmed, but it still needs ${grant.woodNeeded - grant.woodRaised} more wood before any HCB funding can be issued.`
+                        : "Fully funded. You can now create one HCB card grant for each participant using the individual amounts above, then record each reference here. HCB grants are created manually; this dashboard records them but does not send money automatically."}
+                    </p>
                   )}
                   {grant.status === "paid" && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>Every participant's HCB grant has been recorded.</p>}
                 </section>
