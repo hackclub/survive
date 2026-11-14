@@ -39,6 +39,10 @@ export function HikeMap({ hikes = [], editable = false, selected, onSelect, heig
   height?: number
 }) {
   const element = useRef<HTMLDivElement>(null)
+  const onSelectRef = useRef(onSelect)
+  const selectedRef = useRef(selected)
+  onSelectRef.current = onSelect
+  selectedRef.current = selected
 
   useEffect(() => {
     let map: any
@@ -46,8 +50,9 @@ export function HikeMap({ hikes = [], editable = false, selected, onSelect, heig
     loadLeaflet().then(() => {
       if (!alive || !element.current || !window.L) return
       const L = window.L
-      const center: [number, number] = selected
-        ? [selected.latitude, selected.longitude]
+      const currentSelection = selectedRef.current
+      const center: [number, number] = currentSelection
+        ? [currentSelection.latitude, currentSelection.longitude]
         : hikes.find(h => h.latitude != null && h.longitude != null)
           ? [hikes.find(h => h.latitude != null && h.longitude != null)!.latitude!, hikes.find(h => h.latitude != null && h.longitude != null)!.longitude!]
           : [-33.8, 151.2]
@@ -59,13 +64,13 @@ export function HikeMap({ hikes = [], editable = false, selected, onSelect, heig
 
       if (editable) {
         let marker: any
-        if (selected) marker = L.marker(center).addTo(map)
+        if (currentSelection) marker = L.marker(center).addTo(map)
         map.on("click", (event: any) => {
           const lat = Number(event.latlng.lat.toFixed(6))
           const lng = Number(event.latlng.lng.toFixed(6))
           if (marker) marker.setLatLng([lat, lng])
           else marker = L.marker([lat, lng]).addTo(map)
-          onSelect?.(lat, lng)
+          onSelectRef.current?.(lat, lng)
         })
       } else {
         const pins = hikes.filter(h => h.latitude != null && h.longitude != null)
@@ -82,7 +87,7 @@ export function HikeMap({ hikes = [], editable = false, selected, onSelect, heig
       if (element.current) element.current.textContent = "The map couldn't load. Please refresh or check your connection."
     })
     return () => { alive = false; map?.remove() }
-  }, [hikes, editable, selected?.latitude, selected?.longitude, onSelect])
+  }, [hikes, editable])
 
   return <div ref={element} style={{ width: "100%", height, borderRadius: 12, overflow: "hidden", background: "var(--surface-2, #eee)" }} aria-label={editable ? "Choose the hike location by clicking the map" : "Map of upcoming public hikes"} />
 }
