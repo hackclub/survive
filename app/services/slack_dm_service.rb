@@ -16,7 +16,7 @@ class SlackDmService
       channel_id = opened.dig("channel", "id")
       raise DeliveryError, "Slack did not return a DM channel" if channel_id.blank?
 
-      post("chat.postMessage", channel: channel_id, text: text, mrkdwn: false, unfurl_links: false, unfurl_media: false)
+      post("chat.postMessage", channel: channel_id, text: text.to_s.truncate(3500), mrkdwn: false, unfurl_links: false, unfurl_media: false)
       notification.update!(sent_at: Time.current)
     end
 
