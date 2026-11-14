@@ -1,4 +1,5 @@
 require "test_helper"
+require "faraday/adapter/test"
 
 class SlackDmServiceTest < ActiveSupport::TestCase
   test "opens a DM and sends a notification only once for an event" do
