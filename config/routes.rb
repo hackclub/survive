@@ -62,7 +62,7 @@ Rails.application.routes.draw do
   resources :hike_grants, only: %i[index create] do
     member do
       post :add_participants
-      patch :location
+      patch "location" => "hike_grants#update_location", as: :update_location
       post :join
       delete :leave
       post "participants/:participant_id/approve" => "hike_grants#approve_join", as: :approve_join
