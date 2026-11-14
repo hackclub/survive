@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_210000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_15_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -184,6 +184,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_210000) do
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.integer "wood_cost", default: 0, null: false
+    t.integer "membership_status", default: 1, null: false
+    t.index ["hike_grant_id", "membership_status"], name: "index_hike_participants_on_grant_and_membership"
     t.index ["hike_grant_id", "user_id"], name: "index_hike_grant_participants_on_grant_and_user", unique: true
     t.index ["hike_grant_id"], name: "index_hike_grant_participants_on_hike_grant_id"
     t.index ["user_id"], name: "index_hike_grant_participants_on_user_id"
@@ -208,6 +210,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_210000) do
     t.datetime "updated_at", null: false
     t.integer "visibility", default: 0, null: false
     t.integer "wood_needed", default: 0, null: false
+    t.decimal "latitude", precision: 10, scale: 7
+    t.decimal "longitude", precision: 10, scale: 7
     t.index ["created_by_id"], name: "index_hike_grants_on_created_by_id"
     t.index ["reviewed_by_id"], name: "index_hike_grants_on_reviewed_by_id"
     t.index ["status"], name: "index_hike_grants_on_status"
