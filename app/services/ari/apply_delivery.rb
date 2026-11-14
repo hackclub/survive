@@ -102,7 +102,7 @@ module Ari
       AirtableSyncJob.perform_later(review.id)
       return if final_review.nil?
 
-      User.where("roles && ARRAY['reviewer', 'admin', 'superadmin']::varchar[]").find_each do |reviewer|
+      User.where("roles && ARRAY['reviewer', 'admin', 'superadmin']::varchar[]").where.not(slack_id: [ nil, "" ]).find_each do |reviewer|
         SlackDmJob.perform_later(
           reviewer.id,
           "final-review-queue:#{final_review.id}",
