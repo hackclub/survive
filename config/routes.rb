@@ -62,7 +62,11 @@ Rails.application.routes.draw do
   resources :hike_grants, only: %i[index create] do
     member do
       post :add_participants
+      patch "location" => "hike_grants#update_location", as: :update_location
       post :join
+      delete :leave
+      post "participants/:participant_id/approve" => "hike_grants#approve_join", as: :approve_join
+      post "participants/:participant_id/decline" => "hike_grants#decline_join", as: :decline_join
       post :contribute
       delete "contribute" => "hike_grants#withdraw", as: :withdraw
     end

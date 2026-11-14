@@ -16,7 +16,7 @@ class Admin::HikeGrantsController < ApplicationController
 
   def create
     authorize :hike_grant, :manage?
-    attributes = params.require(:hike_grant).permit(:name, :trail, :region, :meeting_point, :starts_at, :budget)
+    attributes = params.require(:hike_grant).permit(:name, :trail, :region, :meeting_point, :starts_at, :budget, :latitude, :longitude)
     emails = params[:participant_emails].to_s.split(/[\s,;]+/).map { |email| email.strip.downcase }.reject(&:blank?).uniq
     return redirect_to(admin_hike_grants_path, alert: "Add at least one participant email.") if emails.empty?
 
@@ -36,6 +36,8 @@ class Admin::HikeGrantsController < ApplicationController
         region: attributes[:region],
         meeting_point: attributes[:meeting_point],
         starts_at: Time.zone.parse(attributes[:starts_at]),
+        latitude: attributes[:latitude],
+        longitude: attributes[:longitude],
         budget_cents: budget_cents,
         wood_needed: HikeGrant.wood_for(budget_cents),
         status: :pending,
@@ -118,7 +120,7 @@ class Admin::HikeGrantsController < ApplicationController
       decisionReason: grant.decision_reason,
       createdBy: grant.created_by.display_name,
       reviewedBy: grant.reviewed_by&.display_name,
-      participants: grant.participants.map do |participant|
+      participants: grant.participants.going.map do |participant|
         {
           id: participant.id,
           userId: participant.user_id,
