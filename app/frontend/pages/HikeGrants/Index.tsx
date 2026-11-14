@@ -73,7 +73,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
       title="Hikes"
       lede="Join a hike, plan one, or chip in wood to help someone else's happen."
       narrow
-      actions={<Link className="btn btn--quiet btn--sm" href="/dashboard">← Dashboard</Link>}
+      actions={auth.user ? <Link className="btn btn--quiet btn--sm" href="/dashboard">← Dashboard</Link> : <Link className="btn btn--quiet btn--sm" href="/">← Home</Link>}
     >
 
       {galleryImages.length > 0 && <div style={{ marginTop: "var(--sp-4)" }}><ImageCarousel images={galleryImages} label="Hikes gallery" /></div>}
