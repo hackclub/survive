@@ -5,10 +5,10 @@ class SlackDmServiceTest < ActiveSupport::TestCase
   test "opens a DM and sends a notification only once for an event" do
     user = build_maker(slack_id: "U123")
     stubs = Faraday::Adapter::Test::Stubs.new do |stub|
-      stub.post("/conversations.open") do
+      stub.post("/api/conversations.open") do
         [ 200, { "Content-Type" => "application/json" }, { ok: true, channel: { id: "D123" } }.to_json ]
       end
-      stub.post("/chat.postMessage") do
+      stub.post("/api/chat.postMessage") do
         [ 200, { "Content-Type" => "application/json" }, { ok: true, ts: "123.456" }.to_json ]
       end
     end
