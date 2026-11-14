@@ -21,7 +21,7 @@ const tone = (s: string): "neutral" | "ok" | "warn" | "bad" => ["approved", "pai
 function WoodBar({ hike }: { hike: Wood }) {
   const percent = hike.woodNeeded > 0 ? Math.min(100, Math.round((hike.woodRaised / hike.woodNeeded) * 100)) : 100
   return <div style={{ display: "grid", gap: 4 }}>
-    <div style={{ display: "flex", justifyContent: "space-between" }} className="u-xs"><strong>{hike.woodRaised} / {hike.woodNeeded} wood</strong><span className="u-faint">{hike.woodRaised >= hike.woodNeeded ? "Fully paid" : `${hike.woodNeeded - hike.woodRaised} to go`}</span></div>
+    <div style={{ display: "flex", justifyContent: "space-between" }} className="u-xs"><strong>{hike.woodRaised} / {hike.woodNeeded} wood</strong><span className="u-faint">{hike.woodRaised >= hike.woodNeeded ? "Fully funded" : `${hike.woodNeeded - hike.woodRaised} to go`}</span></div>
     <div style={{ height: 8, borderRadius: 999, background: "var(--border)", overflow: "hidden" }} role="progressbar" aria-valuemin={0} aria-valuemax={hike.woodNeeded} aria-valuenow={hike.woodRaised}><div style={{ width: `${percent}%`, height: "100%", background: "var(--accent, #8a5a2b)" }} /></div>
   </div>
 }
@@ -96,7 +96,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
           </div>
         </div>}
         <h2 className="u-h2">Upcoming hikes</h2>
-        <p className="u-sm u-soft">Admin-approved public hikes. Sign in to join one.</p>
+        <p className="u-sm u-soft">Approved hikes are happening. Chip in wood to help cover the costs, or join one.</p>
         {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div className="hikes-page__cards">
           {publicHikes.map(h => <article className="card hikes-page__card" key={h.id} style={{ padding: "var(--sp-4)", display: "grid", gap: "var(--sp-3)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Meet at {h.meetingPoint}</p><p className="u-xs u-faint">Organised by {h.organiser}</p></div><div style={{ textAlign: "right" }}><Status tone="ok">Approved · happening</Status><p className="u-xs u-faint" style={{ marginTop: 8 }}>{h.participantCount} {h.participantCount === 1 ? "hiker" : "hikers"}</p>{h.joined ? <Status tone="ok">You are going</Status> : h.joinable ? auth.user ? <button className="btn btn--primary btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => router.post("/hike_grants/" + h.id + "/join", {}, { preserveScroll: true })}>Join hike</button> : <a className="btn btn--primary btn--sm" style={{ display: "inline-block", marginTop: 8 }} href={signInPath}>Sign in to join</a> : <Status tone="neutral">Joining closed</Status>}</div></div>
