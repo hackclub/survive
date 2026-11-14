@@ -155,7 +155,7 @@ class HikeGrantsController < ApplicationController
       organiser: grant.created_by.display_name, participantCount: grant.participants.going.size,
       latitude: grant.latitude&.to_f, longitude: grant.longitude&.to_f,
       joined: mine&.membership_approved? || false, joinPending: mine&.membership_pending? || false,
-      joinable: mine.nil? && grant.approved? && !grant.participants.issued.exists?, status: grant.status }.merge(wood_props(grant))
+      joinable: (mine.nil? || mine.membership_left? || mine.membership_declined?) && grant.approved? && !grant.participants.issued.exists?, status: grant.status }.merge(wood_props(grant))
   end
 
   def serialize_needs_wood(grant)
