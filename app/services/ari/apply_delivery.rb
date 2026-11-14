@@ -78,10 +78,37 @@ module Ari
         review.project.public_send("#{PROJECT_ACTIONS.fetch(state)}_event!", feedback)
       end
 
+      maker = review.project.user
+      unless review.test_submission?
+        outcome = case state
+        when :approved
+          "Your project review for “#{review.project.name}” is complete: it was approved for #{review.approved_minutes.to_i} minutes. It is now waiting for final checks before any wood payout."
+        when :returned
+          "Your project “#{review.project.name}” needs some changes before it can be approved. Reviewer feedback: #{feedback || 'Check your project page for details.'}"
+        when :rejected
+          "Your project “#{review.project.name}” was not approved. Reviewer feedback: #{feedback || 'Check your project page for details.'}"
+        end
+
+        SlackDmJob.perform_later(
+          maker.id,
+          "review-decision:#{delivery.delivery_id}",
+          "#{outcome} #{SlackDmService.project_url(review.project)}"
+        )
+      end
+
       return unless state == :approved
 
-      review.open_final_review!
+      final_review = review.open_final_review!
       AirtableSyncJob.perform_later(review.id)
+      return if final_review.nil?
+
+      User.where("roles && ARRAY['reviewer', 'admin', 'superadmin']::varchar[]").find_each do |reviewer|
+        SlackDmJob.perform_later(
+          reviewer.id,
+          "final-review-queue:#{final_review.id}",
+          "A Survive project has passed its first review and needs final checks: “#{review.project.name}” by #{maker.display_name}. Open the final review queue: #{SlackDmService.admin_final_reviews_url}"
+        )
+      end
     end
 
     def minutes(body)
