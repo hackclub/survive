@@ -103,7 +103,9 @@ class HikeGrantsController < ApplicationController
   def serialize_public(grant)
     { id: grant.id, name: grant.name, trail: grant.trail, region: grant.region,
       meetingPoint: grant.meeting_point, startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
-      organiser: grant.created_by.display_name, participantCount: grant.participants.size,\n      joined: current_user ? grant.participants.exists?(user_id: current_user.id) : false,\n      joinable: grant.approved? && !grant.participants.issued.exists? }
+      organiser: grant.created_by.display_name, participantCount: grant.participants.size,
+      joined: current_user ? grant.participants.exists?(user_id: current_user.id) : false,
+      joinable: grant.approved? && !grant.participants.issued.exists? }
   end
 
   # Pending hikes anyone can chip in to. The meeting point stays hidden until it's approved.
