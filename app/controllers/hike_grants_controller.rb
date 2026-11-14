@@ -9,6 +9,8 @@ class HikeGrantsController < ApplicationController
   def index
     public_hikes = HikeGrant.visibility_public.where(status: %i[approved paid], starts_at: Time.current..)
       .includes(:created_by, :participants, :contributions).recent
+    map_hikes = HikeGrant.visibility_public.where(status: %i[pending approved paid], starts_at: Time.current..)
+      .includes(:created_by).recent
     needs_wood = current_user ? HikeGrant.visibility_public.where(status: :pending, starts_at: Time.current..)
       .includes(:created_by, :items, :contributions).order(:starts_at) : HikeGrant.none
     my_hikes = if current_user
@@ -22,6 +24,7 @@ class HikeGrantsController < ApplicationController
     render inertia: "HikeGrants/Index", props: {
       galleryImages: GalleryImage.where(placement: %w[hikes both]).with_attached_image.ordered.map { |image| { id: image.id, imageUrl: image.image_url, caption: image.caption } },
       publicHikes: public_hikes.map { |grant| serialize_public(grant) },
+      mapHikes: map_hikes.map { |grant| serialize_map(grant) },
       needsWood: needs_wood.map { |grant| serialize_needs_wood(grant) },
       grants: my_hikes.map { |grant| serialize_private(grant) },
       costKinds: HikeGrantItem::KINDS.map { |kind, info| { kind: kind, label: info[:label], hint: info[:hint] } },
@@ -156,6 +159,12 @@ class HikeGrantsController < ApplicationController
       latitude: grant.latitude&.to_f, longitude: grant.longitude&.to_f,
       joined: mine&.membership_approved? || false, joinPending: mine&.membership_pending? || false,
       joinable: (mine.nil? || mine.membership_left? || mine.membership_declined?) && grant.approved? && !grant.participants.issued.exists?, status: grant.status }.merge(wood_props(grant))
+  end
+
+  def serialize_map(grant)
+    { id: grant.id, name: grant.name, trail: grant.trail, region: grant.region,
+      startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
+      latitude: grant.latitude&.to_f, longitude: grant.longitude&.to_f, status: grant.status }
   end
 
   def serialize_needs_wood(grant)
