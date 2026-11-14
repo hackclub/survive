@@ -5,8 +5,8 @@ class HikeGrant < ApplicationRecord
   has_many :items, class_name: "HikeGrantItem", dependent: :destroy
   has_many :contributions, class_name: "HikeGrantContribution", dependent: :destroy
 
-  # A hike only happens once its wood is paid in full. Anyone can chip in. The rate is
-  # deliberately never shown on the site.
+  # Approval confirms a hike is happening; its costs are funded once enough wood is raised.
+  # Anyone can chip in. The rate is deliberately never shown on the site.
   DEFAULT_WOOD_PER_USD = 1
   # Contributions are held while a hike is pending or approved; rejected hikes release them.
   WOOD_STATUSES = %i[pending approved paid completed].freeze
