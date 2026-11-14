@@ -72,23 +72,23 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
     <AppShell
       title="Hikes"
       lede="Join a hike, plan one, or chip in wood to help someone else's happen."
-      narrow
+      wide
       actions={auth.user ? <Link className="btn btn--quiet btn--sm" href="/dashboard">← Dashboard</Link> : <Link className="btn btn--quiet btn--sm" href="/">← Home</Link>}
     >
+      <div className="hikes-page">
+        {galleryImages.length > 0 && <ImageCarousel images={galleryImages} label="Hikes gallery" />}
 
-      {galleryImages.length > 0 && <div style={{ marginTop: "var(--sp-4)" }}><ImageCarousel images={galleryImages} label="Hikes gallery" /></div>}
-
-      <div role="tablist" aria-label="Hikes" style={{ display: "flex", gap: "var(--sp-2)", borderBottom: "1px solid var(--border)", marginTop: "var(--sp-4)" }}>
+      <div className="hikes-page__tabs" role="tablist" aria-label="Hikes">
         <button type="button" role="tab" aria-selected={tab === "explore"} className={tab === "explore" ? "btn btn--primary" : "btn btn--quiet"} onClick={() => setTab("explore")}>Upcoming</button>
         {auth.user && <button type="button" role="tab" aria-selected={tab === "mine"} className={tab === "mine" ? "btn btn--primary" : "btn btn--quiet"} onClick={() => setTab("mine")}>Your hikes</button>}
       </div>
 
-      {tab === "explore" ? <section style={{ marginTop: "var(--sp-4)" }}>
+      {tab === "explore" ? <section className="hikes-page__section">
         {needsWood.length > 0 && <div style={{ marginBottom: "var(--sp-5)" }}>
           <h2 className="u-h2">Needs wood</h2>
           <p className="u-sm u-soft">These hikes can't go ahead until their wood is paid. Anyone can chip in. If a hike doesn't get approved, you get your wood back.</p>
-          <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
-            {needsWood.map(h => <article className="card" key={h.id} style={{ padding: "var(--sp-4)", display: "grid", gap: "var(--sp-3)" }}>
+          <div className="hikes-page__cards">
+            {needsWood.map(h => <article className="card hikes-page__card" key={h.id} style={{ padding: "var(--sp-4)", display: "grid", gap: "var(--sp-3)" }}>
               <div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Organised by {h.organiser}{h.isOrganiser ? " (you)" : ""}</p></div>
               {h.items.length > 0 && <ul style={{ display: "grid", gap: "var(--sp-1)", paddingLeft: 0, listStyle: "none" }}>{h.items.map(item => <li key={item.id} className="u-sm"><strong>{item.label}</strong><div className="u-xs u-faint">{item.reason}</div></li>)}</ul>}
               <ChipIn id={h.id} hike={h} spendable={spendable} />
@@ -97,12 +97,12 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
         </div>}
         <h2 className="u-h2">Upcoming hikes</h2>
         <p className="u-sm u-soft">Admin-approved public hikes. Sign in to join one.</p>
-        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
-          {publicHikes.map(h => <article className="card" key={h.id} style={{ padding: "var(--sp-4)" }}>
+        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div className="hikes-page__cards">
+          {publicHikes.map(h => <article className="card hikes-page__card" key={h.id} style={{ padding: "var(--sp-4)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Meet at {h.meetingPoint}</p><p className="u-xs u-faint">Organised by {h.organiser}</p></div><div style={{ textAlign: "right" }}><Status tone="ok">Approved</Status><p className="u-xs u-faint" style={{ marginTop: 8 }}>{h.participantCount} {h.participantCount === 1 ? "hiker" : "hikers"}</p>{h.joined ? <Status tone="ok">You are going</Status> : h.joinable ? auth.user ? <button className="btn btn--primary btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => router.post("/hike_grants/" + h.id + "/join", {}, { preserveScroll: true })}>Join hike</button> : <a className="btn btn--primary btn--sm" style={{ display: "inline-block", marginTop: 8 }} href={signInPath}>Sign in to join</a> : <Status tone="neutral">Joining closed</Status>}</div></div>
           </article>)}
         </div>}
-      </section> : auth.user ? <section style={{ marginTop: "var(--sp-4)" }}>
+      </section> : auth.user ? <section className="hikes-page__section">
         <h2 className="u-h2">Plan a hike</h2>
         <p className="u-sm u-soft">Tell us where you're going and what it'll cost. An admin reviews the hike first. If approved, participant HCB funding can then be sent. You can keep adding people until the review is complete.</p>
         <form className="card" onSubmit={submit} style={{ padding: "var(--sp-4)", marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-3)" }}>
@@ -143,8 +143,8 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
           <div style={{ display: "flex", justifyContent: "flex-end" }}><button className="btn btn--primary" type="submit" disabled={items.length === 0 || upfrontWood > upfrontMax}>Send for review</button></div>
         </form>
         <h3 className="u-h2" style={{ marginTop: "var(--sp-5)" }}>Your hikes</h3>
-        {grants.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">You haven't planned a hike yet.</p></div> : <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
-          {grants.map(g => <article className="card" key={g.id} style={{ padding: "var(--sp-4)" }}>
+        {grants.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">You haven't planned a hike yet.</p></div> : <div className="hikes-page__cards">
+          {grants.map(g => <article className="card hikes-page__card" key={g.id} style={{ padding: "var(--sp-4)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><div style={{ display: "flex", gap: "var(--sp-2)", alignItems: "center", flexWrap: "wrap" }}><h3 className="u-h3">{g.name}</h3><Status tone={tone(g.status)}>{g.status}</Status><Status tone="neutral">{g.visibility === "private" ? "Private" : "Public"}</Status></div><p className="u-sm u-soft">{g.trail} · {g.region} · {g.startsAt}</p><p className="u-xs u-faint">Meet at {g.meetingPoint}</p></div><div><strong className="u-h3">{money(g.budgetCents)}</strong><p className="u-xs u-faint">{g.participants.length} {g.participants.length === 1 ? "hiker" : "hikers"}</p></div></div>
             {g.decisionReason && <p className="u-sm">From the reviewer: {g.decisionReason}</p>}
             {g.items.length > 0 && <ul style={{ marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-1)", paddingLeft: 0, listStyle: "none" }}>{g.items.map(item => <li key={item.id} className="u-sm"><strong>{item.label}</strong> · {money(item.amountCents)}<div className="u-xs u-faint">{item.reason}</div></li>)}</ul>}
@@ -155,7 +155,8 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
             {g.isOrganiser && g.status !== "pending" && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-3)" }}>You can't change who's going once it's been reviewed.</p>}
           </article>)}
         </div>}
-      </section> : <section style={{ marginTop: "var(--sp-4)" }}><div className="dashboard__empty"><p className="u-sm u-faint">Sign in to plan a hike, manage your hikes, or contribute wood.</p><a className="btn btn--primary" href={signInPath}>Sign in</a></div></section>}
+      </section> : <section className="hikes-page__section"><div className="dashboard__empty"><p className="u-sm u-faint">Sign in to plan a hike, manage your hikes, or contribute wood.</p><a className="btn btn--primary" href={signInPath}>Sign in</a></div></section>}
+      </div>
     </AppShell>
   </>
 }
