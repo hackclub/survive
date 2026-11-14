@@ -1,15 +1,22 @@
 class HikeGrantsController < ApplicationController
   before_action :set_owned_grant, only: :add_participants
   before_action :set_visible_grant, only: %i[contribute withdraw]
+  before_action :set_public_grant, only: :join
+
+  allow_unauthenticated_access only: :index
 
   def index
     public_hikes = HikeGrant.where(visibility: :public, status: %i[approved paid], starts_at: Time.current..)
       .includes(:created_by, :participants).recent
-    needs_wood = HikeGrant.where(visibility: :public, status: :pending, starts_at: Time.current..)
-      .includes(:created_by, :items, :contributions).order(:starts_at)
-    my_hikes = HikeGrant.joins("LEFT JOIN hike_grant_participants ON hike_grant_participants.hike_grant_id = hike_grants.id")
-      .where("hike_grants.created_by_id = :user_id OR hike_grant_participants.user_id = :user_id", user_id: current_user.id)
-      .includes(:items, contributions: :user, participants: :user).distinct.recent
+    needs_wood = current_user ? HikeGrant.where(visibility: :public, status: :pending, starts_at: Time.current..)
+      .includes(:created_by, :items, :contributions).order(:starts_at) : HikeGrant.none
+    my_hikes = if current_user
+      HikeGrant.joins("LEFT JOIN hike_grant_participants ON hike_grant_participants.hike_grant_id = hike_grants.id")
+        .where("hike_grants.created_by_id = :user_id OR hike_grant_participants.user_id = :user_id", user_id: current_user.id)
+        .includes(:items, contributions: :user, participants: :user).distinct.recent
+    else
+      HikeGrant.none
+    end
 
     render inertia: "HikeGrants/Index", props: {
       galleryImages: GalleryImage.where(placement: %w[hikes both]).with_attached_image.ordered.map { |image| { id: image.id, imageUrl: image.image_url, caption: image.caption } },
@@ -18,7 +25,7 @@ class HikeGrantsController < ApplicationController
       grants: my_hikes.map { |grant| serialize_private(grant) },
       costKinds: HikeGrantItem::KINDS.map { |kind, info| { kind: kind, label: info[:label], hint: info[:hint] } },
       woodRate: HikeGrant.wood_per_usd,
-      spendable: current_user.spendable_coins
+      spendable: current_user&.spendable_coins || 0
     }
   end
 
@@ -38,6 +45,14 @@ class HikeGrantsController < ApplicationController
     audit!("hike_grant.created", target: grant, metadata: { budget_cents: grant.budget_cents,
       participant_count: grant.participants.size, wood_needed: grant.wood_needed, wood_raised: grant.wood_raised })
     redirect_to hike_grants_path, notice: created_notice(grant)
+  rescue HikeGrantSubmission::Refused, ActiveRecord::RecordInvalid => e
+    redirect_to hike_grants_path, alert: e.message
+  end
+
+  def join
+    participant = HikeGrantSubmission.join!(@grant, current_user)
+    audit!("hike_grant.joined", target: @grant, metadata: { participant_id: participant.id })
+    redirect_to hike_grants_path, notice: "You're in! You've joined #{@grant.name}."
   rescue HikeGrantSubmission::Refused, ActiveRecord::RecordInvalid => e
     redirect_to hike_grants_path, alert: e.message
   end
@@ -67,6 +82,10 @@ class HikeGrantsController < ApplicationController
   end
 
   private
+
+  def set_public_grant
+    @grant = HikeGrant.visibility_public.find(params[:id])
+  end
 
   def set_owned_grant
     @grant = HikeGrant.where(created_by: current_user).find(params[:id])
