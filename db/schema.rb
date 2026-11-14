@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_15_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_15_093000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -343,6 +343,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_15_090000) do
     t.index ["featured"], name: "index_shop_items_on_featured"
   end
 
+  create_table "slack_notifications", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.string "event_key", null: false
+    t.datetime "sent_at"
+    t.bigint "user_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id", "event_key"], name: "index_slack_notifications_on_user_id_and_event_key", unique: true
+    t.index ["user_id"], name: "index_slack_notifications_on_user_id"
+  end
+
   create_table "solid_cable_messages", force: :cascade do |t|
     t.binary "channel", null: false
     t.bigint "channel_hash", null: false
@@ -563,6 +573,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_15_090000) do
   add_foreign_key "reviews", "projects"
   add_foreign_key "reviews", "users", column: "reviewer_id"
   add_foreign_key "shop_item_regions", "shop_items"
+  add_foreign_key "slack_notifications", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_failed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
