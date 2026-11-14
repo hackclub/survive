@@ -140,6 +140,56 @@ class HikeGrantSubmissionTest < ActiveSupport::TestCase
     assert_equal 0, HikeGrant.count
   end
 
+  test "joining a public hike creates a request until the organiser approves it" do
+    grant = submit
+    grant.approve!(@admin)
+    newcomer = build_maker
+
+    request = HikeGrantSubmission.join!(grant, newcomer)
+
+    assert request.membership_pending?
+    assert_equal 2, grant.participants.going.count
+    assert_equal 0, request.allocation_cents
+
+    HikeGrantSubmission.decide_join_request!(grant, request, organiser: @organiser, approve: true)
+
+    assert request.reload.membership_approved?
+    assert_equal [ 1_000, 1_000, 1_000 ], grant.participants.going.order(:id).pluck(:allocation_cents)
+  end
+
+  test "only the organiser can approve a join request" do
+    grant = submit
+    grant.approve!(@admin)
+    newcomer = build_maker
+    request = HikeGrantSubmission.join!(grant, newcomer)
+
+    assert_raises(HikeGrantSubmission::Refused) do
+      HikeGrantSubmission.decide_join_request!(grant, request, organiser: @friend, approve: true)
+    end
+  end
+
+  test "members can leave and request to join again" do
+    grant = submit
+    grant.approve!(@admin)
+    newcomer = build_maker
+    request = HikeGrantSubmission.join!(grant, newcomer)
+    HikeGrantSubmission.decide_join_request!(grant, request, organiser: @organiser, approve: true)
+
+    HikeGrantSubmission.leave!(grant, newcomer)
+    assert request.reload.membership_left?
+
+    HikeGrantSubmission.join!(grant, newcomer)
+    assert request.reload.membership_pending?
+  end
+
+  test "private hikes cannot be joined through the public join flow" do
+    grant = submit
+    grant.update!(visibility: :private)
+    grant.approve!(@admin)
+
+    assert_raises(HikeGrantSubmission::Refused) { HikeGrantSubmission.join!(grant, build_maker) }
+  end
+
   test "adding people re-splits the money but not the wood" do
     grant = submit
     third = build_maker
