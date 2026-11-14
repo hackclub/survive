@@ -118,7 +118,7 @@ class Admin::HikeGrantsController < ApplicationController
       decisionReason: grant.decision_reason,
       createdBy: grant.created_by.display_name,
       reviewedBy: grant.reviewed_by&.display_name,
-      participants: grant.participants.map do |participant|
+      participants: grant.participants.going.map do |participant|
         {
           id: participant.id,
           userId: participant.user_id,
