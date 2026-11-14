@@ -20,3 +20,17 @@ Build a game or project that is outdoors themed:
 
 
 
+
+## Slack notifications
+
+Survive can send private DMs through the existing Survive Slack bot. Set `SLACK_BOT_TOKEN` on the Rails web/worker service to the same bot token used by the bot. The Slack app needs the `chat:write` and `im:write` bot token scopes; reinstall the app if those scopes are newly added.
+
+The website reuses each account's `slack_id` from Hack Club authentication. No separate account linking is needed.
+
+Notifications are sent for:
+- Project submissions (confirmation to the maker and a review-queue DM to reviewers).
+- Review decisions and final-review outcomes (to the maker).
+- Fulfilled rewards (to the participant).
+- Draft or returned projects inactive for 14 days (a reminder at most once per week).
+
+DMs are queued through Active Job and deduplicated by event, so retries do not normally send duplicates. The inactive-project check runs daily in production.
