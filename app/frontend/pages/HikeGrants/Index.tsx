@@ -102,7 +102,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Meet at {h.meetingPoint}</p><p className="u-xs u-faint">Organised by {h.organiser}</p></div><div style={{ textAlign: "right" }}><Status tone="ok">Approved</Status><p className="u-xs u-faint" style={{ marginTop: 8 }}>{h.participantCount} {h.participantCount === 1 ? "hiker" : "hikers"}</p>{h.joined ? <Status tone="ok">You are going</Status> : h.joinable ? auth.user ? <button className="btn btn--primary btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => router.post("/hike_grants/" + h.id + "/join", {}, { preserveScroll: true })}>Join hike</button> : <a className="btn btn--primary btn--sm" style={{ display: "inline-block", marginTop: 8 }} href={signInPath}>Sign in to join</a> : <Status tone="neutral">Joining closed</Status>}</div></div>
           </article>)}
         </div>}
-      </section> : <section style={{ marginTop: "var(--sp-4)" }}>
+      </section> : auth.user ? <section style={{ marginTop: "var(--sp-4)" }}>
         <h2 className="u-h2">Plan a hike</h2>
         <p className="u-sm u-soft">Tell us where you're going and what it'll cost. An admin reviews the hike first. If approved, participant HCB funding can then be sent. You can keep adding people until the review is complete.</p>
         <form className="card" onSubmit={submit} style={{ padding: "var(--sp-4)", marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-3)" }}>
