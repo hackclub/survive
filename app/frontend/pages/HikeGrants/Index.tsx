@@ -1,9 +1,8 @@
 import { useState } from "react"
-import { Head, Link, router } from "@inertiajs/react"
+import { Head, Link, router, usePage } from "@inertiajs/react"
 import { Status } from "../../components/Status"
 import { ImageCarousel } from "../../components/ImageCarousel"
 import { AppShell } from "../../components/AppShell"
-import { usePage } from "@inertiajs/react"
 import type { SharedProps } from "../../types"
 
 type Participant = { id: number; name: string; email: string; allocationCents: number }
@@ -105,7 +104,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
         </div>}
       </section> : <section style={{ marginTop: "var(--sp-4)" }}>
         <h2 className="u-h2">Plan a hike</h2>
-        <p className="u-sm u-soft">Tell us where you're going and what it'll cost. The hike is paid for in wood, and we can only approve it once all of it is in. You can keep adding people until we review it.</p>
+        <p className="u-sm u-soft">Tell us where you're going and what it'll cost. An admin reviews the hike first. If approved, participant HCB funding can then be sent. You can keep adding people until the review is complete.</p>
         <form className="card" onSubmit={submit} style={{ padding: "var(--sp-4)", marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-3)" }}>
           <h3 className="u-h3">New hike</h3>
           <label className="field"><span className="field__label">Who can see it</span><select className="field__input" value={fields.visibility} onChange={e => change("visibility",e.target.value)}><option value="public">Everyone (anyone can chip in wood, and it shows in Upcoming once approved)</option><option value="private">Only you and the people you add</option></select><span className="u-xs u-faint">You can't change this later.</span></label>
