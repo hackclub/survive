@@ -63,7 +63,7 @@ class Admin::HikeGrantsController < ApplicationController
     when "approve"
       grant.approve!(current_user)
       audit!("hike_grant.approved", target: grant, metadata: { budget_cents: grant.budget_cents })
-      redirect_to admin_hike_grants_path, notice: "Approved #{grant.name}. Individual allocations are ready for HCB processing."
+      redirect_to admin_hike_grants_path, notice: "Approved #{grant.name}. The hike is confirmed; raise all required wood before issuing HCB funding."
     when "reject"
       reason = params[:reason].to_s.strip
       return redirect_to(admin_hike_grants_path, alert: "A rejection reason is required.") if reason.blank?
@@ -85,6 +85,7 @@ class Admin::HikeGrantsController < ApplicationController
     return redirect_to(admin_hike_grants_path, alert: "Enter the HCB card grant ID or reference after creating it in HCB.") if reference.blank?
 
     return redirect_to(admin_hike_grants_path, alert: "Approve this hike before sending participant funding.") unless grant.approved? || grant.paid?
+    return redirect_to(admin_hike_grants_path, alert: "Raise all #{grant.wood_needed} wood before issuing HCB funding. #{grant.wood_remaining} more needed.") unless grant.funded?
     return redirect_to(admin_hike_grants_path, alert: "This participant already has a recorded HCB grant.") if participant.issued?
 
     participant.mark_issued!(reference: reference)
