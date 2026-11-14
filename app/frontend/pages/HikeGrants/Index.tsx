@@ -13,7 +13,7 @@ type DraftItem = { kind: string; amount: string; reason: string }
 type Grant = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; budgetCents: number; status: string; visibility: "public" | "private"; isOrganiser: boolean; decisionReason: string | null; items: Item[]; participants: Participant[]; contributors: { name: string; wood: number }[] } & Wood
 type NeedsWood = { id: number; name: string; trail: string; region: string; startsAt: string; organiser: string; isOrganiser: boolean; items: { id: number; label: string; reason: string }[] } & Wood
 type GallerySlide = { id: number; imageUrl: string; caption: string | null }
-type PublicHike = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; organiser: string; participantCount: number; joined: boolean; joinable: boolean }
+type PublicHike = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; organiser: string; participantCount: number; joined: boolean; joinable: boolean } & Wood
 const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n / 100)
 const tone = (s: string): "neutral" | "ok" | "warn" | "bad" => ["approved", "paid", "completed"].includes(s) ? "ok" : s === "rejected" ? "bad" : s === "pending" ? "warn" : "neutral"
 
@@ -26,7 +26,7 @@ function WoodBar({ hike }: { hike: Wood }) {
   </div>
 }
 
-function ChipIn({ id, hike, spendable }: { id: number; hike: Wood; spendable: number }) {
+function ChipIn({ id, hike, spendable, allowWithdraw = true }: { id: number; hike: Wood; spendable: number; allowWithdraw?: boolean }) {
   const left = Math.max(0, hike.woodNeeded - hike.woodRaised)
   const most = Math.min(left, spendable)
   const [wood, setWood] = useState("")
@@ -43,7 +43,7 @@ function ChipIn({ id, hike, spendable }: { id: number; hike: Wood; spendable: nu
           {most > 1 && <button className="btn btn--quiet btn--sm" type="button" onClick={() => setWood(String(most))}>{most === left ? "Pay the rest" : `All ${most} I have`}</button>}
         </div>
       : <p className="u-xs u-faint">You don't have any wood to put in right now.</p>)}
-    {hike.myWood > 0 && <p className="u-xs u-faint">You've put in {hike.myWood} wood. <button className="btn btn--quiet btn--sm" type="button" onClick={takeBack}>Take it back</button></p>}
+    {hike.myWood > 0 && <p className="u-xs u-faint">You've put in {hike.myWood} wood.{allowWithdraw && <> <button className="btn btn--quiet btn--sm" type="button" onClick={takeBack}>Take it back</button></>}</p>}
   </div>
 }
 
@@ -86,7 +86,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
       {tab === "explore" ? <section className="hikes-page__section">
         {needsWood.length > 0 && <div style={{ marginBottom: "var(--sp-5)" }}>
           <h2 className="u-h2">Needs wood</h2>
-          <p className="u-sm u-soft">These hikes can't go ahead until their wood is paid. Anyone can chip in. If a hike doesn't get approved, you get your wood back.</p>
+          <p className="u-sm u-soft">These hikes are awaiting admin review. You can chip in now; contributions are returned if a hike is rejected.</p>
           <div className="hikes-page__cards">
             {needsWood.map(h => <article className="card hikes-page__card" key={h.id} style={{ padding: "var(--sp-4)", display: "grid", gap: "var(--sp-3)" }}>
               <div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Organised by {h.organiser}{h.isOrganiser ? " (you)" : ""}</p></div>
@@ -104,7 +104,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
         </div>}
       </section> : auth.user ? <section className="hikes-page__section">
         <h2 className="u-h2">Plan a hike</h2>
-        <p className="u-sm u-soft">Tell us where you're going and what it'll cost. An admin reviews the hike first. If approved, participant HCB funding can then be sent. You can keep adding people until the review is complete.</p>
+        <p className="u-sm u-soft">Tell us where you're going and what it'll cost. An admin approves the plan first. Approval confirms the hike is happening; then the group raises the required wood before HCB funding can be issued.</p>
         <form className="card" onSubmit={submit} style={{ padding: "var(--sp-4)", marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-3)" }}>
           <h3 className="u-h3">New hike</h3>
           <label className="field"><span className="field__label">Who can see it</span><select className="field__input" value={fields.visibility} onChange={e => change("visibility",e.target.value)}><option value="public">Everyone (anyone can chip in wood, and it shows in Upcoming once approved)</option><option value="private">Only you and the people you add</option></select><span className="u-xs u-faint">You can't change this later.</span></label>
@@ -135,7 +135,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
             <div className="card" style={{ padding: "var(--sp-3)", marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-1)" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Total cost</span><strong>{money(totalCents)}</strong></div>
               <div style={{ display: "flex", justifyContent: "space-between" }}><span>Wood this hike needs</span><strong>{woodNeeded} wood</strong></div>
-              <label className="field" style={{ marginTop: "var(--sp-2)" }}><span className="field__label">Wood you put in now</span><input className="field__input" type="number" min={0} max={upfrontMax} step={1} value={upfront} onChange={e => setUpfront(e.target.value)} placeholder="0" disabled={woodNeeded === 0} /><span className="u-xs u-faint">You have {spendable} wood. Pay it all, some, or none. Whatever's left shows up under Needs wood (for public hikes) so anyone can chip in. Your wood is held while we review, spent if we approve, and handed back if we don't.</span></label>
+              <label className="field" style={{ marginTop: "var(--sp-2)" }}><span className="field__label">Wood you put in now</span><input className="field__input" type="number" min={0} max={upfrontMax} step={1} value={upfront} onChange={e => setUpfront(e.target.value)} placeholder="0" disabled={woodNeeded === 0} /><span className="u-xs u-faint">You have {spendable} wood. Pay it all, some, or none. Whatever's left shows up under Needs wood (for public hikes) so anyone can chip in. Your wood is held while the hike is pending or approved, and handed back if the hike is rejected.</span></label>
               {upfrontWood > upfrontMax && <p className="u-xs" style={{ color: "var(--danger, #b42318)" }}>You can put in at most {upfrontMax} wood.</p>}
             </div>
           </div>
@@ -148,7 +148,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><div style={{ display: "flex", gap: "var(--sp-2)", alignItems: "center", flexWrap: "wrap" }}><h3 className="u-h3">{g.name}</h3><Status tone={tone(g.status)}>{g.status}</Status><Status tone="neutral">{g.visibility === "private" ? "Private" : "Public"}</Status></div><p className="u-sm u-soft">{g.trail} · {g.region} · {g.startsAt}</p><p className="u-xs u-faint">Meet at {g.meetingPoint}</p></div><div><strong className="u-h3">{money(g.budgetCents)}</strong><p className="u-xs u-faint">{g.participants.length} {g.participants.length === 1 ? "hiker" : "hikers"}</p></div></div>
             {g.decisionReason && <p className="u-sm">From the reviewer: {g.decisionReason}</p>}
             {g.items.length > 0 && <ul style={{ marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-1)", paddingLeft: 0, listStyle: "none" }}>{g.items.map(item => <li key={item.id} className="u-sm"><strong>{item.label}</strong> · {money(item.amountCents)}<div className="u-xs u-faint">{item.reason}</div></li>)}</ul>}
-            <div style={{ marginTop: "var(--sp-3)" }}>{g.status === "pending" ? <ChipIn id={g.id} hike={g} spendable={spendable} /> : <WoodBar hike={g} />}</div>
+            <div style={{ marginTop: "var(--sp-3)" }}>{g.status === "pending" || g.status === "approved" ? <ChipIn id={g.id} hike={g} spendable={spendable} allowWithdraw={g.status === "pending"} /> : <WoodBar hike={g} />}</div>
             {g.contributors.length > 0 && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-2)" }}>Paid by {g.contributors.map(c => `${c.name} (${c.wood})`).join(", ")}</p>}
             <div style={{ overflowX: "auto", marginTop: "var(--sp-3)" }}><table className="data-table"><thead><tr><th>Hiker</th><th>Their share</th></tr></thead><tbody>{g.participants.map(p => <tr key={p.id}><td><strong>{p.name}</strong><div className="u-xs u-faint">{p.email}</div></td><td>{money(p.allocationCents)}</td></tr>)}</tbody></table></div>
             {g.isOrganiser && g.status === "pending" && <div style={{ marginTop: "var(--sp-3)" }}>{adding === g.id ? <div style={{ display: "grid", gap: "var(--sp-2)" }}><label className="field"><span className="field__label">More people</span><textarea className="field__input" rows={2} value={emails} onChange={e => setEmails(e.target.value)} placeholder="three@hackclub.com, four@hackclub.com"/></label><p className="u-xs u-faint">They'll be added to the hike. It doesn't change how much wood it needs.</p><div style={{ display: "flex", justifyContent: "flex-end", gap: "var(--sp-2)" }}><button className="btn btn--quiet btn--sm" type="button" onClick={() => setAdding(null)}>Cancel</button><button className="btn btn--primary btn--sm" type="button" disabled={!emails.trim()} onClick={() => addPeople(g.id)}>Add people</button></div></div> : <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setAdding(g.id); setEmails("") }}>Add people</button>}</div>}
