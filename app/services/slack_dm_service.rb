@@ -67,5 +67,4 @@ class SlackDmService
       faraday.options.timeout = 10
     end
   end
-  private_class_method :connection
 end
