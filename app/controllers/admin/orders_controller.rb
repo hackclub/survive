@@ -42,6 +42,7 @@ class Admin::OrdersController < ApplicationController
     return redirect_to(admin_orders_path, alert: "Only a fulfilled order can be refunded.") unless order.fulfilled?
 
     order.refund!(current_user, reason: reason)
+    notify_order_user(order, "refunded", "Your Survive reward order for “#{order.frozen_item_name}” has been refunded. #{order.total_coins} wood has been returned to your balance. Reason: #{reason}")
     audit!("order.refunded", target: order, metadata: metadata(order).merge(reason: reason))
     redirect_to admin_orders_path, notice: "Refunded #{order.total_coins} wood to #{order.user.display_name}."
   end
@@ -57,6 +58,8 @@ class Admin::OrdersController < ApplicationController
 
   def hold(order)
     order.hold!(current_user, notes: params[:notes])
+    note = params[:notes].to_s.strip.presence
+    notify_order_user(order, "held", "Your Survive reward order for “#{order.frozen_item_name}” has been put on hold. #{note}")
     audit!("order.held", target: order, metadata: metadata(order))
     redirect_to admin_orders_path, notice: "Put #{order.frozen_item_name} on hold."
   end
@@ -66,6 +69,7 @@ class Admin::OrdersController < ApplicationController
     return redirect_to(admin_orders_path, alert: "A reason is required to reject.") if reason.blank?
 
     order.reject!(current_user, reason: reason, fraud_project: fraud_project)
+    notify_order_user(order, "rejected", "Your Survive reward order for “#{order.frozen_item_name}” was rejected. Reason: #{reason}")
     audit!("order.rejected", target: order, metadata: metadata(order).merge(reason: reason))
     redirect_to admin_orders_path, notice: "Rejected #{order.frozen_item_name}. #{order.total_coins} wood released."
   end
@@ -74,6 +78,14 @@ class Admin::OrdersController < ApplicationController
     return nil if params[:fraud_related_project_id].blank?
 
     Project.find_by(id: params[:fraud_related_project_id])
+  end
+
+  def notify_order_user(order, outcome, message)
+    SlackDmJob.perform_later(
+      order.user_id,
+      "order-#{outcome}:#{order.id}:#{order.updated_at.to_f}",
+      "#{message} #{SlackDmService.app_url}/orders"
+    )
   end
 
   def metadata(order)
