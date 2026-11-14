@@ -23,7 +23,7 @@ production:
   slack_inactive_projects:
     class: SlackInactiveProjectsJob
     queue: default
-    schedule: every day at 10am
+    schedule: at 10am every day
 
   clear_solid_queue_finished_jobs:
     command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
