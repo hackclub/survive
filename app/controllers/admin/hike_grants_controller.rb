@@ -84,12 +84,11 @@ class Admin::HikeGrantsController < ApplicationController
     reference = params[:hcb_grant_id].to_s.strip
     return redirect_to(admin_hike_grants_path, alert: "Enter the HCB card grant ID or reference after creating it in HCB.") if reference.blank?
 
-    participant.update!(
-      status: :issued,
-      hcb_grant_id: reference,
-      hcb_grant_url: params[:hcb_grant_url].to_s.strip.presence,
-      issued_at: Time.current
-    )
+    return redirect_to(admin_hike_grants_path, alert: "Approve this hike before sending participant funding.") unless grant.approved? || grant.paid?
+    return redirect_to(admin_hike_grants_path, alert: "This participant already has a recorded HCB grant.") if participant.issued?
+
+    participant.mark_issued!(reference: reference)
+    participant.update!(hcb_grant_url: params[:hcb_grant_url].to_s.strip.presence)
     grant.refresh_payment_status!
     audit!("hike_grant.participant_issued", target: participant, metadata: { hike_grant_id: grant.id, user_id: participant.user_id, allocation_cents: participant.allocation_cents, hcb_grant_id: reference })
     redirect_to admin_hike_grants_path, notice: "Recorded the HCB grant for #{participant.user.display_name}."
