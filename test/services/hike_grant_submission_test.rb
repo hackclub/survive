@@ -50,16 +50,25 @@ class HikeGrantSubmissionTest < ActiveSupport::TestCase
     assert_equal 25, stranger.reload.spendable_coins
   end
 
-  test "it can't be approved until every bit of wood is in" do
+  test "approval confirms the hike before it is fully funded" do
     grant = submit(wood: 10)
 
-    error = assert_raises(ArgumentError) { grant.approve!(@admin) }
-    assert_match "20 wood", error.message
-
-    HikeGrantSubmission.contribute!(grant, @friend, 20)
     grant.approve!(@admin)
+
     assert grant.approved?
-    assert_equal 80, @friend.reload.spendable_coins, "approved wood stays spent"
+    assert_equal 20, grant.wood_remaining
+    assert_equal 90, @organiser.reload.spendable_coins
+  end
+
+  test "people can contribute wood after a hike is approved" do
+    grant = submit
+    grant.approve!(@admin)
+
+    HikeGrantSubmission.contribute!(grant, @friend, 30)
+
+    assert grant.funded?
+    assert_equal 70, @friend.reload.spendable_coins
+    assert_equal 30, @friend.hike_wood_held
   end
 
   test "a hike can't be overpaid, and nobody can spend wood they don't have" do
@@ -96,11 +105,15 @@ class HikeGrantSubmissionTest < ActiveSupport::TestCase
     assert_raises(HikeGrantSubmission::Refused) { HikeGrantSubmission.withdraw!(grant, @friend) }
   end
 
-  test "chipping in stops once the hike is reviewed" do
-    grant = submit
-    grant.reject!(@admin, reason: "No")
+  test "chipping in is allowed after approval but stops if the hike is rejected" do
+    approved = submit
+    approved.approve!(@admin)
+    HikeGrantSubmission.contribute!(approved, @friend, 5)
+    assert_equal 5, approved.wood_raised
 
-    assert_raises(HikeGrantSubmission::Refused) { HikeGrantSubmission.contribute!(grant, @friend, 5) }
+    rejected = submit
+    rejected.reject!(@admin, reason: "No")
+    assert_raises(HikeGrantSubmission::Refused) { HikeGrantSubmission.contribute!(rejected, @friend, 5) }
   end
 
   test "every cost needs a reason" do
