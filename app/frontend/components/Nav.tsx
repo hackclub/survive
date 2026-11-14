@@ -152,12 +152,11 @@ export function Nav({ over, admin }: { over?: boolean; admin?: boolean } = {}) {
             </div>
           </>
         ) : (
-          // The landing hero has its own sign-in button, so skip the duplicate over it.
-          !over && (
-            <a className="btn btn--primary btn--sm" href={signInPath}>
-              Sign in
-            </a>
-          )
+          <>
+            <Link className="nav__link" href="/hike_grants">Hikes</Link>
+            {/* The landing hero has its own sign-in button, so skip the duplicate over it. */}
+            {!over && <a className="btn btn--primary btn--sm" href={signInPath}>Sign in</a>}
+          </>
         )}
       </div>
     </nav>
