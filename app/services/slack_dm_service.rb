@@ -36,7 +36,7 @@ class SlackDmService
   end
 
   def self.app_url
-    ENV["APP_HOST"].presence || "https://survive.hackclub.com"
+    (ENV["APP_HOST"].presence || "https://survive.hackclub.com").delete_suffix("/")
   end
 
   def self.post(endpoint, payload)
