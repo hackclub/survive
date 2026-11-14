@@ -11,6 +11,8 @@ class HikeGrantTest < ActiveSupport::TestCase
       region: "Sydney, NSW",
       meeting_point: "Central Station",
       starts_at: 2.weeks.from_now,
+      latitude: -33.8,
+      longitude: 151.2,
       budget_cents: 10_001,
       status: :pending,
       created_by: admin
@@ -44,7 +46,7 @@ class HikeGrantTest < ActiveSupport::TestCase
   test "visibility uses prefixed helpers and keeps the stored values" do
     admin = build_maker(roles: [ "admin" ])
     attrs = { trail: "Track", region: "Sydney, NSW", meeting_point: "Central", starts_at: 1.week.from_now,
-      budget_cents: 1_000, status: :pending, created_by: admin }
+      budget_cents: 1_000, status: :pending, created_by: admin, latitude: -33.8, longitude: 151.2 }
     open_hike = HikeGrant.create!(attrs.merge(name: "Open", visibility: :public))
     closed_hike = HikeGrant.create!(attrs.merge(name: "Closed", visibility: "private"))
 
