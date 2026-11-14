@@ -118,7 +118,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
             <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sp-2)", marginTop: "var(--sp-2)" }}>
               {costKinds.map(k => <button key={k.kind} type="button" className="btn btn--quiet btn--sm" onClick={() => addItem(k.kind)}>+ {k.label}</button>)}
             </div>
-            {items.length > 0 && <div className="hikes-page__cards">
+            {items.length > 0 && <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
               {items.map((item, index) => {
                 const info = kindInfo(item.kind)
                 return <div key={index} className="card" style={{ padding: "var(--sp-3)", display: "grid", gap: "var(--sp-2)" }}>
