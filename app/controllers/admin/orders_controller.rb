@@ -50,6 +50,7 @@ class Admin::OrdersController < ApplicationController
 
   def approve(order)
     order.approve!(current_user, notes: params[:notes])
+    SlackOrderApprovedJob.perform_later(order.id)
     audit!("order.approved", target: order, metadata: metadata(order))
     redirect_to admin_orders_path, notice: "Approved #{order.frozen_item_name}."
   end
