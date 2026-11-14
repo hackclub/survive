@@ -55,20 +55,34 @@ class Admin::FinalReviewsController < ApplicationController
 
   def pass(record)
     record.pass!(current_user, params[:note])
+    notify_maker(record, "passed", "Your final Survive review for “#{record.review.project.name}” passed. #{record.net_minutes} minutes were approved and your wood payout has been issued.")
     audit!("final_review.passed", target: record, metadata: base_metadata(record))
     redirect_to admin_final_reviews_path, notice: "Passed #{record.review.project.name} at #{record.net_minutes} minutes."
   end
 
   def deduct(record)
     record.deduct!(current_user, minutes: params[:deduction_minutes].to_i, note: params[:note].to_s)
+    notify_maker(record, "deducted", "Your final Survive review for “#{record.review.project.name}” is complete. #{record.net_minutes} minutes were approved after a deduction. Check your project page for details.")
     audit!("final_review.deducted", target: record, metadata: base_metadata(record).merge(deducted: record.deduction_minutes))
     redirect_to admin_final_reviews_path, notice: "Deducted #{record.deduction_minutes} minutes from #{record.review.project.name}."
   end
 
   def ban(record)
     record.ban!(current_user, note: params[:note].to_s)
+    notify_maker(record, "banned", "A final Survive review decision was made about your account. Please sign in to Survive and review the information on your account.")
     audit!("final_review.banned", target: record, metadata: base_metadata(record).merge(reason: record.decision_note))
     redirect_to admin_final_reviews_path, notice: "Banned #{record.review.project.user.display_name}."
+  end
+
+  def notify_maker(record, outcome, message)
+    maker = record.review.project.user
+    return if maker.slack_id.blank?
+
+    SlackDmJob.perform_later(
+      maker.id,
+      "final-review-#{outcome}:#{record.id}",
+      "#{message} #{SlackDmService.project_url(record.review.project)}"
+    )
   end
 
   def base_metadata(record)
