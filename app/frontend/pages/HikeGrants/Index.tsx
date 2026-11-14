@@ -97,7 +97,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
         </div>}
         <h2 className="u-h2">Upcoming hikes</h2>
         <p className="u-sm u-soft">Admin-approved public hikes. Sign in to join one.</p>
-        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
+        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div className="hikes-page__cards">
           {publicHikes.map(h => <article className="card hikes-page__card" key={h.id} style={{ padding: "var(--sp-4)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Meet at {h.meetingPoint}</p><p className="u-xs u-faint">Organised by {h.organiser}</p></div><div style={{ textAlign: "right" }}><Status tone="ok">Approved</Status><p className="u-xs u-faint" style={{ marginTop: 8 }}>{h.participantCount} {h.participantCount === 1 ? "hiker" : "hikers"}</p>{h.joined ? <Status tone="ok">You are going</Status> : h.joinable ? auth.user ? <button className="btn btn--primary btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => router.post("/hike_grants/" + h.id + "/join", {}, { preserveScroll: true })}>Join hike</button> : <a className="btn btn--primary btn--sm" style={{ display: "inline-block", marginTop: 8 }} href={signInPath}>Sign in to join</a> : <Status tone="neutral">Joining closed</Status>}</div></div>
           </article>)}
@@ -118,7 +118,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
             <div style={{ display: "flex", flexWrap: "wrap", gap: "var(--sp-2)", marginTop: "var(--sp-2)" }}>
               {costKinds.map(k => <button key={k.kind} type="button" className="btn btn--quiet btn--sm" onClick={() => addItem(k.kind)}>+ {k.label}</button>)}
             </div>
-            {items.length > 0 && <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
+            {items.length > 0 && <div className="hikes-page__cards">
               {items.map((item, index) => {
                 const info = kindInfo(item.kind)
                 return <div key={index} className="card" style={{ padding: "var(--sp-3)", display: "grid", gap: "var(--sp-2)" }}>
@@ -143,7 +143,7 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
           <div style={{ display: "flex", justifyContent: "flex-end" }}><button className="btn btn--primary" type="submit" disabled={items.length === 0 || upfrontWood > upfrontMax}>Send for review</button></div>
         </form>
         <h3 className="u-h2" style={{ marginTop: "var(--sp-5)" }}>Your hikes</h3>
-        {grants.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">You haven't planned a hike yet.</p></div> : <div style={{ display: "grid", gap: "var(--sp-3)", marginTop: "var(--sp-3)" }}>
+        {grants.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">You haven't planned a hike yet.</p></div> : <div className="hikes-page__cards">
           {grants.map(g => <article className="card hikes-page__card" key={g.id} style={{ padding: "var(--sp-4)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><div style={{ display: "flex", gap: "var(--sp-2)", alignItems: "center", flexWrap: "wrap" }}><h3 className="u-h3">{g.name}</h3><Status tone={tone(g.status)}>{g.status}</Status><Status tone="neutral">{g.visibility === "private" ? "Private" : "Public"}</Status></div><p className="u-sm u-soft">{g.trail} · {g.region} · {g.startsAt}</p><p className="u-xs u-faint">Meet at {g.meetingPoint}</p></div><div><strong className="u-h3">{money(g.budgetCents)}</strong><p className="u-xs u-faint">{g.participants.length} {g.participants.length === 1 ? "hiker" : "hikers"}</p></div></div>
             {g.decisionReason && <p className="u-sm">From the reviewer: {g.decisionReason}</p>}
