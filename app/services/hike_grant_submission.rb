@@ -69,7 +69,7 @@ module HikeGrantSubmission
     ActiveRecord::Base.transaction do
       grant.lock!
       User.where(id: user.id).lock.load
-      raise Refused, "This hike isn't taking wood any more." unless grant.pending?
+      raise Refused, "This hike isn't taking wood any more." unless grant.pending? || grant.approved?
 
       remaining = grant.wood_remaining
       raise Refused, "This hike already has all the wood it needs." if remaining.zero?
@@ -80,7 +80,7 @@ module HikeGrantSubmission
     end
   end
 
-  # Gives back everything the user put in, while the hike is still waiting for review.
+  # Gives back everything the user put in, while the hike is still waiting for review. Approval locks contributions in.
   def withdraw!(grant, user)
     ActiveRecord::Base.transaction do
       grant.lock!

@@ -7,7 +7,7 @@ class HikeGrantsController < ApplicationController
 
   def index
     public_hikes = HikeGrant.where(visibility: :public, status: %i[approved paid], starts_at: Time.current..)
-      .includes(:created_by, :participants).recent
+      .includes(:created_by, :participants, :contributions).recent
     needs_wood = current_user ? HikeGrant.where(visibility: :public, status: :pending, starts_at: Time.current..)
       .includes(:created_by, :items, :contributions).order(:starts_at) : HikeGrant.none
     my_hikes = if current_user
@@ -100,9 +100,7 @@ class HikeGrantsController < ApplicationController
   end
 
   def created_notice(grant)
-    return "Sent, and it's fully paid. We'll review it soon." if grant.funded?
-
-    "Sent. It needs #{grant.wood_remaining} more wood before we can approve it. Anyone can chip in."
+    "Sent for review. Approval confirms the hike can go ahead; it will still need #{grant.wood_remaining} wood before HCB funding can be issued."
   end
 
   def parse_emails
@@ -116,15 +114,15 @@ class HikeGrantsController < ApplicationController
   def wood_props(grant)
     raised = grant.wood_raised
     { woodNeeded: grant.wood_needed, woodRaised: raised,
-      myWood: grant.contributions.select { |c| c.user_id == current_user.id }.sum(&:wood) }
+      myWood: current_user ? grant.contributions.select { |c| c.user_id == current_user.id }.sum(&:wood) : 0 }
   end
 
   def serialize_public(grant)
     { id: grant.id, name: grant.name, trail: grant.trail, region: grant.region,
       meetingPoint: grant.meeting_point, startsAt: grant.starts_at.strftime("%b %d, %Y · %H:%M"),
-      organiser: grant.created_by.display_name, participantCount: grant.participants.size,
+      organiser: grant.created_by.display_name, participantCount: grant.participants.size, status: grant.status,
       joined: current_user ? grant.participants.exists?(user_id: current_user.id) : false,
-      joinable: grant.approved? && !grant.participants.issued.exists? }
+      joinable: grant.approved? && !grant.participants.issued.exists? }.merge(wood_props(grant))
   end
 
   # Pending hikes anyone can chip in to. The meeting point stays hidden until it's approved.

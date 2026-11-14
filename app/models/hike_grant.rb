@@ -5,10 +5,10 @@ class HikeGrant < ApplicationRecord
   has_many :items, class_name: "HikeGrantItem", dependent: :destroy
   has_many :contributions, class_name: "HikeGrantContribution", dependent: :destroy
 
-  # A hike only happens once its wood is paid in full. Anyone can chip in. The rate is
-  # deliberately never shown on the site.
+  # Approval confirms a hike is happening; its costs are funded once enough wood is raised.
+  # Anyone can chip in. The rate is deliberately never shown on the site.
   DEFAULT_WOOD_PER_USD = 1
-  # Pending hikes hold wood; approved ones have spent it. Rejected hikes hold nothing.
+  # Contributions are held while a hike is pending or approved; rejected hikes release them.
   WOOD_STATUSES = %i[pending approved paid completed].freeze
 
   def self.wood_per_usd
@@ -51,6 +51,7 @@ class HikeGrant < ApplicationRecord
     budget_cents - allocated_cents
   end
 
+  # Approval confirms the hike can go ahead; it does not mean its costs are funded.
   def approve!(actor)
     raise ArgumentError, "Only pending grants can be approved." unless pending?
     raise ArgumentError, "Add at least one participant before approving." if participants.empty?
@@ -66,6 +67,7 @@ class HikeGrant < ApplicationRecord
 
   def refresh_payment_status!
     return unless approved? || paid?
+    return unless funded?
     return if participants.empty?
 
     update!(status: :paid, paid_at: Time.current) if participants.all?(&:issued?)
