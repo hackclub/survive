@@ -16,6 +16,7 @@ type Grant = { id: number; name: string; trail: string; region: string; meetingP
 type NeedsWood = { id: number; name: string; trail: string; region: string; startsAt: string; organiser: string; isOrganiser: boolean; items: { id: number; label: string; reason: string }[] } & Wood
 type GallerySlide = { id: number; imageUrl: string; caption: string | null }
 type PublicHike = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; organiser: string; participantCount: number; joined: boolean; joinPending: boolean; joinable: boolean; status: string; latitude: number | null; longitude: number | null } & Wood
+type MapHike = { id: number; name: string; trail: string; region: string; startsAt: string; latitude: number | null; longitude: number | null; status: string }
 const money = (n: number) => new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(n / 100)
 const tone = (s: string): "neutral" | "ok" | "warn" | "bad" => ["approved", "paid", "completed"].includes(s) ? "ok" : s === "rejected" ? "bad" : s === "pending" ? "warn" : "neutral"
 
@@ -49,7 +50,7 @@ function ChipIn({ id, hike, spendable, allowWithdraw = true }: { id: number; hik
   </div>
 }
 
-export default function Index({ grants, publicHikes, needsWood, costKinds, woodRate, spendable, galleryImages = [] }: { galleryImages?: GallerySlide[]; grants: Grant[]; publicHikes: PublicHike[]; needsWood: NeedsWood[]; costKinds: CostKind[]; woodRate: number; spendable: number }) {
+export default function Index({ grants, publicHikes, mapHikes, needsWood, costKinds, woodRate, spendable, galleryImages = [] }: { galleryImages?: GallerySlide[]; grants: Grant[]; publicHikes: PublicHike[]; mapHikes: MapHike[]; needsWood: NeedsWood[]; costKinds: CostKind[]; woodRate: number; spendable: number }) {
   const { auth, signInPath } = usePage<SharedProps>().props
   const [tab, setTab] = useState<"explore" | "mine">("explore")
   const [fields, setFields] = useState({ name: "", trail: "", region: "", meeting_point: "", starts_at: "", visibility: "public", participant_emails: "", latitude: "", longitude: "" })
@@ -99,11 +100,11 @@ export default function Index({ grants, publicHikes, needsWood, costKinds, woodR
         </div>}
         <h2 className="u-h2">Upcoming hikes map</h2>
         <p className="u-sm u-soft">Every public upcoming hike with a pinned location appears here. Select a marker to see the hike.</p>
-        <HikeMap hikes={publicHikes} height={420} />
-        {publicHikes.some(h => h.latitude == null || h.longitude == null) && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-2)" }}>A few older public hikes don't have map pins yet, so they appear in the list below but not on the map.</p>}
+        <HikeMap hikes={mapHikes} height={420} />
+        {mapHikes.some(h => h.latitude == null || h.longitude == null) && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-2)" }}>A few older public hikes don't have map pins yet, so they appear in the list below but not on the map.</p>}
         <h2 className="u-h2" style={{ marginTop: "var(--sp-5)" }}>Upcoming hikes</h2>
         <p className="u-sm u-soft">Approved public hikes are happening. Request to join; the organiser will approve your place. Private hikes never appear here.</p>
-        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No upcoming public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div className="hikes-page__cards">
+        {publicHikes.length === 0 ? <div className="dashboard__empty"><p className="u-sm u-faint">No approved public hikes yet.</p>{auth.user ? <button className="btn btn--primary" type="button" onClick={() => setTab("mine")}>Plan a hike</button> : <a className="btn btn--primary" href={signInPath}>Sign in to plan a hike</a>}</div> : <div className="hikes-page__cards">
           {publicHikes.map(h => <article className="card hikes-page__card" key={h.id} style={{ padding: "var(--sp-4)", display: "grid", gap: "var(--sp-3)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><h3 className="u-h3">{h.name}</h3><p className="u-sm u-soft">{h.trail} · {h.region}</p><p className="u-xs u-faint">{h.startsAt} · Meet at {h.meetingPoint}</p><p className="u-xs u-faint">Organised by {h.organiser}</p></div><div style={{ textAlign: "right" }}><Status tone="ok">Approved · happening</Status><p className="u-xs u-faint" style={{ marginTop: 8 }}>{h.participantCount} {h.participantCount === 1 ? "hiker" : "hikers"}</p>{h.joined ? <><Status tone="ok">You're approved</Status><button className="btn btn--quiet btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => { if (confirm("Leave this hike?")) router.delete("/hike_grants/" + h.id + "/leave", { preserveScroll: true }) }}>Leave hike</button></> : h.joinPending ? <><Status tone="warn">Request pending</Status><button className="btn btn--quiet btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => router.delete("/hike_grants/" + h.id + "/leave", { preserveScroll: true })}>Cancel request</button></> : h.joinable ? auth.user ? <button className="btn btn--primary btn--sm" type="button" style={{ marginTop: 8 }} onClick={() => router.post("/hike_grants/" + h.id + "/join", {}, { preserveScroll: true })}>Request to join</button> : <a className="btn btn--primary btn--sm" style={{ display: "inline-block", marginTop: 8 }} href={signInPath}>Sign in to join</a> : <Status tone="neutral">Joining closed</Status>}</div></div>
             {h.status === "paid" ? <WoodBar hike={h} /> : <ChipIn id={h.id} hike={h} spendable={spendable} allowWithdraw={false} />}
