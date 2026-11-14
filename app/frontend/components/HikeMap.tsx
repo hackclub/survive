@@ -52,12 +52,13 @@ export function HikeMap({ hikes = EMPTY_HIKES, editable = false, selected, onSel
       if (!alive || !element.current || !window.L) return
       const L = window.L
       const currentSelection = selectedRef.current
+      const firstPin = hikes.find(h => h.latitude != null && h.longitude != null)
       const center: [number, number] = currentSelection
         ? [currentSelection.latitude, currentSelection.longitude]
-        : hikes.find(h => h.latitude != null && h.longitude != null)
-          ? [hikes.find(h => h.latitude != null && h.longitude != null)!.latitude!, hikes.find(h => h.latitude != null && h.longitude != null)!.longitude!]
-          : [-33.8, 151.2]
-      map = L.map(element.current).setView(center, editable ? 10 : (hikes.some(h => h.latitude != null && h.longitude != null) ? 11 : 5))
+        : firstPin
+          ? [firstPin.latitude!, firstPin.longitude!]
+          : editable ? [-33.8, 151.2] : [20, 0]
+      map = L.map(element.current).setView(center, editable ? 10 : (firstPin ? 11 : 2))
       L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
