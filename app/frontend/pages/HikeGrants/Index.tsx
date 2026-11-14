@@ -12,7 +12,7 @@ type Wood = { woodNeeded: number; woodRaised: number; myWood: number }
 type Item = { id: number; label: string; amountCents: number; reason: string }
 type CostKind = { kind: string; label: string; hint: string }
 type DraftItem = { kind: string; amount: string; reason: string }
-type Grant = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; budgetCents: number; status: string; visibility: "public" | "private"; isOrganiser: boolean; decisionReason: string | null; items: Item[]; participants: Participant[]; joinRequests: JoinRequest[]; myMembership: string | null; contributors: { name: string; wood: number }[] } & Wood
+type Grant = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; budgetCents: number; status: string; visibility: "public" | "private"; isOrganiser: boolean; latitude: number | null; longitude: number | null; decisionReason: string | null; items: Item[]; participants: Participant[]; joinRequests: JoinRequest[]; myMembership: string | null; contributors: { name: string; wood: number }[] } & Wood
 type NeedsWood = { id: number; name: string; trail: string; region: string; startsAt: string; organiser: string; isOrganiser: boolean; items: { id: number; label: string; reason: string }[] } & Wood
 type GallerySlide = { id: number; imageUrl: string; caption: string | null }
 type PublicHike = { id: number; name: string; trail: string; region: string; meetingPoint: string; startsAt: string; organiser: string; participantCount: number; joined: boolean; joinPending: boolean; joinable: boolean; status: string; latitude: number | null; longitude: number | null } & Wood
@@ -65,6 +65,8 @@ export default function Index({ grants, publicHikes, mapHikes, needsWood, costKi
   function changeItem(index: number, key: keyof DraftItem, value: string) { setItems(old => old.map((item, i) => i === index ? { ...item, [key]: value } : item)) }
   function removeItem(index: number) { setItems(old => old.filter((_, i) => i !== index)) }
   const [adding, setAdding] = useState<number | null>(null)
+  const [pinning, setPinning] = useState<number | null>(null)
+  const [pinSelection, setPinSelection] = useState<{ latitude: number; longitude: number } | null>(null)
   const [emails, setEmails] = useState("")
   function change(key: keyof typeof fields, value: string) { setFields(old => ({ ...old, [key]: value })) }
   function submit(e: React.FormEvent<HTMLFormElement>) { e.preventDefault(); router.post("/hike_grants", { hike_grant: fields, items, participant_emails: fields.participant_emails, wood: upfrontWood }) }
@@ -161,6 +163,17 @@ export default function Index({ grants, publicHikes, mapHikes, needsWood, costKi
           {grants.map(g => <article className="card hikes-page__card" key={g.id} style={{ padding: "var(--sp-4)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", gap: "var(--sp-3)", flexWrap: "wrap" }}><div><div style={{ display: "flex", gap: "var(--sp-2)", alignItems: "center", flexWrap: "wrap" }}><h3 className="u-h3">{g.name}</h3><Status tone={tone(g.status)}>{g.status}</Status><Status tone="neutral">{g.visibility === "private" ? "Private" : "Public"}</Status></div><p className="u-sm u-soft">{g.trail} · {g.region} · {g.startsAt}</p><p className="u-xs u-faint">Meet at {g.meetingPoint}</p></div><div><strong className="u-h3">{money(g.budgetCents)}</strong><p className="u-xs u-faint">{g.participants.length} {g.participants.length === 1 ? "hiker" : "hikers"}</p></div></div>
             {g.decisionReason && <p className="u-sm">From the reviewer: {g.decisionReason}</p>}
+            {g.isOrganiser && g.visibility === "public" && (g.latitude == null || g.longitude == null) && <div style={{ marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-2)" }}>
+              {pinning === g.id ? <>
+                <p className="u-xs u-faint">Choose where this public hike should appear on the map.</p>
+                <HikeMap editable height={260} selected={pinSelection} onSelect={(latitude, longitude) => setPinSelection({ latitude, longitude })} />
+                <div style={{ display: "flex", gap: "var(--sp-2)" }}>
+                  <button className="btn btn--primary btn--sm" type="button" disabled={!pinSelection} onClick={() => pinSelection && router.patch(`/hike_grants/${g.id}/location`, pinSelection, { preserveScroll: true, onSuccess: () => { setPinning(null); setPinSelection(null) } })}>Save map pin</button>
+                  <button className="btn btn--quiet btn--sm" type="button" onClick={() => { setPinning(null); setPinSelection(null) }}>Cancel</button>
+                </div>
+              </> : <button className="btn btn--quiet btn--sm" type="button" style={{ justifySelf: "start" }} onClick={() => { setPinning(g.id); setPinSelection(null) }}>Add map pin</button>}
+            </div>}
+
             {g.items.length > 0 && <ul style={{ marginTop: "var(--sp-3)", display: "grid", gap: "var(--sp-1)", paddingLeft: 0, listStyle: "none" }}>{g.items.map(item => <li key={item.id} className="u-sm"><strong>{item.label}</strong> · {money(item.amountCents)}<div className="u-xs u-faint">{item.reason}</div></li>)}</ul>}
             <div style={{ marginTop: "var(--sp-3)" }}>{g.status === "pending" || g.status === "approved" ? <ChipIn id={g.id} hike={g} spendable={spendable} allowWithdraw={g.status === "pending"} /> : <WoodBar hike={g} />}</div>
             {g.contributors.length > 0 && <p className="u-xs u-faint" style={{ marginTop: "var(--sp-2)" }}>Paid by {g.contributors.map(c => `${c.name} (${c.wood})`).join(", ")}</p>}
