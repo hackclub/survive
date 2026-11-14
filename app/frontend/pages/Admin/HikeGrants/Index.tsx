@@ -84,6 +84,8 @@ export default function Index({ grants, stats }: {
         setStartsAt("")
         setBudget("")
         setParticipantEmails("")
+        setLatitude(null)
+        setLongitude(null)
       },
     })
   }
