@@ -10,7 +10,6 @@ import ground from "../images/ground.webp"
 import vegetation from "../images/vegetation.webp"
 import tentSpot from "../images/tent-spot.webp"
 import campfireSpot from "../images/campfire-spot.webp"
-import fjord from "../images/fjord.webp"
 
 export type HubCamp = {
   projects: number
@@ -157,21 +156,14 @@ export function Hub({ camp }: { camp: HubCamp }) {
           </div>
         </section>
 
-        <Link
-          className="fjord-promo"
-          href="https://fjording.hackclub.com/"
-          target="_blank"
-          rel="noreferrer"
-          aria-label="Fjord It — learn more and RSVP"
-        >
-          <img className="fjord-promo__image" src={fjord} alt="A deep blue Norwegian fjord surrounded by steep mountains" />
-          <span className="fjord-promo__content">
-            <span className="fjord-promo__eyebrow">HACK CLUB PRESENTS · APRIL 2027</span>
-            <strong>Fjord It.</strong>
-            <span className="fjord-promo__description">40 teens. One boat. A hackathon in the middle of a Norwegian fjord.</span>
-            <span className="fjord-promo__cta">Find out more <span aria-hidden="true">↗</span></span>
+        <a className="fjord-promo" href="https://fjording.hackclub.com/" target="_blank" rel="noreferrer">
+          <span className="fjord-promo__eyebrow">Hack Club · April 2027</span>
+          <strong className="fjord-promo__title">Fjord It.</strong>
+          <span className="fjord-promo__description">40 teens. One boat. A hackathon in the middle of a Norwegian fjord.</span>
+          <span className="fjord-promo__cta">
+            Find out more <span aria-hidden="true">↗</span>
           </span>
-        </Link>
+        </a>
       </main>
     </>
   )
