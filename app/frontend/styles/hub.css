@@ -257,6 +257,109 @@ a.hud-card__next:hover {
   margin-block-start: var(--sp-5);
 }
 
+/* Fjord It: a small card in the bottom-right corner, matching the camp card. */
+.fjord-promo {
+  position: absolute;
+  inset-block-end: var(--sp-6);
+  inset-inline-end: var(--gutter);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: min(17rem, calc(100% - 2 * var(--gutter)));
+  padding: var(--sp-4) var(--sp-4) var(--sp-4) calc(var(--sp-4) + 3px);
+  border-radius: calc(var(--r) * 2);
+  background:
+    linear-gradient(to right, var(--ember) 3px, transparent 3px),
+    rgba(16, 22, 30, 0.8);
+  border: 1px solid var(--line-invert);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 18px 48px -18px rgba(0, 0, 0, 0.85);
+  color: var(--bone);
+  text-decoration: none;
+  transition: translate 160ms ease, border-color 160ms ease;
+}
+
+.fjord-promo:hover {
+  translate: 0 -2px;
+  border-color: rgba(242, 163, 63, 0.45);
+}
+
+.fjord-promo:focus-visible {
+  outline: 2px solid var(--ember);
+  outline-offset: 3px;
+}
+
+.fjord-promo__eyebrow {
+  font-size: var(--fs-label);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ember);
+}
+
+.fjord-promo__title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+
+.fjord-promo__description {
+  font-size: var(--fs-sm);
+  line-height: 1.45;
+  color: rgba(232, 230, 223, 0.78);
+}
+
+.fjord-promo__cta {
+  margin-block-start: 0.35rem;
+  font-size: var(--fs-sm);
+  font-weight: 700;
+  color: var(--ember);
+}
+
+.fjord-promo:hover .fjord-promo__cta {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fjord-promo {
+    transition: none;
+  }
+}
+
+@media (max-width: 700px) {
+  /* The camp card fills the bottom on phones, so Fjord It becomes a slim strip under the top bar. */
+  .fjord-promo {
+    inset-block: 4.25rem auto;
+    inset-inline: var(--sp-3);
+    width: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 0.5rem;
+    row-gap: 0;
+    padding: 0.55rem 0.8rem 0.55rem calc(0.8rem + 3px);
+    border-radius: var(--r);
+  }
+
+  .fjord-promo__title {
+    font-size: 1rem;
+  }
+
+  .fjord-promo__eyebrow,
+  .fjord-promo__description {
+    display: none;
+  }
+
+  .fjord-promo__cta {
+    margin-block-start: 0;
+    margin-inline-start: auto;
+  }
+}
+
 @media (max-width: 700px) {
   /* Lift the scene so the tent and fire sit above the camp card. */
   .hub__stage {
